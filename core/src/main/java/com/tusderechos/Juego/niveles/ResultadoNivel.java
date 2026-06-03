@@ -1,24 +1,42 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.niveles;
 
-public class ResultadoNivel {
-    private final int numeroNivel;
-    private final int estrellas;
-    private final int puntaje;
-    private final float tiempo;
+/**
+ *
+ * @author Hp
+ */
 
-    public ResultadoNivel(int numeroNivel, int estrellas, int puntaje, float tiempo) {
-        if (numeroNivel < 1 || numeroNivel > 5 || estrellas < 0 || estrellas > 3 || puntaje < 0
-            || !Float.isFinite(tiempo) || tiempo < 0f) {
+public class ResultadoNivel {
+    private final int NumeroNivel;
+    private final int Estrellas;
+    private final int Puntaje;
+    private final float Tiempo;
+
+    public ResultadoNivel(int NumeroNivel, int Estrellas, int Puntaje, float Tiempo) {
+        if (NumeroNivel < 1 || NumeroNivel > FabricaNiveles.CantidadNiveles() || Estrellas < 0 || Estrellas > 3 || Puntaje < 0 || !Float.isFinite(Tiempo) || Tiempo < 0f) {
             throw new IllegalArgumentException("Los datos del resultado no son validos");
         }
-        this.numeroNivel = numeroNivel;
-        this.estrellas = estrellas;
-        this.puntaje = puntaje;
-        this.tiempo = tiempo;
+        
+        this.NumeroNivel = NumeroNivel;
+        this.Estrellas = Estrellas;
+        this.Puntaje = Puntaje;
+        this.Tiempo = Tiempo;
     }
 
-    public int obtenerNumeroNivel() { return numeroNivel; }
-    public int obtenerEstrellas() { return estrellas; }
-    public int obtenerPuntaje() { return puntaje; }
-    public float obtenerTiempo() { return tiempo; }
+    public int ObtenerNumeroNivel() {
+        return NumeroNivel;
+    }
+    public int ObtenerEstrellas() {
+        return Estrellas;
+    }
+    public int ObtenerPuntaje() {
+        return Puntaje;
+    }
+    public float ObtenerTiempo() {
+        return Tiempo;
+    }
 }
+

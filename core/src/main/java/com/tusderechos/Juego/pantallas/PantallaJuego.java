@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.pantallas;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -39,94 +48,103 @@ import com.tusderechos.Juego.utilidades.CalculadoraPuntaje;
 import com.tusderechos.Juego.enums.EstadoNivel;
 import com.tusderechos.Juego.obstaculos.Obstaculo;
 import com.tusderechos.Juego.obstaculos.ObstaculoPeligroso;
+import java.util.List;
 
 public class PantallaJuego extends ScreenAdapter {
-    private final Juego juego;
-    private final DatosNivel datosNivel;
-    private final PersonalizacionDulce personalizacionDulce;
-    private final PersonalizacionMonstruo personalizacionMonstruo;
-    private World mundo;
-    private OrthographicCamera camara;
-    private FitViewport viewport;
-    private ShapeRenderer shapeRenderer;
-    private SpriteBatch batch;
-    private BitmapFont fuente;
-    private Dulce dulce;
-    private Monstruo monstruo;
-    private final Array<Cuerda> cuerdas = new Array<>();
-    private final Array<CuerdaCortadaVisual> cuerdasCortadas = new Array<>();
-    private final Array<Estrella> estrellas = new Array<>();
-    private final Array<Burbuja> burbujas = new Array<>();
-    private final Array<Obstaculo> obstaculos = new Array<>();
-    private final Rectangle botonSalir = new Rectangle(0.15f, 7.45f, 0.95f, 0.38f);
-    private final Rectangle botonResultadoSalir = new Rectangle(0.65f, 1.55f, 1.35f, 0.52f);
-    private final Rectangle botonSiguiente = new Rectangle(2.75f, 1.55f, 1.35f, 0.52f);
-    private float tiempoNivel;
-    private int fallosNivel;
-    private int estrellasRecolectadas;
-    private boolean mostrandoResultado;
-    private int puntajeFinal;
-    private EstadoNivel estadoNivel = EstadoNivel.JUGANDO;
-    private float tiempoEstadoFallo;
-    private float tiempoDulceDetenido;
-    private String mensajeFallo = "";
-    private PlataformaMovil plataformaMovil;
-    private float acumuladorFisica;
-    private float alphaEntrada = 1f;
-    private boolean cambiarPantallaAlTerminarFrame;
+    private static final float PasoFisica = 1f / 60f;
+    private final Juego JuegoAplicacion;
+    private final DatosNivel DatosNivelActual;
+    private final PersonalizacionDulce PersonalizacionDulceActual;
+    private final PersonalizacionMonstruo PersonalizacionMonstruoActual;
+    private World Mundo;
+    private OrthographicCamera Camara;
+    private FitViewport Viewport;
+    private ShapeRenderer ShapeRendererActual;
+    private SpriteBatch Batch;
+    private BitmapFont Fuente;
+    private Dulce DulceActual;
+    private Monstruo MonstruoActual;
+    private final Array<Cuerda> Cuerdas = new Array<>();
+    private final Array<CuerdaCortadaVisual> CuerdasCortadas = new Array<>();
+    private final Array<Estrella> Estrellas = new Array<>();
+    private final Array<Burbuja> Burbujas = new Array<>();
+    private final Array<Obstaculo> Obstaculos = new Array<>();
+    private final Rectangle BotonSalir = new Rectangle(0.15f, 7.45f, 0.95f, 0.38f);
+    private final Rectangle BotonResultadoSalir = new Rectangle(0.65f, 1.55f, 1.35f, 0.52f);
+    private final Rectangle BotonSiguiente = new Rectangle(2.75f, 1.55f, 1.35f, 0.52f);
+    private float TiempoNivel;
+    private int FallosNivel;
+    private int EstrellasRecolectadas;
+    private int PuntajeFinal;
+    private EstadoNivel EstadoNivelActual = EstadoNivel.Jugando;
+    private float TiempoEstadoFallo;
+    private float TiempoDulceDetenido;
+    private String MensajeFallo = "";
+    private PlataformaMovil PlataformaMovilActual;
+    private float AcumuladorFisica;
+    private float AlphaEntrada = 1f;
+    private int PuntajeAcumulado;
 
-    public PantallaJuego(Juego juego, DatosNivel datosNivel, PersonalizacionDulce personalizacionDulce,
-                         PersonalizacionMonstruo personalizacionMonstruo) {
-        this.juego = juego;
-        this.datosNivel = datosNivel;
-        this.personalizacionDulce = personalizacionDulce;
-        this.personalizacionMonstruo = personalizacionMonstruo;
+    public PantallaJuego(Juego JuegoAplicacion, DatosNivel DatosNivelActual, PersonalizacionDulce PersonalizacionDulceActual, PersonalizacionMonstruo PersonalizacionMonstruoActual) {
+        this.JuegoAplicacion = JuegoAplicacion;
+        this.DatosNivelActual = DatosNivelActual;
+        this.PersonalizacionDulceActual = PersonalizacionDulceActual;
+        this.PersonalizacionMonstruoActual = PersonalizacionMonstruoActual;
     }
 
     @Override
     public void show() {
-        mundo = new World(new Vector2(0f, ConstantesJuego.GRAVEDAD), true);
-        camara = new OrthographicCamera(ConstantesJuego.ANCHO_MUNDO, ConstantesJuego.ALTO_MUNDO);
-        viewport = new FitViewport(ConstantesJuego.ANCHO_MUNDO, ConstantesJuego.ALTO_MUNDO, camara);
-        viewport.apply(true);
-        shapeRenderer = new ShapeRenderer();
-        batch = new SpriteBatch();
-        fuente = new BitmapFont();
-        dulce = new Dulce(mundo, datosNivel.obtenerPosicionDulce(), personalizacionDulce);
-        monstruo = new Monstruo(datosNivel.obtenerPosicionMonstruo(), personalizacionMonstruo);
-        for (DatosCuerda datosCuerda : datosNivel.obtenerCuerdas()) {
-            cuerdas.add(new Cuerda(mundo, datosCuerda.obtenerAncla(), datosCuerda.obtenerLongitud(), dulce.obtenerCuerpo()));
+        Mundo = new World(new Vector2(0f, ConstantesJuego.Gravedad), true);
+        Camara = new OrthographicCamera(ConstantesJuego.AnchoMundo, ConstantesJuego.AltoMundo);
+        Viewport = new FitViewport(ConstantesJuego.AnchoMundo, ConstantesJuego.AltoMundo, Camara);
+        Viewport.apply(true);
+        ShapeRendererActual = new ShapeRenderer();
+        Batch = new SpriteBatch();
+        Fuente = new BitmapFont();
+        DulceActual = new Dulce(Mundo, DatosNivelActual.ObtenerPosicionDulce(), PersonalizacionDulceActual);
+        MonstruoActual = new Monstruo(DatosNivelActual.ObtenerPosicionMonstruo(), PersonalizacionMonstruoActual);
+        for (DatosCuerda DatosCuerdaActual : DatosNivelActual.ObtenerCuerdas()) {
+            Cuerdas.add(new Cuerda(Mundo, DatosCuerdaActual.ObtenerAncla(), DatosCuerdaActual.ObtenerLongitud(), DulceActual.ObtenerCuerpo()));
         }
-        for (DatosEstrella datosEstrella : datosNivel.obtenerEstrellas()) estrellas.add(new Estrella(datosEstrella.obtenerPosicion()));
-        for (DatosBurbuja datosBurbuja : datosNivel.obtenerBurbujas()) burbujas.add(new Burbuja(datosBurbuja.obtenerPosicion(), datosBurbuja.obtenerRadio()));
-        for (DatosObstaculo datosObstaculo : datosNivel.obtenerObstaculos()) {
-            obstaculos.add(new ObstaculoPeligroso(datosObstaculo.obtenerPosicion(), datosObstaculo.obtenerAncho(), datosObstaculo.obtenerAlto()));
+        for (DatosEstrella DatosEstrellaActual : DatosNivelActual.ObtenerEstrellas()) {
+            Estrellas.add(new Estrella(DatosEstrellaActual.ObtenerPosicion()));
         }
-        if (datosNivel.tienePlataformaMovil()) {
-            plataformaMovil = new PlataformaMovil(new Vector2(2.4f, 0.82f), 1.0f, 3.8f, 0.85f);
-            monstruo.establecerPosicion(plataformaMovil.obtenerPosicionMonstruo());
+        for (DatosBurbuja DatosBurbujaActual : DatosNivelActual.ObtenerBurbujas()) {
+            Burbujas.add(new Burbuja(DatosBurbujaActual.ObtenerPosicion(), DatosBurbujaActual.ObtenerRadio()));
+        }
+        for (DatosObstaculo DatosObstaculoActual : DatosNivelActual.ObtenerObstaculos()) {
+            Obstaculos.add(new ObstaculoPeligroso(DatosObstaculoActual.ObtenerPosicion(), DatosObstaculoActual.ObtenerAncho(), DatosObstaculoActual.ObtenerAlto()));
+        }
+        if (DatosNivelActual.TienePlataformaMovil()) {
+            PlataformaMovilActual = new PlataformaMovil(new Vector2(2.4f, 0.82f), 1.0f, 3.8f, 0.75f);
+            MonstruoActual.EstablecerPosicion(PlataformaMovilActual.ObtenerPosicionMonstruo());
         }
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
-            public boolean keyDown(int keycode) {
-                if (keycode == Input.Keys.ESCAPE) {
-                    volverASeleccion();
+            public boolean keyDown(int Keycode) {
+                if (Keycode == Input.Keys.ESCAPE) {
+                    VolverASeleccion();
                     return true;
                 }
                 return false;
             }
 
             @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                Vector3 puntoPantalla = new Vector3(screenX, screenY, 0f);
-                viewport.unproject(puntoPantalla);
-                Vector2 puntoMundo = new Vector2(puntoPantalla.x, puntoPantalla.y);
-                if (mostrandoResultado) {
-                    manejarClicResultado(puntoMundo);
-                } else if (botonSalir.contains(puntoMundo)) {
-                    volverASeleccion();
+            public boolean touchDown(int ScreenX, int ScreenY, int Pointer, int Button) {
+                if (Button != Input.Buttons.LEFT || AlphaEntrada > 0f || EstadoNivelActual == EstadoNivel.Fallando) {
+                    return false;
+                }
+                Vector3 PuntoPantalla = new Vector3(ScreenX, ScreenY, 0f);
+                Viewport.unproject(PuntoPantalla);
+                Vector2 PuntoMundo = new Vector2(PuntoPantalla.x, PuntoPantalla.y);
+                if (NivelCompletado()) {
+                    ManejarClicResultado(PuntoMundo);
+                } else if (BotonSalir.contains(PuntoMundo)) {
+                    VolverASeleccion();
                 } else {
-                    if (!reventarBurbujaCercana(puntoMundo)) cortarCuerdaCercana(puntoMundo);
+                    if (!ReventarBurbujaCercana(PuntoMundo)) {
+                        CortarCuerdaCercana(PuntoMundo);
+                    }
                 }
                 return true;
             }
@@ -134,221 +152,366 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     @Override
-    public void render(float delta) {
+    public void render(float Delta) {
         ScreenUtils.clear(0.12f, 0.16f, 0.20f, 1f);
-        alphaEntrada = Math.max(0f, alphaEntrada - delta * 1.6f);
-        if (!mostrandoResultado && estadoNivel == EstadoNivel.JUGANDO) {
-            tiempoNivel += delta;
-            actualizarPlataforma(delta);
-            actualizarFisica(delta);
-            recolectarEstrellas();
-            if (monstruo.contieneDulce(dulce.obtenerCuerpo().getPosition())) mostrarResultado();
-            if (!mostrandoResultado) detectarFallo(delta);
-        } else if (estadoNivel == EstadoNivel.FALLANDO) {
-            actualizarTransicionFallo(delta);
+        AlphaEntrada = Math.max(0f, AlphaEntrada - Delta * 1.6f);
+        if (EstadoNivelActual == EstadoNivel.Jugando && AlphaEntrada <= 0f) {
+            float DeltaSimulado = Math.min(Delta, 0.25f);
+            ActualizarFisica(DeltaSimulado);
+            if (EstadoNivelActual == EstadoNivel.Jugando) {
+                DetectarDulceDetenido(DeltaSimulado);
+            }
+        } else if (EstadoNivelActual == EstadoNivel.Fallando) {
+            ActualizarTransicionFallo(Delta);
         }
-        if (cambiarPantallaAlTerminarFrame) {
-            PantallaJuego reinicio = new PantallaJuego(juego, datosNivel, personalizacionDulce, personalizacionMonstruo);
-            reinicio.fallosNivel = fallosNivel;
-            juego.cambiarPantalla(reinicio);
+        if (EstadoNivelActual == EstadoNivel.Reiniciando) {
+            PantallaJuego Reinicio = new PantallaJuego(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual);
+            Reinicio.FallosNivel = FallosNivel;
+            JuegoAplicacion.CambiarPantalla(Reinicio);
             return;
         }
-        for (CuerdaCortadaVisual cuerdaCortada : cuerdasCortadas) cuerdaCortada.actualizar(delta);
-        for (int indice = cuerdasCortadas.size - 1; indice >= 0; indice--) {
-            if (cuerdasCortadas.get(indice).estaFinalizada()) cuerdasCortadas.removeIndex(indice);
+        for (CuerdaCortadaVisual CuerdaCortada : CuerdasCortadas) {
+            CuerdaCortada.Actualizar(Delta);
         }
-        shapeRenderer.setProjectionMatrix(camara.combined);
+        for (int Indice = CuerdasCortadas.size - 1; Indice >= 0; Indice--) {
+            if (CuerdasCortadas.get(Indice).EstaFinalizada()) {
+                CuerdasCortadas.removeIndex(Indice);
+            }
+        }
+        ShapeRendererActual.setProjectionMatrix(Camara.combined);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Cuerda cuerda : cuerdas) cuerda.dibujar(shapeRenderer);
-        for (CuerdaCortadaVisual cuerdaCortada : cuerdasCortadas) cuerdaCortada.dibujar(shapeRenderer);
-        shapeRenderer.end();
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (Estrella estrella : estrellas) estrella.dibujar(shapeRenderer);
-        for (Burbuja burbuja : burbujas) burbuja.dibujar(shapeRenderer);
-        for (Obstaculo obstaculo : obstaculos) obstaculo.dibujar(shapeRenderer);
-        if (plataformaMovil != null) plataformaMovil.dibujar(shapeRenderer);
-        monstruo.dibujar(shapeRenderer);
-        dulce.dibujar(shapeRenderer);
-        dibujarBoton(shapeRenderer, botonSalir, new Color(0.55f, 0.18f, 0.18f, 1f));
-        if (mostrandoResultado) dibujarPanelResultado(shapeRenderer);
-        if (estadoNivel == EstadoNivel.FALLANDO) {
-            float alpha = Math.min(1f, tiempoEstadoFallo / 1.2f);
-            shapeRenderer.setColor(new Color(0f, 0f, 0f, alpha));
-            shapeRenderer.rect(0f, 0f, ConstantesJuego.ANCHO_MUNDO, ConstantesJuego.ALTO_MUNDO);
+        ShapeRendererActual.begin(ShapeRenderer.ShapeType.Line);
+        for (Cuerda CuerdaActual : Cuerdas) {
+            CuerdaActual.Dibujar(ShapeRendererActual);
         }
-        if (alphaEntrada > 0f) {
-            shapeRenderer.setColor(new Color(0f, 0f, 0f, alphaEntrada));
-            shapeRenderer.rect(0f, 0f, ConstantesJuego.ANCHO_MUNDO, ConstantesJuego.ALTO_MUNDO);
+        for (CuerdaCortadaVisual CuerdaCortada : CuerdasCortadas) {
+            CuerdaCortada.Dibujar(ShapeRendererActual);
         }
-        shapeRenderer.end();
+        ShapeRendererActual.end();
+        ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
+        for (Estrella EstrellaActual : Estrellas) {
+            EstrellaActual.Dibujar(ShapeRendererActual);
+        }
+        for (Burbuja BurbujaActual : Burbujas) {
+            BurbujaActual.Dibujar(ShapeRendererActual);
+        }
+        for (Obstaculo ObstaculoActual : Obstaculos) {
+            ObstaculoActual.Dibujar(ShapeRendererActual);
+        }
+        if (PlataformaMovilActual != null) {
+            PlataformaMovilActual.Dibujar(ShapeRendererActual);
+        }
+        MonstruoActual.Dibujar(ShapeRendererActual);
+        DulceActual.Dibujar(ShapeRendererActual);
+        if (!NivelCompletado()) {
+            DibujarBoton(ShapeRendererActual, BotonSalir, new Color(0.55f, 0.18f, 0.18f, 1f));
+        }
+        if (NivelCompletado()) {
+            DibujarPanelResultado(ShapeRendererActual);
+        }
+        ShapeRendererActual.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
-        dibujarTextos();
+        DibujarTextos();
+        DibujarTransicion();
     }
 
-    private void cortarCuerdaCercana(Vector2 puntoMundo) {
-        for (Cuerda cuerda : cuerdas) {
-            if (!cuerda.contienePuntoDeCorte(puntoMundo)) continue;
-            Vector2 ancla = cuerda.obtenerAncla();
-            Vector2 fin = cuerda.obtenerFin();
-            cuerda.cortar(puntoMundo);
-            cuerdasCortadas.add(new CuerdaCortadaVisual(ancla, puntoMundo, fin));
+    private void CortarCuerdaCercana(Vector2 PuntoMundo) {
+        Cuerda CuerdaMasCercana = null;
+        float DistanciaMasCercana = Float.MAX_VALUE;
+        for (Cuerda CuerdaActual : Cuerdas) {
+            if (!CuerdaActual.ContienePuntoDeCorte(PuntoMundo)) {
+                continue;
+            }
+            float Distancia = CuerdaActual.ObtenerDistanciaAlPunto(PuntoMundo);
+            if (Distancia < DistanciaMasCercana) {
+                CuerdaMasCercana = CuerdaActual;
+                DistanciaMasCercana = Distancia;
+            }
+        }
+        if (CuerdaMasCercana == null) {
             return;
         }
+        Vector2 Ancla = CuerdaMasCercana.ObtenerAncla();
+        Vector2 Fin = CuerdaMasCercana.ObtenerFin();
+        Vector2 PuntoDeCorte = CuerdaMasCercana.ProyectarPuntoDeCorte(PuntoMundo);
+        CuerdaMasCercana.Cortar();
+        CuerdasCortadas.add(new CuerdaCortadaVisual(Ancla, PuntoDeCorte, Fin));
     }
 
-    private void recolectarEstrellas() {
-        for (Estrella estrella : estrellas) if (estrella.intentarRecolectar(dulce.obtenerCuerpo().getPosition())) estrellasRecolectadas++;
+    private void RecolectarEstrellas() {
+        for (Estrella EstrellaActual : Estrellas) {
+            if (EstrellaActual.IntentarRecolectar(DulceActual.ObtenerCuerpo().getPosition())) {
+                EstrellasRecolectadas++;
+            }
+        }
     }
 
-    private boolean reventarBurbujaCercana(Vector2 puntoMundo) {
-        for (Burbuja burbuja : burbujas) {
-            if (!burbuja.contienePunto(puntoMundo)) continue;
-            burbuja.reventar();
+    private boolean ReventarBurbujaCercana(Vector2 PuntoMundo) {
+        for (Burbuja BurbujaActual : Burbujas) {
+            if (!BurbujaActual.EstaAdherida() || !BurbujaActual.ContienePunto(PuntoMundo)) {
+                continue;
+            }
+            BurbujaActual.Reventar();
             return true;
         }
         return false;
     }
 
-    private boolean hayBurbujaActiva() {
-        for (Burbuja burbuja : burbujas) if (burbuja.estaActiva()) return true;
+    private boolean HayBurbujaAdherida() {
+        for (Burbuja BurbujaActual : Burbujas) {
+            if (BurbujaActual.EstaAdherida()) {
+                return true;
+            }
+        }
         return false;
     }
 
-    private boolean hayCuerdaActiva() {
-        for (Cuerda cuerda : cuerdas) if (!cuerda.estaCortada()) return true;
+    private boolean HayCuerdaActiva() {
+        for (Cuerda CuerdaActual : Cuerdas) {
+            if (!CuerdaActual.EstaCortada()) {
+                return true;
+            }
+        }
         return false;
     }
 
-    private void aplicarFlotacion() {
-        for (Burbuja burbuja : burbujas) {
-            if (!burbuja.estaActiva()) continue;
-            burbuja.seguirDulce(dulce.obtenerCuerpo().getPosition());
-            dulce.obtenerCuerpo().applyForceToCenter(0f, 13f, true);
-        }
-    }
-
-    private void actualizarFisica(float delta) {
-        acumuladorFisica += Math.min(delta, 0.25f);
-        while (acumuladorFisica >= 1f / 60f) {
-            aplicarFlotacion();
-            mundo.step(1f / 60f, 6, 2);
-            acumuladorFisica -= 1f / 60f;
-        }
-    }
-
-    private void detectarFallo(float delta) {
-        Vector2 posicion = dulce.obtenerCuerpo().getPosition();
-        if (posicion.y < -0.6f || posicion.x < -0.6f || posicion.x > ConstantesJuego.ANCHO_MUNDO + 0.6f
-            || (posicion.y > ConstantesJuego.ALTO_MUNDO + 0.6f && hayBurbujaActiva())) {
-            iniciarFallo("El dulce se perdio");
+    private void AplicarFlotacion() {
+        for (Burbuja BurbujaActual : Burbujas) {
+            if (!BurbujaActual.EstaAdherida()) {
+                continue;
+            }
+            DulceActual.ObtenerCuerpo().applyForceToCenter(0f, DulceActual.ObtenerCuerpo().getMass() * 14f, true);
             return;
         }
-        for (Obstaculo obstaculo : obstaculos) {
-            if (obstaculo.tocaDulce(posicion, ConstantesJuego.RADIO_DULCE)) {
-                iniciarFallo("El dulce toco un peligro");
+    }
+
+    private void ActualizarFisica(float Delta) {
+        AcumuladorFisica += Delta;
+        while (AcumuladorFisica >= PasoFisica) {
+            TiempoNivel += PasoFisica;
+            ActualizarPlataforma(PasoFisica);
+            AplicarFlotacion();
+            Mundo.step(PasoFisica, 6, 2);
+            LimitarVelocidadBurbuja();
+            ActualizarBurbujas();
+            ComprobarReglasPasoFisica();
+            AcumuladorFisica -= PasoFisica;
+            if (EstadoNivelActual != EstadoNivel.Jugando) {
+                break;
+            }
+        }
+    }
+
+    private void LimitarVelocidadBurbuja() {
+        if (!HayBurbujaAdherida()) {
+            return;
+        }
+        Vector2 Velocidad = DulceActual.ObtenerCuerpo().getLinearVelocity();
+        if (Velocidad.y > 1.8f) {
+            DulceActual.ObtenerCuerpo().setLinearVelocity(Velocidad.x, 1.8f);
+        }
+    }
+
+    private void ActualizarBurbujas() {
+        Vector2 PosicionDulce = DulceActual.ObtenerCuerpo().getPosition();
+        for (Burbuja BurbujaActual : Burbujas) {
+            if (!BurbujaActual.EstaAdherida()) {
+                continue;
+            }
+            BurbujaActual.SeguirDulce(PosicionDulce);
+            return;
+        }
+        for (Burbuja BurbujaActual : Burbujas) {
+            if (!BurbujaActual.IntentarAdherir(PosicionDulce)) {
+                continue;
+            }
+            BurbujaActual.SeguirDulce(PosicionDulce);
+            return;
+        }
+    }
+
+    private void ComprobarReglasPasoFisica() {
+        RecolectarEstrellas();
+        Vector2 PosicionDulce = DulceActual.ObtenerCuerpo().getPosition();
+        if (MonstruoActual.ContieneDulce(PosicionDulce)) {
+            MostrarResultado();
+            return;
+        }
+        DetectarFalloInstantaneo(PosicionDulce);
+    }
+
+    private void DetectarFalloInstantaneo(Vector2 Posicion) {
+        if (Posicion.y < -0.6f || Posicion.x < -0.6f || Posicion.x > ConstantesJuego.AnchoMundo + 0.6f
+            || (Posicion.y > ConstantesJuego.AltoMundo + 0.6f && HayBurbujaAdherida())) {
+            IniciarFallo("El dulce se perdio");
+            return;
+        }
+        for (Obstaculo ObstaculoActual : Obstaculos) {
+            if (ObstaculoActual.TocaDulce(Posicion, ConstantesJuego.RadioDulce)) {
+                IniciarFallo("El dulce toco un peligro");
                 return;
             }
         }
-        boolean detenido = dulce.obtenerCuerpo().getLinearVelocity().len() < 0.05f;
-        tiempoDulceDetenido = detenido && !hayCuerdaActiva() && !hayBurbujaActiva() ? tiempoDulceDetenido + delta : 0f;
-        if (tiempoDulceDetenido > 3f && !monstruo.contieneDulce(posicion)) iniciarFallo("Intento fallido");
     }
 
-    private void actualizarPlataforma(float delta) {
-        if (plataformaMovil == null) return;
-        plataformaMovil.actualizar(delta);
-        monstruo.establecerPosicion(plataformaMovil.obtenerPosicionMonstruo());
-    }
-
-    private void iniciarFallo(String mensaje) {
-        estadoNivel = EstadoNivel.FALLANDO;
-        mensajeFallo = mensaje;
-        tiempoEstadoFallo = 0f;
-        fallosNivel++;
-    }
-
-    private void actualizarTransicionFallo(float delta) {
-        tiempoEstadoFallo += delta;
-        if (tiempoEstadoFallo >= 1.5f) {
-            cambiarPantallaAlTerminarFrame = true;
+    private void DetectarDulceDetenido(float Delta) {
+        Vector2 Posicion = DulceActual.ObtenerCuerpo().getPosition();
+        boolean Detenido = DulceActual.ObtenerCuerpo().getLinearVelocity().len() < 0.05f;
+        TiempoDulceDetenido = Detenido && !HayCuerdaActiva() && !HayBurbujaAdherida() ? TiempoDulceDetenido + Delta : 0f;
+        if (TiempoDulceDetenido > 3f && !MonstruoActual.ContieneDulce(Posicion)) {
+            IniciarFallo("Intento fallido");
         }
     }
 
-    private void mostrarResultado() {
-        mostrandoResultado = true;
-        puntajeFinal = CalculadoraPuntaje.calcularPuntajeIntento(estrellasRecolectadas, tiempoNivel, fallosNivel);
-        juego.obtenerProgresoJugadorDemo().registrarResultado(
-            new ResultadoNivel(datosNivel.obtenerNumero(), estrellasRecolectadas, puntajeFinal, tiempoNivel));
+    private void ActualizarPlataforma(float Delta) {
+        if (PlataformaMovilActual == null) {
+            return;
+        }
+        PlataformaMovilActual.Actualizar(Delta);
+        MonstruoActual.EstablecerPosicion(PlataformaMovilActual.ObtenerPosicionMonstruo());
     }
 
-    private void manejarClicResultado(Vector2 puntoMundo) {
-        if (botonResultadoSalir.contains(puntoMundo)) {
-            volverASeleccion();
-        } else if (botonSiguiente.contains(puntoMundo) && datosNivel.obtenerNumero() < 5) {
-            juego.cambiarPantalla(new PantallaJuego(juego, FabricaNiveles.obtenerNivel(datosNivel.obtenerNumero() + 1),
-                personalizacionDulce, personalizacionMonstruo));
-        } else if (botonSiguiente.contains(puntoMundo)) {
-            volverASeleccion();
+    private void IniciarFallo(String Mensaje) {
+        EstadoNivelActual = EstadoNivel.Fallando;
+        MensajeFallo = Mensaje;
+        TiempoEstadoFallo = 0f;
+        FallosNivel++;
+    }
+
+    private void ActualizarTransicionFallo(float Delta) {
+        TiempoEstadoFallo += Delta;
+        if (TiempoEstadoFallo >= 1.5f) {
+            EstadoNivelActual = EstadoNivel.Reiniciando;
         }
     }
 
-    private void volverASeleccion() {
-        juego.cambiarPantalla(new PantallaSeleccionNivel(juego, personalizacionDulce.obtenerColorDulce(),
-            personalizacionMonstruo.obtenerColorMonstruo()));
+    private void MostrarResultado() {
+        EstadoNivelActual = EstadoNivel.Ganado;
+        PuntajeFinal = CalculadoraPuntaje.CalcularPuntajeIntento(EstrellasRecolectadas, TiempoNivel, FallosNivel);
+        JuegoAplicacion.ObtenerProgresoJugadorDemo().RegistrarResultado(new ResultadoNivel(DatosNivelActual.ObtenerNumero(), EstrellasRecolectadas, PuntajeFinal, TiempoNivel));
+        PuntajeAcumulado = CalculadoraPuntaje.CalcularPuntajeAcumuladoRecursivo(JuegoAplicacion.ObtenerProgresoJugadorDemo().ObtenerMejoresResultados());
     }
 
-    private void dibujarPanelResultado(ShapeRenderer renderer) {
-        renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.92f));
-        renderer.rect(0.35f, 1.1f, 4.1f, 4.9f);
-        dibujarBoton(renderer, botonResultadoSalir, new Color(0.58f, 0.20f, 0.20f, 1f));
-        dibujarBoton(renderer, botonSiguiente, new Color(0.18f, 0.55f, 0.30f, 1f));
-    }
-
-    private void dibujarBoton(ShapeRenderer renderer, Rectangle rectangulo, Color color) {
-        renderer.setColor(color);
-        renderer.rect(rectangulo.x, rectangulo.y, rectangulo.width, rectangulo.height);
-    }
-
-    private void dibujarTextos() {
-        batch.setProjectionMatrix(camara.combined);
-        batch.begin();
-        fuente.getData().setScale(0.015f);
-        fuente.draw(batch, "Nivel " + datosNivel.obtenerNumero(), 2.05f, 7.72f);
-        fuente.draw(batch, "Salir", botonSalir.x + 0.2f, botonSalir.y + 0.27f);
-        if (mostrandoResultado) {
-            fuente.getData().setScale(0.022f);
-            fuente.draw(batch, "Nivel completado", 1.25f, 5.45f);
-            fuente.getData().setScale(0.016f);
-            fuente.draw(batch, "Estrellas: " + estrellasRecolectadas + "/3", 1.2f, 4.75f);
-            fuente.draw(batch, "Faltaron: " + (3 - estrellasRecolectadas), 1.2f, 4.28f);
-            fuente.draw(batch, "Puntaje: " + puntajeFinal, 1.2f, 3.81f);
-            fuente.draw(batch, "Tiempo: " + Math.round(tiempoNivel) + " s", 1.2f, 3.34f);
-            fuente.draw(batch, "Fallos: " + fallosNivel, 1.2f, 2.87f);
-            fuente.draw(batch, "Salir", 1.05f, 1.88f);
-            fuente.draw(batch, datosNivel.obtenerNumero() < 5 ? "Siguiente" : "Final", 3.05f, 1.88f);
-        } else if (estadoNivel == EstadoNivel.FALLANDO) {
-            fuente.getData().setScale(0.021f);
-            fuente.draw(batch, mensajeFallo, 1.15f, 4.15f);
+    private void ManejarClicResultado(Vector2 PuntoMundo) {
+        if (BotonResultadoSalir.contains(PuntoMundo)) {
+            VolverASeleccion();
+        } else if (BotonSiguiente.contains(PuntoMundo)) {
+            int SiguienteNivel = JuegoAplicacion.ObtenerProgresoJugadorDemo().BuscarSiguienteNivelDisponibleRecursivo(FabricaNiveles.CrearNiveles(), DatosNivelActual.ObtenerNumero());
+            if (SiguienteNivel == DatosNivelActual.ObtenerNumero()) {
+                VolverASeleccion();
+            } else {
+                JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(SiguienteNivel), PersonalizacionDulceActual, PersonalizacionMonstruoActual));
+            }
         }
-        batch.end();
+    }
+
+    private void VolverASeleccion() {
+        JuegoAplicacion.CambiarPantalla(new PantallaSeleccionNivel(JuegoAplicacion, PersonalizacionDulceActual.ObtenerColorDulce(), PersonalizacionMonstruoActual.ObtenerColorMonstruo()));
+    }
+
+    private void DibujarPanelResultado(ShapeRenderer Renderer) {
+        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.92f));
+        Renderer.rect(0.35f, 1.1f, 4.1f, 4.9f);
+        DibujarBoton(Renderer, BotonResultadoSalir, new Color(0.58f, 0.20f, 0.20f, 1f));
+        DibujarBoton(Renderer, BotonSiguiente, new Color(0.18f, 0.55f, 0.30f, 1f));
+    }
+
+    private void DibujarBoton(ShapeRenderer Renderer, Rectangle Rectangulo, Color ColorActual) {
+        Renderer.setColor(ColorActual);
+        Renderer.rect(Rectangulo.x, Rectangulo.y, Rectangulo.width, Rectangulo.height);
+    }
+
+    private void DibujarTextos() {
+        PrepararBatchTexto();
+        Batch.begin();
+        Fuente.setColor(Color.WHITE);
+        Fuente.getData().setScale(1.0f);
+        if (!NivelCompletado()) {
+            DibujarTextoMundo("Nivel " + DatosNivelActual.ObtenerNumero(), 2.05f, 7.72f);
+            DibujarTextoMundo("Salir", BotonSalir.x + 0.2f, BotonSalir.y + 0.27f);
+        }
+        if (NivelCompletado()) {
+            DibujarTextosResultado();
+        } else if (EstadoNivelActual == EstadoNivel.Fallando) {
+            Fuente.getData().setScale(1.1f);
+            DibujarTextoMundo(MensajeFallo, 1.15f, 4.15f);
+        }
+        Batch.end();
+    }
+
+    private void DibujarTextosResultado() {
+        Fuente.setColor(Color.WHITE);
+        Fuente.getData().setScale(1.35f);
+        DibujarTextoMundo("Nivel completado", 0.95f, 5.55f);
+        Fuente.getData().setScale(1.05f);
+        List<String> LineasResultado = TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeFinal, PuntajeAcumulado, TiempoNivel, FallosNivel);
+        for (int Indice = 0; Indice < LineasResultado.size(); Indice++) {
+            DibujarTextoMundo(LineasResultado.get(Indice), 0.9f, 4.85f - Indice * 0.43f);
+        }
+        Fuente.getData().setScale(1.0f);
+        DibujarTextoMundo("Salir", 0.95f, 1.88f);
+        DibujarTextoMundo(TextoPanelResultado.CrearTextoSiguiente(DatosNivelActual.ObtenerNumero()), 2.95f, 1.88f);
+    }
+
+    private void PrepararBatchTexto() {
+        Batch.setProjectionMatrix(Batch.getProjectionMatrix().setToOrtho2D(0f, 0f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+    }
+
+    private void DibujarTextoMundo(String Texto, float MundoX, float MundoY) {
+        Vector3 PuntoPantalla = new Vector3(MundoX, MundoY, 0f);
+        Viewport.project(PuntoPantalla);
+        Fuente.draw(Batch, Texto, PuntoPantalla.x, PuntoPantalla.y);
+    }
+
+    private void DibujarTransicion() {
+        float Alpha = AlphaEntrada;
+        if (EstadoNivelActual == EstadoNivel.Fallando) {
+            Alpha = Math.max(Alpha, Math.min(1f, TiempoEstadoFallo / 1.2f));
+        }
+        if (Alpha <= 0f) {
+            return;
+        }
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
+        ShapeRendererActual.setColor(new Color(0f, 0f, 0f, Alpha));
+        ShapeRendererActual.rect(0f, 0f, ConstantesJuego.AnchoMundo, ConstantesJuego.AltoMundo);
+        ShapeRendererActual.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
+
+    private boolean NivelCompletado() {
+        return EstadoNivelActual == EstadoNivel.Ganado;
     }
 
     @Override
-    public void resize(int width, int height) {
-        if (width <= 0 || height <= 0) return;
-        viewport.update(width, height, true);
+    public void resize(int Width, int Height) {
+        if (Width <= 0 || Height <= 0) {
+            return;
+        }
+        Viewport.update(Width, Height, true);
     }
 
     @Override
-    public void hide() { Gdx.input.setInputProcessor(null); }
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
 
     @Override
     public void dispose() {
-        if (shapeRenderer != null) shapeRenderer.dispose();
-        if (batch != null) batch.dispose();
-        if (fuente != null) fuente.dispose();
-        if (mundo != null) mundo.dispose();
+        if (ShapeRendererActual != null) {
+            ShapeRendererActual.dispose();
+        }
+        if (Batch != null) {
+            Batch.dispose();
+        }
+        if (Fuente != null) {
+            Fuente.dispose();
+        }
+        if (Mundo != null) {
+            Mundo.dispose();
+        }
     }
 }
+

@@ -1,25 +1,35 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.enums;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.graphics.Color;
 
 public enum ColorMonstruo {
-    VERDE(new Color(0.25f, 0.80f, 0.32f, 1f)),
-    MORADO(new Color(0.56f, 0.28f, 0.82f, 1f)),
-    NARANJA(new Color(0.95f, 0.48f, 0.18f, 1f)),
-    CELESTE(new Color(0.25f, 0.75f, 0.95f, 1f));
+    Verde(new Color(0.25f, 0.80f, 0.32f, 1f)),
+    Morado(new Color(0.56f, 0.28f, 0.82f, 1f)),
+    Naranja(new Color(0.95f, 0.48f, 0.18f, 1f)),
+    Celeste(new Color(0.25f, 0.75f, 0.95f, 1f));
 
-    private final Color color;
+    private final Color ColorActual;
 
-    ColorMonstruo(Color color) {
-        this.color = color;
+    ColorMonstruo(Color ColorActual) {
+        this.ColorActual = ColorActual;
     }
 
-    public Color obtenerColor() {
-        return color.cpy();
+    public Color ObtenerColor() {
+        return ColorActual.cpy();
     }
 
-    public ColorMonstruo siguiente() {
-        ColorMonstruo[] valores = values();
-        return valores[(ordinal() + 1) % valores.length];
+    public ColorMonstruo Siguiente() {
+        ColorMonstruo[] Valores = values();
+        return Valores[(ordinal() + 1) % Valores.length];
     }
 }
+

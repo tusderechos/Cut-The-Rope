@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.entidades;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -6,24 +15,26 @@ import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 
 public class Monstruo extends ElementoJuego {
-    private final Vector2 posicion;
-    private final PersonalizacionMonstruo personalizacion;
+    private final Vector2 Posicion;
+    private final PersonalizacionMonstruo Personalizacion;
 
-    public Monstruo(Vector2 posicion, PersonalizacionMonstruo personalizacion) {
-        this.posicion = new Vector2(posicion);
-        this.personalizacion = personalizacion;
+    public Monstruo(Vector2 Posicion, PersonalizacionMonstruo Personalizacion) {
+        this.Posicion = new Vector2(Posicion);
+        this.Personalizacion = Personalizacion;
     }
 
-    public boolean contieneDulce(Vector2 posicionDulce) {
-        return posicion.dst(posicionDulce) <= ConstantesJuego.RADIO_MONSTRUO + ConstantesJuego.RADIO_DULCE;
+    public boolean ContieneDulce(Vector2 PosicionDulce) {
+        return Posicion.dst(PosicionDulce) <= ConstantesJuego.RadioMonstruo + ConstantesJuego.RadioDulce;
     }
 
-    public Vector2 obtenerPosicion() { return new Vector2(posicion); }
-    public void establecerPosicion(Vector2 nuevaPosicion) { posicion.set(nuevaPosicion); }
+    public void EstablecerPosicion(Vector2 NuevaPosicion) {
+        Posicion.set(NuevaPosicion);
+    }
 
     @Override
-    public void dibujar(ShapeRenderer shapeRenderer) {
-        shapeRenderer.setColor(personalizacion.obtenerColor());
-        shapeRenderer.circle(posicion.x, posicion.y, ConstantesJuego.RADIO_MONSTRUO, 32);
+    public void Dibujar(ShapeRenderer ShapeRendererActual) {
+        ShapeRendererActual.setColor(Personalizacion.ObtenerColor());
+        ShapeRendererActual.circle(Posicion.x, Posicion.y, ConstantesJuego.RadioMonstruo, 32);
     }
 }
+

@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.entidades;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.math.Vector2;
 import com.tusderechos.Juego.enums.ColorMonstruo;
@@ -10,30 +19,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EntidadesInteractivasTest {
     @Test
-    void burbujaSigueAlDulceHastaQueRevienta() {
-        Burbuja burbuja = new Burbuja(new Vector2(1f, 1f), 0.5f);
+    void BurbujaPermaneceLibreHastaQueElDulceLaToca() {
+        Burbuja BurbujaActual = new Burbuja(new Vector2(1f, 1f), 0.5f);
 
-        burbuja.seguirDulce(new Vector2(3f, 4f));
-        assertTrue(burbuja.contienePunto(new Vector2(3f, 4f)));
+        assertFalse(BurbujaActual.EstaAdherida());
+        BurbujaActual.SeguirDulce(new Vector2(3f, 4f));
+        assertTrue(BurbujaActual.ContienePunto(new Vector2(1f, 1f)));
+        assertFalse(BurbujaActual.ContienePunto(new Vector2(3f, 4f)));
+        BurbujaActual.Reventar();
+        assertTrue(BurbujaActual.EstaActiva());
 
-        burbuja.reventar();
-        assertFalse(burbuja.contienePunto(new Vector2(3f, 4f)));
+        assertTrue(BurbujaActual.IntentarAdherir(new Vector2(1.3f, 1f)));
+        assertTrue(BurbujaActual.EstaAdherida());
+        BurbujaActual.SeguirDulce(new Vector2(3f, 4f));
+        assertTrue(BurbujaActual.ContienePunto(new Vector2(3f, 4f)));
+
+        BurbujaActual.Reventar();
+        assertFalse(BurbujaActual.ContienePunto(new Vector2(3f, 4f)));
     }
 
     @Test
-    void estrellaSoloSeRecolectaUnaVez() {
-        Estrella estrella = new Estrella(new Vector2(2f, 2f));
+    void EstrellaSoloSeRecolectaUnaVez() {
+        Estrella EstrellaActual = new Estrella(new Vector2(2f, 2f));
 
-        assertTrue(estrella.intentarRecolectar(new Vector2(2f, 2f)));
-        assertFalse(estrella.intentarRecolectar(new Vector2(2f, 2f)));
+        assertTrue(EstrellaActual.IntentarRecolectar(new Vector2(2f, 2f)));
+        assertFalse(EstrellaActual.IntentarRecolectar(new Vector2(2f, 2f)));
     }
 
     @Test
-    void monstruoAceptaDulceEnBordeDeContacto() {
-        Monstruo monstruo = new Monstruo(new Vector2(1f, 1f),
-            new PersonalizacionMonstruo(ColorMonstruo.VERDE));
+    void MonstruoAceptaDulceEnBordeDeContacto() {
+        Monstruo MonstruoActual = new Monstruo(new Vector2(1f, 1f), new PersonalizacionMonstruo(ColorMonstruo.Verde));
 
-        assertTrue(monstruo.contieneDulce(new Vector2(1.56f, 1f)));
-        assertFalse(monstruo.contieneDulce(new Vector2(1.57f, 1f)));
+        assertTrue(MonstruoActual.ContieneDulce(new Vector2(1.56f, 1f)));
+        assertFalse(MonstruoActual.ContieneDulce(new Vector2(1.57f, 1f)));
     }
 }
+

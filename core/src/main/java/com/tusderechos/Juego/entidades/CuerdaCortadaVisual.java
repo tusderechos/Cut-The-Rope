@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.entidades;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -7,32 +16,38 @@ import com.tusderechos.Juego.interfaces.Actualizable;
 import com.tusderechos.Juego.interfaces.Dibujable;
 
 public class CuerdaCortadaVisual implements Actualizable, Dibujable {
-    private final Vector2 inicio;
-    private final Vector2 corte;
-    private final Vector2 fin;
-    private float edad;
-    private static final float DURACION = 0.75f;
+    private final Vector2 InicioSuperior;
+    private final Vector2 FinSuperior;
+    private final Vector2 InicioInferior;
+    private final Vector2 FinInferior;
+    private float Edad;
+    private static final float Duracion = 0.75f;
 
-    public CuerdaCortadaVisual(Vector2 inicio, Vector2 corte, Vector2 fin) {
-        this.inicio = new Vector2(inicio);
-        this.corte = new Vector2(corte);
-        this.fin = new Vector2(fin);
+    public CuerdaCortadaVisual(Vector2 Inicio, Vector2 Corte, Vector2 Fin) {
+        InicioSuperior = new Vector2(Inicio);
+        FinSuperior = new Vector2(Corte);
+        InicioInferior = new Vector2(Corte);
+        FinInferior = new Vector2(Fin);
     }
 
     @Override
-    public void actualizar(float delta) {
-        edad += delta;
-        corte.y -= delta * 0.9f;
-        fin.y -= delta * 1.5f;
+    public void Actualizar(float Delta) {
+        Edad += Delta;
+        FinSuperior.y -= Delta * 0.9f;
+        InicioInferior.y -= Delta * 1.2f;
+        FinInferior.y -= Delta * 1.5f;
     }
 
-    public boolean estaFinalizada() { return edad >= DURACION; }
+    public boolean EstaFinalizada() {
+        return Edad >= Duracion;
+    }
 
     @Override
-    public void dibujar(ShapeRenderer shapeRenderer) {
-        float alpha = Math.max(0f, 1f - edad / DURACION);
-        shapeRenderer.setColor(new Color(0.82f, 0.70f, 0.46f, alpha));
-        shapeRenderer.line(inicio, corte);
-        shapeRenderer.line(corte, fin);
+    public void Dibujar(ShapeRenderer ShapeRendererActual) {
+        float Alpha = Math.max(0f, 1f - Edad / Duracion);
+        ShapeRendererActual.setColor(new Color(0.82f, 0.70f, 0.46f, Alpha));
+        ShapeRendererActual.line(InicioSuperior, FinSuperior);
+        ShapeRendererActual.line(InicioInferior, FinInferior);
     }
 }
+

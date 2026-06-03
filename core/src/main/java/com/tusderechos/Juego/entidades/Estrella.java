@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.entidades;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -7,23 +16,28 @@ import com.tusderechos.Juego.interfaces.Dibujable;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 
 public class Estrella implements Dibujable {
-    private final Vector2 posicion;
-    private boolean recolectada;
+    private final Vector2 Posicion;
+    private boolean Recolectada;
 
-    public Estrella(Vector2 posicion) { this.posicion = new Vector2(posicion); }
+    public Estrella(Vector2 Posicion) {
+        this.Posicion = new Vector2(Posicion);
+    }
 
-    public boolean intentarRecolectar(Vector2 posicionDulce) {
-        if (recolectada || posicion.dst(posicionDulce) > ConstantesJuego.RADIO_ESTRELLA + ConstantesJuego.RADIO_DULCE) {
+    public boolean IntentarRecolectar(Vector2 PosicionDulce) {
+        if (Recolectada || Posicion.dst(PosicionDulce) > ConstantesJuego.RadioEstrella + ConstantesJuego.RadioDulce) {
             return false;
         }
-        recolectada = true;
+        Recolectada = true;
         return true;
     }
 
     @Override
-    public void dibujar(ShapeRenderer shapeRenderer) {
-        if (recolectada) return;
-        shapeRenderer.setColor(Color.GOLD);
-        shapeRenderer.circle(posicion.x, posicion.y, ConstantesJuego.RADIO_ESTRELLA, 16);
+    public void Dibujar(ShapeRenderer ShapeRendererActual) {
+        if (Recolectada) {
+            return;
+        }
+        ShapeRendererActual.setColor(Color.GOLD);
+        ShapeRendererActual.circle(Posicion.x, Posicion.y, ConstantesJuego.RadioEstrella, 16);
     }
 }
+

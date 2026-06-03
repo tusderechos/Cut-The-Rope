@@ -1,37 +1,52 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.niveles;
+
+/**
+ *
+ * @author Hp
+ */
 
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProgresoJugadorDemoTest {
     @Test
-    void encuentraSiguienteNivelDisponibleConRecursion() {
-        ProgresoJugadorDemo progreso = new ProgresoJugadorDemo();
+    void EncuentraSiguienteNivelDisponibleConRecursion() {
+        ProgresoJugadorDemo Progreso = new ProgresoJugadorDemo();
 
-        int siguiente = progreso.buscarSiguienteNivelDisponibleRecursivo(FabricaNiveles.crearNiveles(), 3);
+        int Siguiente = Progreso.BuscarSiguienteNivelDisponibleRecursivo(FabricaNiveles.CrearNiveles(), 3);
 
-        assertEquals(4, siguiente);
+        assertEquals(4, Siguiente);
     }
 
     @Test
-    void conservaMejorPuntajeCuandoLlegaUnResultadoPeor() {
-        ProgresoJugadorDemo progreso = new ProgresoJugadorDemo();
-        progreso.registrarResultado(new ResultadoNivel(1, 3, 4000, 8f));
+    void ConservaMejorPuntajeCuandoLlegaUnResultadoPeor() {
+        ProgresoJugadorDemo Progreso = new ProgresoJugadorDemo();
+        Progreso.RegistrarResultado(new ResultadoNivel(1, 3, 4000, 8f));
 
-        progreso.registrarResultado(new ResultadoNivel(1, 1, 1200, 20f));
+        Progreso.RegistrarResultado(new ResultadoNivel(1, 1, 1200, 20f));
 
-        assertEquals(4000, progreso.obtenerMejoresResultados().get(0).obtenerPuntaje());
+        assertEquals(4000, Progreso.ObtenerMejoresResultados().get(0).ObtenerPuntaje());
     }
 
     @Test
-    void encuentraSiguienteNivelAunqueLaListaEsteDesordenada() {
-        ProgresoJugadorDemo progreso = new ProgresoJugadorDemo();
+    void EncuentraSiguienteNivelAunqueLaListaEsteDesordenada() {
+        ProgresoJugadorDemo Progreso = new ProgresoJugadorDemo();
 
-        int siguiente = progreso.buscarSiguienteNivelDisponibleRecursivo(
-            Arrays.asList(FabricaNiveles.obtenerNivel(5), FabricaNiveles.obtenerNivel(4)), 3);
+        int Siguiente = Progreso.BuscarSiguienteNivelDisponibleRecursivo(Arrays.asList(FabricaNiveles.ObtenerNivel(5), FabricaNiveles.ObtenerNivel(4)), 3);
 
-        assertEquals(4, siguiente);
+        assertEquals(4, Siguiente);
+    }
+
+    @Test
+    void RechazaResultadoNulo() {
+        assertThrows(IllegalArgumentException.class, () -> new ProgresoJugadorDemo().RegistrarResultado(null));
     }
 }
+

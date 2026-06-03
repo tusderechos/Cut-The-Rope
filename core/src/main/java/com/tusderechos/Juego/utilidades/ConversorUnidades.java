@@ -1,14 +1,24 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.utilidades;
+
+/**
+ *
+ * @author Hp
+ */
 
 public final class ConversorUnidades {
     private ConversorUnidades() {
     }
 
-    public static final float pixelesAMetros(float pixeles) {
-        return pixeles / ConstantesJuego.PIXELES_POR_METRO;
+    public static float PixelesAMetros(float Pixeles) {
+        return Pixeles / ConstantesJuego.PixelesPorMetro;
     }
 
-    public static final float metrosAPixeles(float metros) {
-        return metros * ConstantesJuego.PIXELES_POR_METRO;
+    public static float MetrosAPixeles(float Metros) {
+        return Metros * ConstantesJuego.PixelesPorMetro;
     }
 }
+

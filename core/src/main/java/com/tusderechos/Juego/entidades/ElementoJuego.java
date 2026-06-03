@@ -1,20 +1,19 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.entidades;
 
+/**
+ *
+ * @author Hp
+ */
+
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.tusderechos.Juego.interfaces.Actualizable;
 import com.tusderechos.Juego.interfaces.Dibujable;
 
-public abstract class ElementoJuego implements Actualizable, Dibujable {
-    protected Body cuerpo;
-
-    public Body obtenerCuerpo() { return cuerpo; }
-    public boolean tieneCuerpo() { return cuerpo != null; }
-
+public abstract class ElementoJuego implements Dibujable {
     @Override
-    public void actualizar(float delta) {
-    }
-
-    @Override
-    public abstract void dibujar(ShapeRenderer shapeRenderer);
+    public abstract void Dibujar(ShapeRenderer ShapeRendererActual);
 }
+

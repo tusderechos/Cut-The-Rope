@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.pantallas;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -23,112 +32,132 @@ import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
 
 public class PantallaSeleccionNivel extends ScreenAdapter {
-    private final Juego juego;
-    private Stage stage;
-    private BitmapFont fuente;
-    private Texture texturaBoton;
-    private Texture texturaBotonPresionado;
-    private ColorDulce colorDulceActual = ColorDulce.ROJO;
-    private ColorMonstruo colorMonstruoActual = ColorMonstruo.VERDE;
+    private final Juego JuegoAplicacion;
+    private Stage StageActual;
+    private BitmapFont Fuente;
+    private Texture TexturaBoton;
+    private Texture TexturaBotonPresionado;
+    private ColorDulce ColorDulceActual = ColorDulce.Rojo;
+    private ColorMonstruo ColorMonstruoActual = ColorMonstruo.Verde;
 
-    public PantallaSeleccionNivel(Juego juego) { this.juego = juego; }
+    public PantallaSeleccionNivel(Juego JuegoAplicacion) {
+        this.JuegoAplicacion = JuegoAplicacion;
+    }
 
-    public PantallaSeleccionNivel(Juego juego, ColorDulce colorDulce, ColorMonstruo colorMonstruo) {
-        this.juego = juego;
-        colorDulceActual = colorDulce;
-        colorMonstruoActual = colorMonstruo;
+    public PantallaSeleccionNivel(Juego JuegoAplicacion, ColorDulce ColorDulceElegido, ColorMonstruo ColorMonstruoElegido) {
+        this.JuegoAplicacion = JuegoAplicacion;
+        ColorDulceActual = ColorDulceElegido;
+        ColorMonstruoActual = ColorMonstruoElegido;
     }
 
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());
-        fuente = new BitmapFont();
-        texturaBoton = crearTextura(Color.valueOf("30445b"));
-        texturaBotonPresionado = crearTextura(Color.valueOf("1e2b3a"));
-        TextButton.TextButtonStyle estiloBoton = new TextButton.TextButtonStyle();
-        estiloBoton.font = fuente;
-        estiloBoton.up = new TextureRegionDrawable(texturaBoton);
-        estiloBoton.down = new TextureRegionDrawable(texturaBotonPresionado);
-        Label.LabelStyle estiloTexto = new Label.LabelStyle(fuente, Color.WHITE);
+        StageActual = new Stage(new ScreenViewport());
+        Fuente = new BitmapFont();
+        TexturaBoton = CrearTextura(Color.valueOf("30445b"));
+        TexturaBotonPresionado = CrearTextura(Color.valueOf("1e2b3a"));
+        TextButton.TextButtonStyle EstiloBoton = new TextButton.TextButtonStyle();
+        EstiloBoton.font = Fuente;
+        EstiloBoton.up = new TextureRegionDrawable(TexturaBoton);
+        EstiloBoton.down = new TextureRegionDrawable(TexturaBotonPresionado);
+        Label.LabelStyle EstiloTexto = new Label.LabelStyle(Fuente, Color.WHITE);
 
-        Table raiz = new Table();
-        raiz.setFillParent(true);
-        raiz.pad(28f);
-        stage.addActor(raiz);
-        raiz.add(new Label("Seleccion de niveles", estiloTexto)).colspan(3).padBottom(22f);
-        raiz.row();
-        for (int numeroNivel = 1; numeroNivel <= 5; numeroNivel++) {
-            final int nivelElegido = numeroNivel;
-            TextButton botonNivel = new TextButton(String.valueOf(numeroNivel), estiloBoton);
-            botonNivel.addListener(new ChangeListener() {
+        Table Raiz = new Table();
+        Raiz.setFillParent(true);
+        Raiz.pad(28f);
+        StageActual.addActor(Raiz);
+        Raiz.add(new Label("Seleccion de niveles", EstiloTexto)).colspan(3).padBottom(22f);
+        Raiz.row();
+        for (int NumeroNivel = 1; NumeroNivel <= FabricaNiveles.CantidadNiveles(); NumeroNivel++) {
+            final int NivelElegido = NumeroNivel;
+            TextButton BotonNivel = new TextButton(String.valueOf(NumeroNivel), EstiloBoton);
+            BotonNivel.addListener(new ChangeListener() {
                 @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    juego.cambiarPantalla(new PantallaJuego(juego, FabricaNiveles.obtenerNivel(nivelElegido),
-                        new PersonalizacionDulce(colorDulceActual), new PersonalizacionMonstruo(colorMonstruoActual)));
+                public void changed(ChangeEvent Event, Actor ActorActual) {
+                    JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(NivelElegido), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual)));
                 }
             });
-            raiz.add(botonNivel).width(92f).height(72f).pad(8f);
-            if (numeroNivel % 3 == 0) raiz.row();
+            Raiz.add(BotonNivel).width(92f).height(72f).pad(8f);
+            if (NumeroNivel % 3 == 0) {
+                Raiz.row();
+            }
         }
-        raiz.row();
-        raiz.add(new Label("------------------------------", estiloTexto)).colspan(3).padTop(28f).padBottom(8f);
-        raiz.row();
-        raiz.add(new Label("Personalizacion", estiloTexto)).colspan(3).padBottom(16f);
-        raiz.row();
-        TextButton botonDulce = new TextButton(textoDulce(), estiloBoton);
-        botonDulce.addListener(new ChangeListener() {
+        Raiz.row();
+        Raiz.add(new Label("------------------------------", EstiloTexto)).colspan(3).padTop(28f).padBottom(8f);
+        Raiz.row();
+        Raiz.add(new Label("Personalizacion", EstiloTexto)).colspan(3).padBottom(16f);
+        Raiz.row();
+        TextButton BotonDulce = new TextButton(TextoDulce(), EstiloBoton);
+        BotonDulce.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                colorDulceActual = colorDulceActual.siguiente();
-                botonDulce.setText(textoDulce());
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                ColorDulceActual = ColorDulceActual.Siguiente();
+                BotonDulce.setText(TextoDulce());
             }
         });
-        TextButton botonMonstruo = new TextButton(textoMonstruo(), estiloBoton);
-        botonMonstruo.addListener(new ChangeListener() {
+        TextButton BotonMonstruo = new TextButton(TextoMonstruo(), EstiloBoton);
+        BotonMonstruo.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                colorMonstruoActual = colorMonstruoActual.siguiente();
-                botonMonstruo.setText(textoMonstruo());
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                ColorMonstruoActual = ColorMonstruoActual.Siguiente();
+                BotonMonstruo.setText(TextoMonstruo());
             }
         });
-        raiz.add(botonDulce).colspan(3).width(260f).height(56f).pad(8f);
-        raiz.row();
-        raiz.add(botonMonstruo).colspan(3).width(260f).height(56f).pad(8f);
-        Gdx.input.setInputProcessor(stage);
+        Raiz.add(BotonDulce).colspan(3).width(260f).height(56f).pad(8f);
+        Raiz.row();
+        Raiz.add(BotonMonstruo).colspan(3).width(260f).height(56f).pad(8f);
+        Gdx.input.setInputProcessor(StageActual);
     }
 
     @Override
-    public void render(float delta) {
+    public void render(float Delta) {
         ScreenUtils.clear(0.04f, 0.05f, 0.07f, 1f);
-        stage.act(delta);
-        stage.draw();
+        StageActual.act(Delta);
+        StageActual.draw();
     }
 
     @Override
-    public void resize(int width, int height) {
-        if (stage != null && width > 0 && height > 0) stage.getViewport().update(width, height, true);
+    public void resize(int Width, int Height) {
+        if (StageActual != null && Width > 0 && Height > 0) {
+            StageActual.getViewport().update(Width, Height, true);
+        }
     }
 
-    private String textoDulce() { return "Dulce: " + colorDulceActual.name(); }
-    private String textoMonstruo() { return "Monstruo: " + colorMonstruoActual.name(); }
+    private String TextoDulce() {
+        return "Dulce: " + ColorDulceActual.name();
+    }
+    private String TextoMonstruo() {
+        return "Monstruo: " + ColorMonstruoActual.name();
+    }
 
-    private Texture crearTextura(Color color) {
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(color);
-        pixmap.fill();
-        Texture textura = new Texture(pixmap);
-        pixmap.dispose();
-        return textura;
+    private Texture CrearTextura(Color ColorActual) {
+        Pixmap PixmapActual = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        PixmapActual.setColor(ColorActual);
+        PixmapActual.fill();
+        Texture Textura = new Texture(PixmapActual);
+        PixmapActual.dispose();
+        return Textura;
     }
 
     @Override
-    public void hide() { Gdx.input.setInputProcessor(null); }
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
 
     @Override
     public void dispose() {
-        if (stage != null) stage.dispose();
-        if (fuente != null) fuente.dispose();
-        if (texturaBoton != null) texturaBoton.dispose();
-        if (texturaBotonPresionado != null) texturaBotonPresionado.dispose();
+        if (StageActual != null) {
+            StageActual.dispose();
+        }
+        if (Fuente != null) {
+            Fuente.dispose();
+        }
+        if (TexturaBoton != null) {
+            TexturaBoton.dispose();
+        }
+        if (TexturaBotonPresionado != null) {
+            TexturaBotonPresionado.dispose();
+        }
     }
 }
+

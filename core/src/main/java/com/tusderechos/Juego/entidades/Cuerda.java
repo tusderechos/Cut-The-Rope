@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.entidades;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -14,49 +23,65 @@ import com.tusderechos.Juego.utilidades.ConstantesJuego;
 import com.tusderechos.Juego.utilidades.GeometriaJuego;
 
 public class Cuerda implements Cortable, Dibujable {
-    private final World mundo;
-    private final Body ancla;
-    private final Body cuerpoDulce;
-    private DistanceJoint joint;
-    private boolean cortada;
+    private final World Mundo;
+    private final Body Ancla;
+    private final Body CuerpoDulce;
+    private DistanceJoint Joint;
+    private boolean Cortada;
 
-    public Cuerda(World mundo, Vector2 posicionAncla, float longitud, Body cuerpoDulce) {
-        this.mundo = mundo;
-        this.cuerpoDulce = cuerpoDulce;
-        BodyDef definicionAncla = new BodyDef();
-        definicionAncla.type = BodyDef.BodyType.StaticBody;
-        definicionAncla.position.set(posicionAncla);
-        ancla = mundo.createBody(definicionAncla);
-        DistanceJointDef definicionJoint = new DistanceJointDef();
-        definicionJoint.initialize(ancla, cuerpoDulce, ancla.getPosition(), cuerpoDulce.getPosition());
-        definicionJoint.length = longitud;
-        joint = (DistanceJoint) mundo.createJoint(definicionJoint);
+    public Cuerda(World Mundo, Vector2 PosicionAncla, float Longitud, Body CuerpoDulce) {
+        this.Mundo = Mundo;
+        this.CuerpoDulce = CuerpoDulce;
+        BodyDef DefinicionAncla = new BodyDef();
+        DefinicionAncla.type = BodyDef.BodyType.StaticBody;
+        DefinicionAncla.position.set(PosicionAncla);
+        Ancla = Mundo.createBody(DefinicionAncla);
+        DistanceJointDef DefinicionJoint = new DistanceJointDef();
+        DefinicionJoint.initialize(Ancla, CuerpoDulce, Ancla.getPosition(), CuerpoDulce.getPosition());
+        DefinicionJoint.length = Longitud;
+        Joint = (DistanceJoint) Mundo.createJoint(DefinicionJoint);
     }
 
-    public Vector2 obtenerAncla() { return new Vector2(ancla.getPosition()); }
-    public Vector2 obtenerFin() { return new Vector2(cuerpoDulce.getPosition()); }
-
-    @Override
-    public boolean contienePuntoDeCorte(Vector2 puntoMundo) {
-        return !cortada && GeometriaJuego.distanciaPuntoASegmento(puntoMundo, ancla.getPosition(), cuerpoDulce.getPosition())
-            <= ConstantesJuego.MARGEN_CORTE_CUERDA;
+    public Vector2 ObtenerAncla() {
+        return new Vector2(Ancla.getPosition());
     }
-
-    @Override
-    public void cortar(Vector2 puntoMundo) {
-        if (cortada) return;
-        mundo.destroyJoint(joint);
-        joint = null;
-        cortada = true;
+    public Vector2 ObtenerFin() {
+        return new Vector2(CuerpoDulce.getPosition());
+    }
+    public float ObtenerDistanciaAlPunto(Vector2 PuntoMundo) {
+        return GeometriaJuego.DistanciaPuntoASegmento(PuntoMundo, Ancla.getPosition(), CuerpoDulce.getPosition());
+    }
+    public Vector2 ProyectarPuntoDeCorte(Vector2 PuntoMundo) {
+        return GeometriaJuego.ProyectarPuntoSobreSegmento(PuntoMundo, Ancla.getPosition(), CuerpoDulce.getPosition());
     }
 
     @Override
-    public boolean estaCortada() { return cortada; }
+    public boolean ContienePuntoDeCorte(Vector2 PuntoMundo) {
+        return !Cortada && ObtenerDistanciaAlPunto(PuntoMundo) <= ConstantesJuego.MargenCorteCuerda;
+    }
 
     @Override
-    public void dibujar(ShapeRenderer shapeRenderer) {
-        if (cortada) return;
-        shapeRenderer.setColor(new Color(0.82f, 0.70f, 0.46f, 1f));
-        shapeRenderer.line(ancla.getPosition(), cuerpoDulce.getPosition());
+    public void Cortar() {
+        if (Cortada) {
+            return;
+        }
+        Mundo.destroyJoint(Joint);
+        Joint = null;
+        Cortada = true;
+    }
+
+    @Override
+    public boolean EstaCortada() {
+        return Cortada;
+    }
+
+    @Override
+    public void Dibujar(ShapeRenderer ShapeRendererActual) {
+        if (Cortada) {
+            return;
+        }
+        ShapeRendererActual.setColor(new Color(0.82f, 0.70f, 0.46f, 1f));
+        ShapeRendererActual.line(Ancla.getPosition(), CuerpoDulce.getPosition());
     }
 }
+

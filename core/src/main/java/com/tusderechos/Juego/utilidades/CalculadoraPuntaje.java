@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.utilidades;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.tusderechos.Juego.niveles.ResultadoNivel;
 import java.util.List;
@@ -7,24 +16,28 @@ public final class CalculadoraPuntaje {
     private CalculadoraPuntaje() {
     }
 
-    public static int calcularPuntajeIntento(int estrellas, float tiempo, int fallos) {
-        if (estrellas < 0 || estrellas > 3 || !Float.isFinite(tiempo) || tiempo < 0f || fallos < 0) {
+    public static int CalcularPuntajeIntento(int Estrellas, float Tiempo, int Fallos) {
+        if (Estrellas < 0 || Estrellas > 3 || !Float.isFinite(Tiempo) || Tiempo < 0f || Fallos < 0) {
             throw new IllegalArgumentException("Los datos del intento no son validos");
         }
-        long bonoEstrellas = estrellas * 1000L;
-        long bonoTiempo = Math.max(0L, 2000L - Math.round(tiempo * 50f));
-        long puntaje = Math.max(0L, bonoEstrellas + bonoTiempo - fallos * 150L);
-        return (int) Math.min(Integer.MAX_VALUE, puntaje);
+        long BonoEstrellas = Estrellas * 1000L;
+        long BonoTiempo = Math.max(0L, 2000L - Math.round(Tiempo * 50f));
+        long Puntaje = Math.max(0L, BonoEstrellas + BonoTiempo - Fallos * 150L);
+        return (int) Math.min(Integer.MAX_VALUE, Puntaje);
     }
 
-    public static int calcularPuntajeAcumuladoRecursivo(List<ResultadoNivel> resultados) {
-        return (int) Math.min(Integer.MAX_VALUE, sumarDesdeIndice(resultados, 0));
+    public static int CalcularPuntajeAcumuladoRecursivo(List<ResultadoNivel> Resultados) {
+        if (Resultados == null || Resultados.contains(null)) {
+            throw new IllegalArgumentException("Los resultados no pueden contener valores nulos");
+        }
+        return (int) Math.min(Integer.MAX_VALUE, SumarDesdeIndice(Resultados, 0));
     }
 
-    private static long sumarDesdeIndice(List<ResultadoNivel> resultados, int indice) {
-        if (indice >= resultados.size()) {
+    private static long SumarDesdeIndice(List<ResultadoNivel> Resultados, int Indice) {
+        if (Indice >= Resultados.size()) {
             return 0L;
         }
-        return resultados.get(indice).obtenerPuntaje() + sumarDesdeIndice(resultados, indice + 1);
+        return Resultados.get(Indice).ObtenerPuntaje() + SumarDesdeIndice(Resultados, Indice + 1);
     }
 }
+

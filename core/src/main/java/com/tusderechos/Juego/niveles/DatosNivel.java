@@ -1,4 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.tusderechos.Juego.niveles;
+
+/**
+ *
+ * @author Hp
+ */
 
 import com.badlogic.gdx.math.Vector2;
 import com.tusderechos.Juego.enums.DificultadNivel;
@@ -6,41 +15,69 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DatosNivel {
-    private final int numero;
-    private final String nombre;
-    private final DificultadNivel dificultad;
-    private final Vector2 posicionDulce;
-    private final Vector2 posicionMonstruo;
-    private final List<DatosCuerda> cuerdas;
-    private final List<DatosEstrella> estrellas;
-    private final List<DatosBurbuja> burbujas;
-    private final List<DatosObstaculo> obstaculos;
-    private final boolean plataformaMovil;
+public final class DatosNivel {
+    private final int Numero;
+    private final String Nombre;
+    private final DificultadNivel Dificultad;
+    private final Vector2 PosicionDulce;
+    private final Vector2 PosicionMonstruo;
+    private final List<DatosCuerda> Cuerdas;
+    private final List<DatosEstrella> Estrellas;
+    private final List<DatosBurbuja> Burbujas;
+    private final List<DatosObstaculo> Obstaculos;
+    private final boolean PlataformaMovilActual;
 
-    public DatosNivel(int numero, String nombre, DificultadNivel dificultad, Vector2 posicionDulce,
-                      Vector2 posicionMonstruo, List<DatosCuerda> cuerdas, List<DatosEstrella> estrellas,
-                      List<DatosBurbuja> burbujas, List<DatosObstaculo> obstaculos, boolean plataformaMovil) {
-        this.numero = numero;
-        this.nombre = nombre;
-        this.dificultad = dificultad;
-        this.posicionDulce = new Vector2(posicionDulce);
-        this.posicionMonstruo = new Vector2(posicionMonstruo);
-        this.cuerdas = new ArrayList<>(cuerdas);
-        this.estrellas = new ArrayList<>(estrellas);
-        this.burbujas = new ArrayList<>(burbujas);
-        this.obstaculos = new ArrayList<>(obstaculos);
-        this.plataformaMovil = plataformaMovil;
+    public DatosNivel(int Numero, String Nombre, DificultadNivel Dificultad, Vector2 PosicionDulce, Vector2 PosicionMonstruo, List<DatosCuerda> Cuerdas, List<DatosEstrella> Estrellas, List<DatosBurbuja> Burbujas, List<DatosObstaculo> Obstaculos, boolean PlataformaMovilActual) {
+        if (Numero < 1 || Nombre == null || Nombre.trim().isEmpty() || Dificultad == null) {
+            throw new IllegalArgumentException("Los datos principales del nivel no son validos");
+        }
+        ValidacionDatosNivel.ValidarVector(PosicionDulce, "La posicion del dulce");
+        ValidacionDatosNivel.ValidarVector(PosicionMonstruo, "La posicion del monstruo");
+        ValidacionDatosNivel.ValidarLista(Cuerdas, "Las Cuerdas");
+        ValidacionDatosNivel.ValidarLista(Estrellas, "Las Estrellas");
+        ValidacionDatosNivel.ValidarLista(Burbujas, "Las Burbujas");
+        ValidacionDatosNivel.ValidarLista(Obstaculos, "Los Obstaculos");
+        this.Numero = Numero;
+        this.Nombre = Nombre;
+        this.Dificultad = Dificultad;
+        this.PosicionDulce = new Vector2(PosicionDulce);
+        this.PosicionMonstruo = new Vector2(PosicionMonstruo);
+        this.Cuerdas = new ArrayList<>(Cuerdas);
+        this.Estrellas = new ArrayList<>(Estrellas);
+        this.Burbujas = new ArrayList<>(Burbujas);
+        this.Obstaculos = new ArrayList<>(Obstaculos);
+        this.PlataformaMovilActual = PlataformaMovilActual;
     }
 
-    public int obtenerNumero() { return numero; }
-    public String obtenerNombre() { return nombre; }
-    public DificultadNivel obtenerDificultad() { return dificultad; }
-    public Vector2 obtenerPosicionDulce() { return new Vector2(posicionDulce); }
-    public Vector2 obtenerPosicionMonstruo() { return new Vector2(posicionMonstruo); }
-    public List<DatosCuerda> obtenerCuerdas() { return Collections.unmodifiableList(cuerdas); }
-    public List<DatosEstrella> obtenerEstrellas() { return Collections.unmodifiableList(estrellas); }
-    public List<DatosBurbuja> obtenerBurbujas() { return Collections.unmodifiableList(burbujas); }
-    public List<DatosObstaculo> obtenerObstaculos() { return Collections.unmodifiableList(obstaculos); }
-    public boolean tienePlataformaMovil() { return plataformaMovil; }
+    public int ObtenerNumero() {
+        return Numero;
+    }
+    public String ObtenerNombre() {
+        return Nombre;
+    }
+    public DificultadNivel ObtenerDificultad() {
+        return Dificultad;
+    }
+    public Vector2 ObtenerPosicionDulce() {
+        return new Vector2(PosicionDulce);
+    }
+    public Vector2 ObtenerPosicionMonstruo() {
+        return new Vector2(PosicionMonstruo);
+    }
+    public List<DatosCuerda> ObtenerCuerdas() {
+        return Collections.unmodifiableList(Cuerdas);
+    }
+    public List<DatosEstrella> ObtenerEstrellas() {
+        return Collections.unmodifiableList(Estrellas);
+    }
+    public List<DatosBurbuja> ObtenerBurbujas() {
+        return Collections.unmodifiableList(Burbujas);
+    }
+    public List<DatosObstaculo> ObtenerObstaculos() {
+        return Collections.unmodifiableList(Obstaculos);
+    }
+    public boolean TienePlataformaMovil() {
+        return PlataformaMovilActual;
+    }
 }
+
