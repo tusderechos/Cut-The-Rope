@@ -28,6 +28,7 @@ public class Cuerda implements Cortable, Dibujable {
     private final Body CuerpoDulce;
     private DistanceJoint Joint;
     private boolean Cortada;
+    private static final float GrosorVisual = 0.035f;
 
     public Cuerda(World Mundo, Vector2 PosicionAncla, float Longitud, Body CuerpoDulce) {
         this.Mundo = Mundo;
@@ -81,7 +82,7 @@ public class Cuerda implements Cortable, Dibujable {
             return;
         }
         ShapeRendererActual.setColor(new Color(0.82f, 0.70f, 0.46f, 1f));
-        ShapeRendererActual.line(Ancla.getPosition(), CuerpoDulce.getPosition());
+        ShapeRendererActual.rectLine(Ancla.getPosition(), CuerpoDulce.getPosition(), GrosorVisual);
     }
 }
 

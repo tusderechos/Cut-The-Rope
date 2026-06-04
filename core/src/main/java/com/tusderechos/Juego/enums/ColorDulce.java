@@ -15,7 +15,7 @@ public enum ColorDulce {
     Rojo(new Color(0.95f, 0.18f, 0.20f, 1f)),
     Azul(new Color(0.20f, 0.45f, 0.95f, 1f)),
     Verde(new Color(0.20f, 0.75f, 0.35f, 1f)),
-    Amarillo(new Color(0.98f, 0.82f, 0.22f, 1f));
+    Morado(new Color(0.56f, 0.28f, 0.82f, 1f));
 
     private final Color ColorActual;
 

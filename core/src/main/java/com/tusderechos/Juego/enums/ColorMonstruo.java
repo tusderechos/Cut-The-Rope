@@ -15,7 +15,7 @@ public enum ColorMonstruo {
     Verde(new Color(0.25f, 0.80f, 0.32f, 1f)),
     Morado(new Color(0.56f, 0.28f, 0.82f, 1f)),
     Naranja(new Color(0.95f, 0.48f, 0.18f, 1f)),
-    Celeste(new Color(0.25f, 0.75f, 0.95f, 1f));
+    Azul(new Color(0.25f, 0.75f, 0.95f, 1f));
 
     private final Color ColorActual;
 

@@ -22,6 +22,7 @@ public class CuerdaCortadaVisual implements Actualizable, Dibujable {
     private final Vector2 FinInferior;
     private float Edad;
     private static final float Duracion = 0.75f;
+    private static final float GrosorVisual = 0.03f;
 
     public CuerdaCortadaVisual(Vector2 Inicio, Vector2 Corte, Vector2 Fin) {
         InicioSuperior = new Vector2(Inicio);
@@ -46,8 +47,8 @@ public class CuerdaCortadaVisual implements Actualizable, Dibujable {
     public void Dibujar(ShapeRenderer ShapeRendererActual) {
         float Alpha = Math.max(0f, 1f - Edad / Duracion);
         ShapeRendererActual.setColor(new Color(0.82f, 0.70f, 0.46f, Alpha));
-        ShapeRendererActual.line(InicioSuperior, FinSuperior);
-        ShapeRendererActual.line(InicioInferior, FinInferior);
+        ShapeRendererActual.rectLine(InicioSuperior, FinSuperior, GrosorVisual);
+        ShapeRendererActual.rectLine(InicioInferior, FinInferior, GrosorVisual);
     }
 }
 

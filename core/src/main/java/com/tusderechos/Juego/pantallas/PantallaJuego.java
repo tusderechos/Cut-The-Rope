@@ -16,6 +16,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.tusderechos.Juego.Juego;
+import com.tusderechos.Juego.audio.GestorAudio;
 import com.tusderechos.Juego.entidades.Dulce;
 import com.tusderechos.Juego.entidades.Burbuja;
 import com.tusderechos.Juego.entidades.Cuerda;
@@ -34,6 +36,8 @@ import com.tusderechos.Juego.entidades.CuerdaCortadaVisual;
 import com.tusderechos.Juego.entidades.Monstruo;
 import com.tusderechos.Juego.entidades.Estrella;
 import com.tusderechos.Juego.entidades.PlataformaMovil;
+import com.tusderechos.Juego.graficos.GestorFuentes;
+import com.tusderechos.Juego.graficos.GestorTexturas;
 import com.tusderechos.Juego.niveles.DatosCuerda;
 import com.tusderechos.Juego.niveles.DatosBurbuja;
 import com.tusderechos.Juego.niveles.DatosEstrella;
@@ -62,6 +66,7 @@ public class PantallaJuego extends ScreenAdapter {
     private ShapeRenderer ShapeRendererActual;
     private SpriteBatch Batch;
     private BitmapFont Fuente;
+    private GestorTexturas GestorTexturasActual;
     private Dulce DulceActual;
     private Monstruo MonstruoActual;
     private final Array<Cuerda> Cuerdas = new Array<>();
@@ -69,21 +74,28 @@ public class PantallaJuego extends ScreenAdapter {
     private final Array<Estrella> Estrellas = new Array<>();
     private final Array<Burbuja> Burbujas = new Array<>();
     private final Array<Obstaculo> Obstaculos = new Array<>();
+    private final Array<EfectoVisualTemporal> EfectosVisuales = new Array<>();
     private final Rectangle BotonSalir = new Rectangle(0.15f, 7.45f, 0.95f, 0.38f);
     private final Rectangle BotonResultadoSalir = new Rectangle(0.65f, 1.55f, 1.35f, 0.52f);
     private final Rectangle BotonSiguiente = new Rectangle(2.75f, 1.55f, 1.35f, 0.52f);
+    private final Rectangle PanelConfirmacionSalir = new Rectangle(0.55f, 2.85f, 3.7f, 1.55f);
+    private final Rectangle BotonCancelarSalida = new Rectangle(0.85f, 3.1f, 1.25f, 0.48f);
+    private final Rectangle BotonConfirmarSalida = new Rectangle(2.75f, 3.1f, 1.05f, 0.48f);
+    private final Rectangle FondoHud = new Rectangle(0f, 7.25f, ConstantesJuego.AnchoMundo, 0.75f);
     private float TiempoNivel;
     private int FallosNivel;
     private int EstrellasRecolectadas;
     private int PuntajeFinal;
+    private ResultadoNivel ResultadoNivelActual;
     private EstadoNivel EstadoNivelActual = EstadoNivel.Jugando;
+    private boolean ConfirmacionSalidaActiva;
     private float TiempoEstadoFallo;
     private float TiempoDulceDetenido;
     private String MensajeFallo = "";
     private PlataformaMovil PlataformaMovilActual;
+    private GestorAudio GestorAudioActual;
     private float AcumuladorFisica;
     private float AlphaEntrada = 1f;
-    private int PuntajeAcumulado;
 
     public PantallaJuego(Juego JuegoAplicacion, DatosNivel DatosNivelActual, PersonalizacionDulce PersonalizacionDulceActual, PersonalizacionMonstruo PersonalizacionMonstruoActual) {
         this.JuegoAplicacion = JuegoAplicacion;
@@ -100,7 +112,10 @@ public class PantallaJuego extends ScreenAdapter {
         Viewport.apply(true);
         ShapeRendererActual = new ShapeRenderer();
         Batch = new SpriteBatch();
-        Fuente = new BitmapFont();
+        Fuente = GestorFuentes.CrearFuenteGoodDog(24);
+        GestorTexturasActual = new GestorTexturas();
+        GestorAudioActual = new GestorAudio();
+        GestorAudioActual.IniciarMusica();
         DulceActual = new Dulce(Mundo, DatosNivelActual.ObtenerPosicionDulce(), PersonalizacionDulceActual);
         MonstruoActual = new Monstruo(DatosNivelActual.ObtenerPosicionMonstruo(), PersonalizacionMonstruoActual);
         for (DatosCuerda DatosCuerdaActual : DatosNivelActual.ObtenerCuerdas()) {
@@ -116,14 +131,14 @@ public class PantallaJuego extends ScreenAdapter {
             Obstaculos.add(new ObstaculoPeligroso(DatosObstaculoActual.ObtenerPosicion(), DatosObstaculoActual.ObtenerAncho(), DatosObstaculoActual.ObtenerAlto()));
         }
         if (DatosNivelActual.TienePlataformaMovil()) {
-            PlataformaMovilActual = new PlataformaMovil(new Vector2(2.4f, 0.82f), 1.0f, 3.8f, 0.75f);
+            PlataformaMovilActual = new PlataformaMovil(new Vector2(2.4f, 0.82f), 1.0f, 3.8f, 0.45f);
             MonstruoActual.EstablecerPosicion(PlataformaMovilActual.ObtenerPosicionMonstruo());
         }
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int Keycode) {
                 if (Keycode == Input.Keys.ESCAPE) {
-                    VolverASeleccion();
+                    ConfirmacionSalidaActiva = !ConfirmacionSalidaActiva;
                     return true;
                 }
                 return false;
@@ -137,10 +152,12 @@ public class PantallaJuego extends ScreenAdapter {
                 Vector3 PuntoPantalla = new Vector3(ScreenX, ScreenY, 0f);
                 Viewport.unproject(PuntoPantalla);
                 Vector2 PuntoMundo = new Vector2(PuntoPantalla.x, PuntoPantalla.y);
-                if (NivelCompletado()) {
+                if (ConfirmacionSalidaActiva) {
+                    ManejarClicConfirmacionSalida(PuntoMundo);
+                } else if (NivelCompletado()) {
                     ManejarClicResultado(PuntoMundo);
                 } else if (BotonSalir.contains(PuntoMundo)) {
-                    VolverASeleccion();
+                    ConfirmacionSalidaActiva = true;
                 } else {
                     if (!ReventarBurbujaCercana(PuntoMundo)) {
                         CortarCuerdaCercana(PuntoMundo);
@@ -178,10 +195,14 @@ public class PantallaJuego extends ScreenAdapter {
                 CuerdasCortadas.removeIndex(Indice);
             }
         }
+        ActualizarEfectosVisuales(Delta);
         ShapeRendererActual.setProjectionMatrix(Camara.combined);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        ShapeRendererActual.begin(ShapeRenderer.ShapeType.Line);
+        ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
+        DibujarFondoNivel(ShapeRendererActual);
+        ShapeRendererActual.end();
+        ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
         for (Cuerda CuerdaActual : Cuerdas) {
             CuerdaActual.Dibujar(ShapeRendererActual);
         }
@@ -191,10 +212,15 @@ public class PantallaJuego extends ScreenAdapter {
         ShapeRendererActual.end();
         ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
         for (Estrella EstrellaActual : Estrellas) {
-            EstrellaActual.Dibujar(ShapeRendererActual);
+            if (GestorTexturasActual.ObtenerEstrella(false) == null) {
+                EstrellaActual.Dibujar(ShapeRendererActual);
+            }
         }
         for (Burbuja BurbujaActual : Burbujas) {
             BurbujaActual.Dibujar(ShapeRendererActual);
+        }
+        for (EfectoVisualTemporal EfectoVisual : EfectosVisuales) {
+            EfectoVisual.Dibujar(ShapeRendererActual);
         }
         for (Obstaculo ObstaculoActual : Obstaculos) {
             ObstaculoActual.Dibujar(ShapeRendererActual);
@@ -202,15 +228,29 @@ public class PantallaJuego extends ScreenAdapter {
         if (PlataformaMovilActual != null) {
             PlataformaMovilActual.Dibujar(ShapeRendererActual);
         }
-        MonstruoActual.Dibujar(ShapeRendererActual);
-        DulceActual.Dibujar(ShapeRendererActual);
+        if (GestorTexturasActual.ObtenerMonstruo(PersonalizacionMonstruoActual.ObtenerColorMonstruo()) == null) {
+            MonstruoActual.Dibujar(ShapeRendererActual);
+        }
+        if (GestorTexturasActual.ObtenerDulce(PersonalizacionDulceActual.ObtenerColorDulce()) == null) {
+            DulceActual.Dibujar(ShapeRendererActual);
+        }
+        ShapeRendererActual.end();
+        DibujarSpritesMundo();
+        ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
         if (!NivelCompletado()) {
+            DibujarHud(ShapeRendererActual);
             DibujarBoton(ShapeRendererActual, BotonSalir, new Color(0.55f, 0.18f, 0.18f, 1f));
         }
         if (NivelCompletado()) {
             DibujarPanelResultado(ShapeRendererActual);
         }
+        if (ConfirmacionSalidaActiva) {
+            DibujarPanelConfirmacionSalida(ShapeRendererActual);
+        }
         ShapeRendererActual.end();
+        if (NivelCompletado() && !ConfirmacionSalidaActiva) {
+            DibujarSpritesResultado();
+        }
         Gdx.gl.glDisable(GL20.GL_BLEND);
         DibujarTextos();
         DibujarTransicion();
@@ -237,12 +277,16 @@ public class PantallaJuego extends ScreenAdapter {
         Vector2 PuntoDeCorte = CuerdaMasCercana.ProyectarPuntoDeCorte(PuntoMundo);
         CuerdaMasCercana.Cortar();
         CuerdasCortadas.add(new CuerdaCortadaVisual(Ancla, PuntoDeCorte, Fin));
+        CrearEfecto(PuntoDeCorte, 0.08f, 0.32f, new Color(0.82f, 0.70f, 0.46f, 1f));
+        GestorAudioActual.ReproducirCorteCuerda();
     }
 
     private void RecolectarEstrellas() {
         for (Estrella EstrellaActual : Estrellas) {
             if (EstrellaActual.IntentarRecolectar(DulceActual.ObtenerCuerpo().getPosition())) {
                 EstrellasRecolectadas++;
+                CrearEfecto(DulceActual.ObtenerCuerpo().getPosition(), 0.12f, 0.48f, Color.GOLD);
+                GestorAudioActual.ReproducirEstrella();
             }
         }
     }
@@ -253,6 +297,8 @@ public class PantallaJuego extends ScreenAdapter {
                 continue;
             }
             BurbujaActual.Reventar();
+            CrearEfecto(PuntoMundo, 0.18f, 0.62f, new Color(0.35f, 0.80f, 1f, 1f));
+            GestorAudioActual.ReproducirBurbuja();
             return true;
         }
         return false;
@@ -373,10 +419,15 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void IniciarFallo(String Mensaje) {
+        if (EstadoNivelActual != EstadoNivel.Jugando) {
+            return;
+        }
         EstadoNivelActual = EstadoNivel.Fallando;
         MensajeFallo = Mensaje;
         TiempoEstadoFallo = 0f;
         FallosNivel++;
+        CrearEfecto(DulceActual.ObtenerCuerpo().getPosition(), 0.18f, 0.75f, new Color(0.85f, 0.16f, 0.16f, 1f));
+        GestorAudioActual.ReproducirFallo();
     }
 
     private void ActualizarTransicionFallo(float Delta) {
@@ -387,22 +438,50 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void MostrarResultado() {
+        if (EstadoNivelActual == EstadoNivel.Ganado) {
+            return;
+        }
         EstadoNivelActual = EstadoNivel.Ganado;
+        ConfirmacionSalidaActiva = false;
         PuntajeFinal = CalculadoraPuntaje.CalcularPuntajeIntento(EstrellasRecolectadas, TiempoNivel, FallosNivel);
-        JuegoAplicacion.ObtenerProgresoJugadorDemo().RegistrarResultado(new ResultadoNivel(DatosNivelActual.ObtenerNumero(), EstrellasRecolectadas, PuntajeFinal, TiempoNivel));
-        PuntajeAcumulado = CalculadoraPuntaje.CalcularPuntajeAcumuladoRecursivo(JuegoAplicacion.ObtenerProgresoJugadorDemo().ObtenerMejoresResultados());
+        ResultadoNivelActual = new ResultadoNivel(DatosNivelActual.ObtenerNumero(), EstrellasRecolectadas, PuntajeFinal, TiempoNivel);
+        CrearEfecto(MonstruoActual.ObtenerPosicion(), 0.24f, 0.95f, new Color(0.25f, 0.90f, 0.35f, 1f));
+        GestorAudioActual.ReproducirVictoria();
+    }
+
+    private void CrearEfecto(Vector2 Posicion, float RadioInicial, float RadioFinal, Color ColorActual) {
+        EfectosVisuales.add(new EfectoVisualTemporal(Posicion, RadioInicial, RadioFinal, ColorActual));
+    }
+
+    private void ActualizarEfectosVisuales(float Delta) {
+        for (EfectoVisualTemporal EfectoVisual : EfectosVisuales) {
+            EfectoVisual.Actualizar(Delta);
+        }
+        for (int Indice = EfectosVisuales.size - 1; Indice >= 0; Indice--) {
+            if (EfectosVisuales.get(Indice).EstaFinalizado()) {
+                EfectosVisuales.removeIndex(Indice);
+            }
+        }
     }
 
     private void ManejarClicResultado(Vector2 PuntoMundo) {
         if (BotonResultadoSalir.contains(PuntoMundo)) {
             VolverASeleccion();
         } else if (BotonSiguiente.contains(PuntoMundo)) {
-            int SiguienteNivel = JuegoAplicacion.ObtenerProgresoJugadorDemo().BuscarSiguienteNivelDisponibleRecursivo(FabricaNiveles.CrearNiveles(), DatosNivelActual.ObtenerNumero());
-            if (SiguienteNivel == DatosNivelActual.ObtenerNumero()) {
+            int SiguienteNivel = DatosNivelActual.ObtenerNumero() + 1;
+            if (SiguienteNivel > FabricaNiveles.CantidadNiveles()) {
                 VolverASeleccion();
             } else {
                 JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(SiguienteNivel), PersonalizacionDulceActual, PersonalizacionMonstruoActual));
             }
+        }
+    }
+
+    private void ManejarClicConfirmacionSalida(Vector2 PuntoMundo) {
+        if (BotonCancelarSalida.contains(PuntoMundo)) {
+            ConfirmacionSalidaActiva = false;
+        } else if (BotonConfirmarSalida.contains(PuntoMundo)) {
+            VolverASeleccion();
         }
     }
 
@@ -411,10 +490,82 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void DibujarPanelResultado(ShapeRenderer Renderer) {
-        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.92f));
-        Renderer.rect(0.35f, 1.1f, 4.1f, 4.9f);
+        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.98f));
+        Renderer.rect(0.35f, 1.0f, 4.1f, 5.15f);
+        Renderer.setColor(new Color(0.10f, 0.14f, 0.19f, 1f));
+        Renderer.rect(0.62f, 2.72f, 3.55f, 2.08f);
+        if (GestorTexturasActual.ObtenerEstrella(false) == null || GestorTexturasActual.ObtenerEstrella(true) == null) {
+            DibujarEstrellasResultado(Renderer);
+        }
         DibujarBoton(Renderer, BotonResultadoSalir, new Color(0.58f, 0.20f, 0.20f, 1f));
         DibujarBoton(Renderer, BotonSiguiente, new Color(0.18f, 0.55f, 0.30f, 1f));
+    }
+
+    private void DibujarFondoNivel(ShapeRenderer Renderer) {
+        Renderer.setColor(new Color(0.13f, 0.18f, 0.23f, 1f));
+        Renderer.rect(0f, 0f, ConstantesJuego.AnchoMundo, ConstantesJuego.AltoMundo);
+        Renderer.setColor(new Color(0.10f, 0.14f, 0.18f, 1f));
+        Renderer.rect(0f, 0f, ConstantesJuego.AnchoMundo, 1.0f);
+        Renderer.setColor(new Color(0.17f, 0.23f, 0.28f, 0.55f));
+        Renderer.rect(0f, 6.55f, ConstantesJuego.AnchoMundo, 0.14f);
+        Renderer.rect(0f, 1.0f, ConstantesJuego.AnchoMundo, 0.08f);
+    }
+
+    private void DibujarPanelConfirmacionSalida(ShapeRenderer Renderer) {
+        Renderer.setColor(new Color(0f, 0f, 0f, 0.58f));
+        Renderer.rect(0f, 0f, ConstantesJuego.AnchoMundo, ConstantesJuego.AltoMundo);
+        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.98f));
+        Renderer.rect(PanelConfirmacionSalir.x, PanelConfirmacionSalir.y, PanelConfirmacionSalir.width, PanelConfirmacionSalir.height);
+        DibujarBoton(Renderer, BotonCancelarSalida, new Color(0.22f, 0.34f, 0.47f, 1f));
+        DibujarBoton(Renderer, BotonConfirmarSalida, new Color(0.58f, 0.20f, 0.20f, 1f));
+    }
+
+    private void DibujarSpritesMundo() {
+        Batch.setProjectionMatrix(Camara.combined);
+        Batch.begin();
+        for (Estrella EstrellaActual : Estrellas) {
+            EstrellaActual.DibujarTextura(Batch, GestorTexturasActual);
+        }
+        MonstruoActual.DibujarTextura(Batch, GestorTexturasActual);
+        DulceActual.DibujarTextura(Batch, GestorTexturasActual);
+        Batch.end();
+    }
+
+    private void DibujarSpritesResultado() {
+        Batch.setProjectionMatrix(Camara.combined);
+        Batch.begin();
+        DibujarEstrellasResultadoTextura();
+        Batch.end();
+    }
+
+    private void DibujarEstrellasResultadoTextura() {
+        float InicioX = 1.35f;
+        for (int Indice = 0; Indice < 3; Indice++) {
+            Texture Textura = GestorTexturasActual.ObtenerEstrella(Indice >= EstrellasRecolectadas);
+            if (Textura == null) {
+                continue;
+            }
+            float Tamano = 0.42f;
+            float PosicionX = InicioX + Indice * 0.75f;
+            Batch.draw(Textura, PosicionX - Tamano / 2f, 5.0f - Tamano / 2f, Tamano, Tamano);
+        }
+    }
+
+    private void DibujarHud(ShapeRenderer Renderer) {
+        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.70f));
+        Renderer.rect(FondoHud.x, FondoHud.y, FondoHud.width, FondoHud.height);
+    }
+
+    private void DibujarEstrellasResultado(ShapeRenderer Renderer) {
+        float InicioX = 1.35f;
+        for (int Indice = 0; Indice < 3; Indice++) {
+            if (Indice < EstrellasRecolectadas) {
+                Renderer.setColor(Color.GOLD);
+            } else {
+                Renderer.setColor(new Color(0.28f, 0.30f, 0.34f, 1f));
+            }
+            Renderer.circle(InicioX + Indice * 0.75f, 5.0f, 0.24f, 24);
+        }
     }
 
     private void DibujarBoton(ShapeRenderer Renderer, Rectangle Rectangulo, Color ColorActual) {
@@ -426,15 +577,18 @@ public class PantallaJuego extends ScreenAdapter {
         PrepararBatchTexto();
         Batch.begin();
         Fuente.setColor(Color.WHITE);
-        Fuente.getData().setScale(1.0f);
+        Fuente.getData().setScale(0.72f);
         if (!NivelCompletado()) {
-            DibujarTextoMundo("Nivel " + DatosNivelActual.ObtenerNumero(), 2.05f, 7.72f);
+            DibujarTextoMundo(TextoHudNivel.CrearTexto(DatosNivelActual.ObtenerNumero(), EstrellasRecolectadas, TiempoNivel), 1.2f, 7.72f);
             DibujarTextoMundo("Salir", BotonSalir.x + 0.2f, BotonSalir.y + 0.27f);
         }
-        if (NivelCompletado()) {
+        if (NivelCompletado() && !ConfirmacionSalidaActiva) {
             DibujarTextosResultado();
+        }
+        if (ConfirmacionSalidaActiva) {
+            DibujarTextosConfirmacionSalida();
         } else if (EstadoNivelActual == EstadoNivel.Fallando) {
-            Fuente.getData().setScale(1.1f);
+            Fuente.getData().setScale(0.85f);
             DibujarTextoMundo(MensajeFallo, 1.15f, 4.15f);
         }
         Batch.end();
@@ -442,16 +596,27 @@ public class PantallaJuego extends ScreenAdapter {
 
     private void DibujarTextosResultado() {
         Fuente.setColor(Color.WHITE);
-        Fuente.getData().setScale(1.35f);
-        DibujarTextoMundo("Nivel completado", 0.95f, 5.55f);
-        Fuente.getData().setScale(1.05f);
-        List<String> LineasResultado = TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeFinal, PuntajeAcumulado, TiempoNivel, FallosNivel);
+        Fuente.getData().setScale(0.92f);
+        DibujarTextoMundo("Nivel completado", 0.92f, 5.82f);
+        Fuente.getData().setScale(0.66f);
+        List<String> LineasResultado = TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeFinal, TiempoNivel, FallosNivel);
         for (int Indice = 0; Indice < LineasResultado.size(); Indice++) {
-            DibujarTextoMundo(LineasResultado.get(Indice), 0.9f, 4.85f - Indice * 0.43f);
+            DibujarTextoMundo(LineasResultado.get(Indice), 0.78f, 4.33f - Indice * 0.42f);
         }
-        Fuente.getData().setScale(1.0f);
+        Fuente.getData().setScale(0.72f);
         DibujarTextoMundo("Salir", 0.95f, 1.88f);
         DibujarTextoMundo(TextoPanelResultado.CrearTextoSiguiente(DatosNivelActual.ObtenerNumero()), 2.95f, 1.88f);
+    }
+
+    private void DibujarTextosConfirmacionSalida() {
+        Fuente.setColor(Color.WHITE);
+        Fuente.getData().setScale(0.82f);
+        DibujarTextoMundo("Salir del nivel?", 1.32f, 4.08f);
+        Fuente.getData().setScale(0.58f);
+        DibujarTextoMundo("El intento se reiniciara.", 1.12f, 3.78f);
+        Fuente.getData().setScale(0.68f);
+        DibujarTextoMundo("Cancelar", 1.08f, 3.42f);
+        DibujarTextoMundo("Salir", 2.98f, 3.42f);
     }
 
     private void PrepararBatchTexto() {
@@ -485,6 +650,10 @@ public class PantallaJuego extends ScreenAdapter {
         return EstadoNivelActual == EstadoNivel.Ganado;
     }
 
+    public ResultadoNivel ObtenerResultadoNivelActual() {
+        return ResultadoNivelActual;
+    }
+
     @Override
     public void resize(int Width, int Height) {
         if (Width <= 0 || Height <= 0) {
@@ -508,6 +677,12 @@ public class PantallaJuego extends ScreenAdapter {
         }
         if (Fuente != null) {
             Fuente.dispose();
+        }
+        if (GestorTexturasActual != null) {
+            GestorTexturasActual.dispose();
+        }
+        if (GestorAudioActual != null) {
+            GestorAudioActual.dispose();
         }
         if (Mundo != null) {
             Mundo.dispose();

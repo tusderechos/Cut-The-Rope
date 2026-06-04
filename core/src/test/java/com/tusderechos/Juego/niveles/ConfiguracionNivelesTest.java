@@ -41,6 +41,31 @@ class ConfiguracionNivelesTest {
     }
 
     @Test
+    void NivelUnoPermiteRecolectarTresEstrellasEnLaCaidaTutorial() {
+        DatosNivel NivelUno = FabricaNiveles.ObtenerNivel(1);
+        float MargenRecolectable = ConstantesJuego.RadioDulce + ConstantesJuego.RadioEstrella;
+
+        NivelUno.ObtenerEstrellas().forEach(EstrellaActual -> assertTrue(Math.abs(EstrellaActual.ObtenerPosicion().x - NivelUno.ObtenerPosicionDulce().x) <= MargenRecolectable, "Nivel 1 estrella fuera de la caida tutorial"));
+    }
+
+    @Test
+    void NivelTresUsaBurbujaParaSubirHaciaEstrellasSuperiores() {
+        DatosNivel NivelTres = FabricaNiveles.ObtenerNivel(3);
+        DatosBurbuja BurbujaActual = NivelTres.ObtenerBurbujas().get(0);
+
+        assertTrue(Math.abs(BurbujaActual.ObtenerPosicion().x - NivelTres.ObtenerPosicionDulce().x) <= 0.1f);
+        assertTrue(BurbujaActual.ObtenerPosicion().y < NivelTres.ObtenerPosicionDulce().y);
+        assertTrue(NivelTres.ObtenerEstrellas().stream().anyMatch(EstrellaActual -> EstrellaActual.ObtenerPosicion().y > BurbujaActual.ObtenerPosicion().y + 0.6f));
+    }
+
+    @Test
+    void NivelCincoMantieneEstrellasDentroDeArcosAlcanzables() {
+        DatosNivel NivelCinco = FabricaNiveles.ObtenerNivel(5);
+
+        NivelCinco.ObtenerEstrellas().forEach(EstrellaActual -> assertTrue(EstrellaActual.ObtenerPosicion().x >= 1.8f && EstrellaActual.ObtenerPosicion().x <= 3.0f, "Nivel 5 estrella demasiado lateral"));
+    }
+
+    @Test
     void NingunNivelRecolectaEstrellasAlIniciar() {
         float DistanciaMinima = ConstantesJuego.RadioDulce + ConstantesJuego.RadioEstrella;
 

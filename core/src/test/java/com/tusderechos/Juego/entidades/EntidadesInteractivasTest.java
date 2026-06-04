@@ -15,6 +15,7 @@ import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EntidadesInteractivasTest {
@@ -52,6 +53,17 @@ class EntidadesInteractivasTest {
 
         assertTrue(MonstruoActual.ContieneDulce(new Vector2(1.56f, 1f)));
         assertFalse(MonstruoActual.ContieneDulce(new Vector2(1.57f, 1f)));
+    }
+
+    @Test
+    void MonstruoEntregaCopiaDeSuPosicionActual() {
+        Monstruo MonstruoActual = new Monstruo(new Vector2(1f, 1f), new PersonalizacionMonstruo(ColorMonstruo.Verde));
+
+        MonstruoActual.EstablecerPosicion(new Vector2(2f, 3f));
+        Vector2 PosicionObtenida = MonstruoActual.ObtenerPosicion();
+        PosicionObtenida.set(9f, 9f);
+
+        assertEquals(new Vector2(2f, 3f), MonstruoActual.ObtenerPosicion());
     }
 }
 

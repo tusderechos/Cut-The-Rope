@@ -11,12 +11,9 @@ package com.tusderechos.Juego;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
-import com.tusderechos.Juego.niveles.ProgresoJugadorDemo;
 import com.tusderechos.Juego.pantallas.PantallaSeleccionNivel;
 
 public class Juego extends Game {
-    private final ProgresoJugadorDemo ProgresoJugadorDemoActual = new ProgresoJugadorDemo();
-
     @Override
     public void create() {
         setScreen(new PantallaSeleccionNivel(this));
@@ -28,10 +25,6 @@ public class Juego extends Game {
         if (PantallaAnterior != null) {
             PantallaAnterior.dispose();
         }
-    }
-
-    public ProgresoJugadorDemo ObtenerProgresoJugadorDemo() {
-        return ProgresoJugadorDemoActual;
     }
 
     @Override

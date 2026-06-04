@@ -10,12 +10,15 @@ package com.tusderechos.Juego.entidades;
  */
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.tusderechos.Juego.graficos.GestorTexturas;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 
@@ -48,6 +51,17 @@ public class Dulce extends ElementoJuego {
     public void Dibujar(ShapeRenderer ShapeRendererActual) {
         ShapeRendererActual.setColor(Personalizacion.ObtenerColor());
         ShapeRendererActual.circle(Cuerpo.getPosition().x, Cuerpo.getPosition().y, ConstantesJuego.RadioDulce, 32);
+    }
+
+    public boolean DibujarTextura(SpriteBatch Batch, GestorTexturas GestorTexturasActual) {
+        Texture Textura = GestorTexturasActual.ObtenerDulce(Personalizacion.ObtenerColorDulce());
+        if (Textura == null) {
+            return false;
+        }
+        Vector2 Posicion = Cuerpo.getPosition();
+        float Tamano = ConstantesJuego.RadioDulce * 2.35f;
+        Batch.draw(Textura, Posicion.x - Tamano / 2f, Posicion.y - Tamano / 2f, Tamano, Tamano);
+        return true;
     }
 }
 

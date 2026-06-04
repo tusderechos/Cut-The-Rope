@@ -17,15 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TextoPanelResultadoTest {
     @Test
     void CreaTodasLasLineasDelPanelDeVictoria() {
-        List<String> Lineas = TextoPanelResultado.CrearLineas(2, 3100, 7200, 12.4f, 1);
+        List<String> Lineas = TextoPanelResultado.CrearLineas(2, 3100, 12.4f, 1);
 
-        assertEquals(6, Lineas.size());
-        assertEquals("Estrellas: 2/3", Lineas.get(0));
-        assertEquals("Faltaron: 1", Lineas.get(1));
-        assertEquals("Puntaje: 3100", Lineas.get(2));
-        assertEquals("Total ranking: 7200", Lineas.get(3));
-        assertEquals("Tiempo: 12 s", Lineas.get(4));
-        assertEquals("Fallos: 1", Lineas.get(5));
+        assertEquals(4, Lineas.size());
+        assertEquals("Puntaje conseguido: 3100", Lineas.get(0));
+        assertEquals("Tiempo usado: 12 s", Lineas.get(1));
+        assertEquals("Fallos del intento: 1", Lineas.get(2));
+        assertEquals("Estrellas faltantes: 1", Lineas.get(3));
     }
 
     @Test

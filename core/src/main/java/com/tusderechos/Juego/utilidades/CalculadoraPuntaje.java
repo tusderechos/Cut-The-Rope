@@ -9,9 +9,6 @@ package com.tusderechos.Juego.utilidades;
  * @author Hp
  */
 
-import com.tusderechos.Juego.niveles.ResultadoNivel;
-import java.util.List;
-
 public final class CalculadoraPuntaje {
     private CalculadoraPuntaje() {
     }
@@ -24,20 +21,6 @@ public final class CalculadoraPuntaje {
         long BonoTiempo = Math.max(0L, 2000L - Math.round(Tiempo * 50f));
         long Puntaje = Math.max(0L, BonoEstrellas + BonoTiempo - Fallos * 150L);
         return (int) Math.min(Integer.MAX_VALUE, Puntaje);
-    }
-
-    public static int CalcularPuntajeAcumuladoRecursivo(List<ResultadoNivel> Resultados) {
-        if (Resultados == null || Resultados.contains(null)) {
-            throw new IllegalArgumentException("Los resultados no pueden contener valores nulos");
-        }
-        return (int) Math.min(Integer.MAX_VALUE, SumarDesdeIndice(Resultados, 0));
-    }
-
-    private static long SumarDesdeIndice(List<ResultadoNivel> Resultados, int Indice) {
-        if (Indice >= Resultados.size()) {
-            return 0L;
-        }
-        return Resultados.get(Indice).ObtenerPuntaje() + SumarDesdeIndice(Resultados, Indice + 1);
     }
 }
 
