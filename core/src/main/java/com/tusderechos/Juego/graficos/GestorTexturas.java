@@ -40,6 +40,10 @@ public final class GestorTexturas implements Disposable {
         return Texturas.get(RutasTexturas.Estrella);
     }
 
+    public Texture ObtenerFondoNivel(int NumeroNivel) {
+        return Texturas.get(RutasTexturas.ObtenerFondoNivel(NumeroNivel));
+    }
+
     private Texture CargarTextura(String Ruta) {
         try {
             Texture Textura = new Texture(Gdx.files.internal(Ruta));

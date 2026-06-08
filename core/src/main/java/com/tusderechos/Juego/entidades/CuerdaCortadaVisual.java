@@ -16,13 +16,14 @@ import com.tusderechos.Juego.interfaces.Actualizable;
 import com.tusderechos.Juego.interfaces.Dibujable;
 
 public class CuerdaCortadaVisual implements Actualizable, Dibujable {
+    private static final float Duracion = 0.75f;
+    private static final float GrosorSombra = 0.060f;
+    private static final float GrosorCuerpo = 0.044f;
     private final Vector2 InicioSuperior;
     private final Vector2 FinSuperior;
     private final Vector2 InicioInferior;
     private final Vector2 FinInferior;
     private float Edad;
-    private static final float Duracion = 0.75f;
-    private static final float GrosorVisual = 0.03f;
 
     public CuerdaCortadaVisual(Vector2 Inicio, Vector2 Corte, Vector2 Fin) {
         InicioSuperior = new Vector2(Inicio);
@@ -46,9 +47,15 @@ public class CuerdaCortadaVisual implements Actualizable, Dibujable {
     @Override
     public void Dibujar(ShapeRenderer ShapeRendererActual) {
         float Alpha = Math.max(0f, 1f - Edad / Duracion);
-        ShapeRendererActual.setColor(new Color(0.82f, 0.70f, 0.46f, Alpha));
-        ShapeRendererActual.rectLine(InicioSuperior, FinSuperior, GrosorVisual);
-        ShapeRendererActual.rectLine(InicioInferior, FinInferior, GrosorVisual);
+        DibujarSegmento(ShapeRendererActual, InicioSuperior, FinSuperior, Alpha);
+        DibujarSegmento(ShapeRendererActual, InicioInferior, FinInferior, Alpha);
+    }
+
+    private void DibujarSegmento(ShapeRenderer ShapeRendererActual, Vector2 Inicio, Vector2 Fin, float Alpha) {
+        ShapeRendererActual.setColor(new Color(0.26f, 0.18f, 0.10f, Alpha * 0.75f));
+        ShapeRendererActual.rectLine(Inicio, Fin, GrosorSombra);
+        ShapeRendererActual.setColor(new Color(0.72f, 0.52f, 0.27f, Alpha));
+        ShapeRendererActual.rectLine(Inicio, Fin, GrosorCuerpo);
     }
 }
 

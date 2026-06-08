@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GeometriaJuegoTest {
     @Test
@@ -35,6 +37,20 @@ class GeometriaJuegoTest {
 
         assertEquals(1f, PuntoProyectado.x, 0.001f);
         assertEquals(0f, PuntoProyectado.y, 0.001f);
+    }
+
+    @Test
+    void DetectaArrastreQueCruzaUnaCuerdaEnMovimiento() {
+        boolean CruzaCuerda = GeometriaJuego.SegmentosEstanCerca(new Vector2(1f, -0.6f), new Vector2(1f, 0.6f), new Vector2(0f, 0f), new Vector2(2f, 0f), 0.05f);
+
+        assertTrue(CruzaCuerda);
+    }
+
+    @Test
+    void IgnoraArrastreLejanoDeLaCuerda() {
+        boolean CruzaCuerda = GeometriaJuego.SegmentosEstanCerca(new Vector2(1f, 0.8f), new Vector2(1f, 1.2f), new Vector2(0f, 0f), new Vector2(2f, 0f), 0.05f);
+
+        assertFalse(CruzaCuerda);
     }
 }
 

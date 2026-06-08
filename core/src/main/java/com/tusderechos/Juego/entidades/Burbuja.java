@@ -16,6 +16,7 @@ import com.tusderechos.Juego.interfaces.Dibujable;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 
 public class Burbuja implements Dibujable {
+    
     private final Vector2 Posicion;
     private final float Radio;
     private boolean Activa = true;
@@ -29,12 +30,15 @@ public class Burbuja implements Dibujable {
     public boolean ContienePunto(Vector2 PuntoMundo) {
         return Activa && Posicion.dst(PuntoMundo) <= Radio;
     }
+    
     public boolean EstaActiva() {
         return Activa;
     }
+    
     public boolean EstaAdherida() {
         return Activa && Adherida;
     }
+    
     public boolean IntentarAdherir(Vector2 PosicionDulce) {
         if (!Activa || Adherida || Posicion.dst(PosicionDulce) > Radio + ConstantesJuego.RadioDulce) {
             return false;
@@ -43,11 +47,13 @@ public class Burbuja implements Dibujable {
         Posicion.set(PosicionDulce);
         return true;
     }
+    
     public void Reventar() {
         if (Adherida) {
             Activa = false;
         }
     }
+    
     public void SeguirDulce(Vector2 PosicionDulce) {
         if (EstaAdherida()) {
             Posicion.set(PosicionDulce);

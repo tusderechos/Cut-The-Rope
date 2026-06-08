@@ -10,6 +10,7 @@ package com.tusderechos.Juego.pantallas;
  */
 
 import java.util.List;
+import com.tusderechos.Juego.niveles.FabricaNiveles;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,6 +30,15 @@ class TextoPanelResultadoTest {
     @Test
     void CambiaTextoDeSiguienteEnElUltimoNivel() {
         assertEquals("Siguiente", TextoPanelResultado.CrearTextoSiguiente(1));
-        assertEquals("Final", TextoPanelResultado.CrearTextoSiguiente(5));
+        assertEquals("Siguiente", TextoPanelResultado.CrearTextoSiguiente(5));
+        assertEquals("Siguiente", TextoPanelResultado.CrearTextoSiguiente(10));
+        assertEquals("Final", TextoPanelResultado.CrearTextoSiguiente(15));
+    }
+
+    @Test
+    void CambiaTextoDeSiguienteSegunCategoriaDelNivel() {
+        assertEquals("Siguiente", TextoPanelResultado.CrearTextoSiguiente(FabricaNiveles.ObtenerNivel(1)));
+        assertEquals("Final", TextoPanelResultado.CrearTextoSiguiente(FabricaNiveles.ObtenerNivel(5)));
+        assertEquals("Final", TextoPanelResultado.CrearTextoSiguiente(FabricaNiveles.ObtenerNivel(10)));
     }
 }

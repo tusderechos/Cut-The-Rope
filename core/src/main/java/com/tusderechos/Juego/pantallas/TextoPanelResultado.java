@@ -9,6 +9,7 @@ package com.tusderechos.Juego.pantallas;
  * @author Hp
  */
 
+import com.tusderechos.Juego.niveles.DatosNivel;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import java.util.Arrays;
 import java.util.List;
@@ -23,5 +24,9 @@ public final class TextoPanelResultado {
 
     public static String CrearTextoSiguiente(int NumeroNivelActual) {
         return NumeroNivelActual < FabricaNiveles.CantidadNiveles() ? "Siguiente" : "Final";
+    }
+
+    public static String CrearTextoSiguiente(DatosNivel NivelActual) {
+        return NivelActual.ObtenerNumeroEnCategoria() < FabricaNiveles.CantidadNiveles(NivelActual.ObtenerCategoria()) ? "Siguiente" : "Final";
     }
 }

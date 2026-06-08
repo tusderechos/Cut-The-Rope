@@ -23,12 +23,17 @@ import com.tusderechos.Juego.utilidades.ConstantesJuego;
 import com.tusderechos.Juego.utilidades.GeometriaJuego;
 
 public class Cuerda implements Cortable, Dibujable {
+    private static final Color ColorSombra = new Color(0.28f, 0.20f, 0.12f, 0.75f);
+    private static final Color ColorCuerpo = new Color(0.72f, 0.52f, 0.27f, 1f);
+    private static final Color ColorBrillo = new Color(0.96f, 0.82f, 0.52f, 0.88f);
+    private static final float GrosorSombra = 0.070f;
+    private static final float GrosorCuerpo = 0.052f;
+    private static final float GrosorBrillo = 0.018f;
     private final World Mundo;
     private final Body Ancla;
     private final Body CuerpoDulce;
     private DistanceJoint Joint;
     private boolean Cortada;
-    private static final float GrosorVisual = 0.035f;
 
     public Cuerda(World Mundo, Vector2 PosicionAncla, float Longitud, Body CuerpoDulce) {
         this.Mundo = Mundo;
@@ -46,19 +51,23 @@ public class Cuerda implements Cortable, Dibujable {
     public Vector2 ObtenerAncla() {
         return new Vector2(Ancla.getPosition());
     }
+
     public Vector2 ObtenerFin() {
         return new Vector2(CuerpoDulce.getPosition());
     }
-    public float ObtenerDistanciaAlPunto(Vector2 PuntoMundo) {
-        return GeometriaJuego.DistanciaPuntoASegmento(PuntoMundo, Ancla.getPosition(), CuerpoDulce.getPosition());
-    }
-    public Vector2 ProyectarPuntoDeCorte(Vector2 PuntoMundo) {
+
+    private Vector2 ProyectarPuntoDeCorte(Vector2 PuntoMundo) {
         return GeometriaJuego.ProyectarPuntoSobreSegmento(PuntoMundo, Ancla.getPosition(), CuerpoDulce.getPosition());
     }
 
     @Override
-    public boolean ContienePuntoDeCorte(Vector2 PuntoMundo) {
-        return !Cortada && ObtenerDistanciaAlPunto(PuntoMundo) <= ConstantesJuego.MargenCorteCuerda;
+    public boolean IntersectaTrazoDeCorte(Vector2 InicioTrazo, Vector2 FinTrazo) {
+        return !Cortada && GeometriaJuego.SegmentosEstanCerca(InicioTrazo, FinTrazo, Ancla.getPosition(), CuerpoDulce.getPosition(), ConstantesJuego.MargenCorteCuerda);
+    }
+
+    public Vector2 ProyectarTrazoDeCorte(Vector2 InicioTrazo, Vector2 FinTrazo) {
+        Vector2 PuntoMedioTrazo = new Vector2(InicioTrazo).add(FinTrazo).scl(0.5f);
+        return ProyectarPuntoDeCorte(PuntoMedioTrazo);
     }
 
     @Override
@@ -81,8 +90,12 @@ public class Cuerda implements Cortable, Dibujable {
         if (Cortada) {
             return;
         }
-        ShapeRendererActual.setColor(new Color(0.82f, 0.70f, 0.46f, 1f));
-        ShapeRendererActual.rectLine(Ancla.getPosition(), CuerpoDulce.getPosition(), GrosorVisual);
+        ShapeRendererActual.setColor(ColorSombra);
+        ShapeRendererActual.rectLine(Ancla.getPosition(), CuerpoDulce.getPosition(), GrosorSombra);
+        ShapeRendererActual.setColor(ColorCuerpo);
+        ShapeRendererActual.rectLine(Ancla.getPosition(), CuerpoDulce.getPosition(), GrosorCuerpo);
+        ShapeRendererActual.setColor(ColorBrillo);
+        ShapeRendererActual.rectLine(Ancla.getPosition(), CuerpoDulce.getPosition(), GrosorBrillo);
     }
 }
 
