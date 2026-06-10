@@ -12,7 +12,6 @@ package com.tusderechos.Juego.pantallas;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -31,6 +30,7 @@ import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.GestorFuentes;
 import com.tusderechos.Juego.graficos.RutasTexturas;
+import com.tusderechos.Juego.graficos.TexturasInterfaz;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
@@ -81,10 +81,10 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     public void show() {
         StageActual = new Stage(new ScreenViewport());
         Fuente = GestorFuentes.CrearFuenteGoodDog(36);
-        TexturaBoton = CrearTexturaBoton(Color.valueOf("2f9f91"), Color.valueOf("9ff5df"), Color.valueOf("43c7b6"));
-        TexturaBotonPresionado = CrearTexturaBoton(Color.valueOf("21766d"), Color.valueOf("c6fff0"), Color.valueOf("2fa394"));
-        TexturaBotonNivel = CrearTexturaBoton(Color.valueOf("f0a13a"), Color.valueOf("ffe0a2"), Color.valueOf("ffc65a"));
-        TexturaBotonNivelPresionado = CrearTexturaBoton(Color.valueOf("c87425"), Color.valueOf("fff0c9"), Color.valueOf("e99a36"));
+        TexturaBoton = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("2f9f91"), Color.valueOf("9ff5df"), Color.valueOf("43c7b6"));
+        TexturaBotonPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("21766d"), Color.valueOf("c6fff0"), Color.valueOf("2fa394"));
+        TexturaBotonNivel = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("f0a13a"), Color.valueOf("ffe0a2"), Color.valueOf("ffc65a"));
+        TexturaBotonNivelPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("c87425"), Color.valueOf("fff0c9"), Color.valueOf("e99a36"));
         EstiloBoton = new TextButton.TextButtonStyle();
         EstiloBoton.font = Fuente;
         EstiloBoton.fontColor = Color.WHITE;
@@ -125,6 +125,15 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
                 Raiz.row();
             }
         }
+        Raiz.row();
+        TextButton BotonRivalidad = new TextButton("Rivalidad", EstiloBoton);
+        BotonRivalidad.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                JuegoAplicacion.CambiarPantalla(new PantallaRivalidad(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
+            }
+        });
+        Raiz.add(BotonRivalidad).colspan(3).width(260f).height(58f).padTop(16f).padBottom(10f);
         Raiz.row();
         Raiz.add(new Image(TexturaBotonPresionado)).colspan(3).width(320f).height(2f).padTop(28f).padBottom(8f);
         Raiz.row();
@@ -207,31 +216,6 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         }
         TexturaMonstruoPreview = CargarTextura(RutasTexturas.ObtenerMonstruo(ColorMonstruoActual));
         ImagenMonstruoPreview.setDrawable(new TextureRegionDrawable(TexturaMonstruoPreview));
-    }
-
-    private Texture CrearTexturaBoton(Color ColorFondo, Color ColorBorde, Color ColorBrillo) {
-        Pixmap PixmapActual = new Pixmap(96, 64, Pixmap.Format.RGBA8888);
-        PixmapActual.setColor(0f, 0f, 0f, 0f);
-        PixmapActual.fill();
-        PixmapActual.setColor(ColorBorde);
-        DibujarRectanguloRedondeado(PixmapActual, 0, 0, 96, 64, 14);
-        PixmapActual.setColor(ColorFondo);
-        DibujarRectanguloRedondeado(PixmapActual, 3, 3, 90, 58, 11);
-        PixmapActual.setColor(ColorBrillo);
-        DibujarRectanguloRedondeado(PixmapActual, 8, 8, 80, 14, 6);
-        Texture Textura = new Texture(PixmapActual);
-        Textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        PixmapActual.dispose();
-        return Textura;
-    }
-
-    private void DibujarRectanguloRedondeado(Pixmap PixmapActual, int X, int Y, int Ancho, int Alto, int Radio) {
-        PixmapActual.fillRectangle(X + Radio, Y, Ancho - Radio * 2, Alto);
-        PixmapActual.fillRectangle(X, Y + Radio, Ancho, Alto - Radio * 2);
-        PixmapActual.fillCircle(X + Radio, Y + Radio, Radio);
-        PixmapActual.fillCircle(X + Ancho - Radio - 1, Y + Radio, Radio);
-        PixmapActual.fillCircle(X + Radio, Y + Alto - Radio - 1, Radio);
-        PixmapActual.fillCircle(X + Ancho - Radio - 1, Y + Alto - Radio - 1, Radio);
     }
 
     @Override

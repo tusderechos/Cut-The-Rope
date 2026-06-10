@@ -11,15 +11,16 @@ package com.tusderechos.Juego;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
-import com.tusderechos.Juego.pantallas.PantallaSeleccionNivel;
 
-public class Juego extends Game {
+public abstract class Juego extends Game {
     @Override
-    public void create() {
-        setScreen(new PantallaSeleccionNivel(this));
+    public final void create() {
+        setScreen(CrearPantallaInicial());
     }
 
-    public void CambiarPantalla(Screen NuevaPantalla) {
+    protected abstract Screen CrearPantallaInicial();
+
+    public final void CambiarPantalla(Screen NuevaPantalla) {
         Screen PantallaAnterior = getScreen();
         setScreen(NuevaPantalla);
         if (PantallaAnterior != null) {
@@ -28,7 +29,7 @@ public class Juego extends Game {
     }
 
     @Override
-    public void dispose() {
+    public final void dispose() {
         if (getScreen() != null) {
             getScreen().dispose();
         }

@@ -48,6 +48,11 @@ import com.tusderechos.Juego.niveles.DatosNivel;
 import com.tusderechos.Juego.niveles.ResultadoNivel;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
+import com.tusderechos.Juego.persistencia.GuardadorPartidasBinario;
+import com.tusderechos.Juego.persistencia.RegistroPartida;
+import com.tusderechos.Juego.rivalidad.DatosReto;
+import com.tusderechos.Juego.rivalidad.GestorRetos;
+import com.tusderechos.Juego.rivalidad.ResultadoReto;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 import com.tusderechos.Juego.utilidades.CalculadoraPuntaje;
 import com.tusderechos.Juego.enums.EstadoNivel;
@@ -61,6 +66,7 @@ public class PantallaJuego extends ScreenAdapter {
     private final DatosNivel DatosNivelActual;
     private final PersonalizacionDulce PersonalizacionDulceActual;
     private final PersonalizacionMonstruo PersonalizacionMonstruoActual;
+    private final DatosReto RetoActual;
     private World Mundo;
     private OrthographicCamera Camara;
     private FitViewport Viewport;
@@ -89,6 +95,7 @@ public class PantallaJuego extends ScreenAdapter {
     private int EstrellasRecolectadas;
     private int PuntajeFinal;
     private ResultadoNivel ResultadoNivelActual;
+    private ResultadoReto ResultadoRetoActual;
     private AnimacionPanelResultado AnimacionResultadoActual;
     private EstadoNivel EstadoNivelActual = EstadoNivel.Jugando;
     private boolean ConfirmacionSalidaActiva;
@@ -103,10 +110,15 @@ public class PantallaJuego extends ScreenAdapter {
     private Vector2 PuntoArrastreAnterior;
 
     public PantallaJuego(Juego JuegoAplicacion, DatosNivel DatosNivelActual, PersonalizacionDulce PersonalizacionDulceActual, PersonalizacionMonstruo PersonalizacionMonstruoActual) {
+        this(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual, null);
+    }
+
+    public PantallaJuego(Juego JuegoAplicacion, DatosNivel DatosNivelActual, PersonalizacionDulce PersonalizacionDulceActual, PersonalizacionMonstruo PersonalizacionMonstruoActual, DatosReto RetoActual) {
         this.JuegoAplicacion = JuegoAplicacion;
         this.DatosNivelActual = DatosNivelActual;
         this.PersonalizacionDulceActual = PersonalizacionDulceActual;
         this.PersonalizacionMonstruoActual = PersonalizacionMonstruoActual;
+        this.RetoActual = RetoActual;
     }
 
     @Override
@@ -212,7 +224,7 @@ public class PantallaJuego extends ScreenAdapter {
             ActualizarTransicionFallo(Delta);
         }
         if (EstadoNivelActual == EstadoNivel.Reiniciando) {
-            PantallaJuego Reinicio = new PantallaJuego(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual);
+            PantallaJuego Reinicio = new PantallaJuego(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual, RetoActual);
             Reinicio.FallosNivel = FallosNivel;
             JuegoAplicacion.CambiarPantalla(Reinicio);
             return;
@@ -475,6 +487,10 @@ public class PantallaJuego extends ScreenAdapter {
         ConfirmacionSalidaActiva = false;
         PuntajeFinal = CalculadoraPuntaje.CalcularPuntajeIntento(EstrellasRecolectadas, TiempoNivel, FallosNivel);
         ResultadoNivelActual = new ResultadoNivel(DatosNivelActual.ObtenerNumero(), EstrellasRecolectadas, PuntajeFinal, TiempoNivel);
+        if (RetoActual != null) {
+            ResultadoRetoActual = GestorRetos.EvaluarResultado(RetoActual, ResultadoNivelActual);
+        }
+        GuardarResultadoPartida();
         AnimacionResultadoActual = new AnimacionPanelResultado(PuntajeFinal);
         CrearEfecto(MonstruoActual.ObtenerPosicion(), 0.24f, 0.95f, new Color(0.25f, 0.90f, 0.35f, 1f));
         GestorAudioActual.ReproducirVictoria();
@@ -482,6 +498,11 @@ public class PantallaJuego extends ScreenAdapter {
 
     private void CrearEfecto(Vector2 Posicion, float RadioInicial, float RadioFinal, Color ColorActual) {
         EfectosVisuales.add(new EfectoVisualTemporal(Posicion, RadioInicial, RadioFinal, ColorActual));
+    }
+
+    private void GuardarResultadoPartida() {
+        RegistroPartida Registro = RegistroPartida.CrearDesdeResultado(DatosNivelActual, ResultadoNivelActual, FallosNivel, RetoActual);
+        GuardadorPartidasBinario.GuardarEnHilo(Gdx.files.local("datos/partidas_cut_the_rope.bin").file().toPath(), Registro);
     }
 
     private void ActualizarEfectosVisuales(float Delta) {
@@ -505,6 +526,10 @@ public class PantallaJuego extends ScreenAdapter {
         if (BotonResultadoSalir.contains(PuntoMundo)) {
             VolverASeleccion();
         } else if (BotonSiguiente.contains(PuntoMundo)) {
+            if (RetoActual != null) {
+                VolverASeleccion();
+                return;
+            }
             int SiguienteNivel = DatosNivelActual.ObtenerNumeroEnCategoria() + 1;
             if (SiguienteNivel > FabricaNiveles.CantidadNiveles(DatosNivelActual.ObtenerCategoria())) {
                 VolverASeleccion();
@@ -523,14 +548,16 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void VolverASeleccion() {
+        if (RetoActual != null) {
+            JuegoAplicacion.CambiarPantalla(new PantallaRivalidad(JuegoAplicacion, PersonalizacionDulceActual.ObtenerColorDulce(), PersonalizacionMonstruoActual.ObtenerColorMonstruo(), RetoActual.ObtenerCategoria()));
+            return;
+        }
         JuegoAplicacion.CambiarPantalla(new PantallaSeleccionNivel(JuegoAplicacion, PersonalizacionDulceActual.ObtenerColorDulce(), PersonalizacionMonstruoActual.ObtenerColorMonstruo(), DatosNivelActual.ObtenerCategoria()));
     }
 
     private void DibujarPanelResultado(ShapeRenderer Renderer) {
-        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.98f));
-        Renderer.rect(0.35f, 1.0f, 4.1f, 5.15f);
-        Renderer.setColor(new Color(0.10f, 0.14f, 0.19f, 1f));
-        Renderer.rect(0.56f, 2.68f, 3.68f, 2.12f);
+        DibujarPanelRedondeado(Renderer, 0.35f, 1.0f, 4.1f, 5.15f, 0.18f, new Color(0.05f, 0.07f, 0.10f, 0.98f), new Color(0.20f, 0.28f, 0.35f, 0.92f));
+        DibujarPanelRedondeado(Renderer, 0.56f, 2.68f, 3.68f, 2.12f, 0.12f, new Color(0.10f, 0.14f, 0.19f, 1f), new Color(0.25f, 0.34f, 0.42f, 0.85f));
         if (GestorTexturasActual.ObtenerEstrella(false) == null || GestorTexturasActual.ObtenerEstrella(true) == null) {
             DibujarEstrellasResultado(Renderer);
         }
@@ -580,8 +607,7 @@ public class PantallaJuego extends ScreenAdapter {
     private void DibujarPanelConfirmacionSalida(ShapeRenderer Renderer) {
         Renderer.setColor(new Color(0f, 0f, 0f, 0.58f));
         Renderer.rect(0f, 0f, ConstantesJuego.AnchoMundo, ConstantesJuego.AltoMundo);
-        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.98f));
-        Renderer.rect(PanelConfirmacionSalir.x, PanelConfirmacionSalir.y, PanelConfirmacionSalir.width, PanelConfirmacionSalir.height);
+        DibujarPanelRedondeado(Renderer, PanelConfirmacionSalir.x, PanelConfirmacionSalir.y, PanelConfirmacionSalir.width, PanelConfirmacionSalir.height, 0.16f, new Color(0.05f, 0.07f, 0.10f, 0.98f), new Color(0.22f, 0.30f, 0.38f, 0.94f));
         DibujarBoton(Renderer, BotonCancelarSalida, Color.valueOf("3b77c4"), Color.valueOf("b9dcff"), Color.valueOf("67a9f0"));
         DibujarBoton(Renderer, BotonConfirmarSalida, Color.valueOf("c74343"), Color.valueOf("ff9a7a"), Color.valueOf("ef6868"));
     }
@@ -619,8 +645,12 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void DibujarHud(ShapeRenderer Renderer) {
-        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.70f));
+        Renderer.setColor(new Color(0f, 0f, 0f, 0.22f));
+        Renderer.rect(FondoHud.x, FondoHud.y - 0.03f, FondoHud.width, FondoHud.height);
+        Renderer.setColor(new Color(0.05f, 0.07f, 0.10f, 0.76f));
         Renderer.rect(FondoHud.x, FondoHud.y, FondoHud.width, FondoHud.height);
+        Renderer.setColor(new Color(0.30f, 0.43f, 0.52f, 0.35f));
+        Renderer.rect(FondoHud.x, FondoHud.y, FondoHud.width, 0.04f);
     }
 
     private void DibujarEstrellasResultado(ShapeRenderer Renderer) {
@@ -645,6 +675,17 @@ public class PantallaJuego extends ScreenAdapter {
         DibujarRectanguloRedondeado(Renderer, Rectangulo.x + 0.035f, Rectangulo.y + 0.035f, Rectangulo.width - 0.07f, Rectangulo.height - 0.07f, 0.08f);
         Renderer.setColor(ColorBrillo);
         DibujarRectanguloRedondeado(Renderer, Rectangulo.x + 0.13f, Rectangulo.y + Rectangulo.height - 0.16f, Rectangulo.width - 0.26f, 0.07f, 0.035f);
+    }
+
+    private void DibujarPanelRedondeado(ShapeRenderer Renderer, float X, float Y, float Ancho, float Alto, float Radio, Color ColorFondo, Color ColorBorde) {
+        Renderer.setColor(new Color(0f, 0f, 0f, 0.28f));
+        DibujarRectanguloRedondeado(Renderer, X + 0.045f, Y - 0.045f, Ancho, Alto, Radio);
+        Renderer.setColor(ColorBorde);
+        DibujarRectanguloRedondeado(Renderer, X, Y, Ancho, Alto, Radio);
+        Renderer.setColor(ColorFondo);
+        DibujarRectanguloRedondeado(Renderer, X + 0.045f, Y + 0.045f, Ancho - 0.09f, Alto - 0.09f, Math.max(0.02f, Radio - 0.035f));
+        Renderer.setColor(new Color(1f, 1f, 1f, 0.06f));
+        DibujarRectanguloRedondeado(Renderer, X + 0.18f, Y + Alto - 0.22f, Ancho - 0.36f, 0.08f, 0.04f);
     }
 
     private void DibujarRectanguloRedondeado(ShapeRenderer Renderer, float X, float Y, float Ancho, float Alto, float Radio) {
@@ -682,16 +723,17 @@ public class PantallaJuego extends ScreenAdapter {
         Fuente.setColor(Color.WHITE);
         Fuente.getData().setScale(1.05f);
         DibujarTextoCentradoMundo("Nivel completado", 2.4f, 5.84f);
-        Fuente.getData().setScale(0.86f);
+        Fuente.getData().setScale(RetoActual == null ? 0.86f : 0.78f);
         int PuntajeVisible = AnimacionResultadoActual == null ? PuntajeFinal : AnimacionResultadoActual.ObtenerPuntajeVisible();
-        List<String> LineasResultado = TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeVisible, TiempoNivel, FallosNivel);
+        List<String> LineasResultado = RetoActual == null ? TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeVisible, TiempoNivel, FallosNivel) : TextoPanelResultado.CrearLineasReto(RetoActual, ResultadoRetoActual, PuntajeVisible, TiempoNivel, FallosNivel);
         int LineasVisibles = AnimacionResultadoActual == null ? LineasResultado.size() : AnimacionResultadoActual.ObtenerCantidadLineasVisibles(LineasResultado.size());
+        float SeparacionLineas = RetoActual == null ? 0.45f : 0.38f;
         for (int Indice = 0; Indice < LineasVisibles; Indice++) {
-            DibujarTextoCentradoMundo(LineasResultado.get(Indice), 2.4f, 4.34f - Indice * 0.45f);
+            DibujarTextoCentradoMundo(LineasResultado.get(Indice), 2.4f, 4.34f - Indice * SeparacionLineas);
         }
         Fuente.getData().setScale(0.78f);
         DibujarTextoCentradoMundo("Salir", BotonResultadoSalir.x + BotonResultadoSalir.width / 2f, BotonResultadoSalir.y + 0.34f);
-        DibujarTextoCentradoMundo(TextoPanelResultado.CrearTextoSiguiente(DatosNivelActual), BotonSiguiente.x + BotonSiguiente.width / 2f, BotonSiguiente.y + 0.34f);
+        DibujarTextoCentradoMundo(RetoActual == null ? TextoPanelResultado.CrearTextoSiguiente(DatosNivelActual) : "Retos", BotonSiguiente.x + BotonSiguiente.width / 2f, BotonSiguiente.y + 0.34f);
     }
 
     private void DibujarTextosConfirmacionSalida() {
@@ -752,6 +794,10 @@ public class PantallaJuego extends ScreenAdapter {
 
     public ResultadoNivel ObtenerResultadoNivelActual() {
         return ResultadoNivelActual;
+    }
+
+    public ResultadoReto ObtenerResultadoRetoActual() {
+        return ResultadoRetoActual;
     }
 
     @Override

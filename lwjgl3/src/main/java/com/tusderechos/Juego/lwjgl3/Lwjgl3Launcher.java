@@ -11,7 +11,7 @@ package com.tusderechos.Juego.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.tusderechos.Juego.Juego;
+import com.tusderechos.Juego.CutTheRope;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 
 public class Lwjgl3Launcher {
@@ -23,7 +23,7 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application CreateApplication() {
-        return new Lwjgl3Application(new Juego(), GetDefaultConfiguration());
+        return new Lwjgl3Application(new CutTheRope(), GetDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration GetDefaultConfiguration() {
@@ -31,7 +31,7 @@ public class Lwjgl3Launcher {
         Configuration.setTitle("CutTheRope");
         Configuration.useVsync(true);
         Configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
-        Configuration.setWindowedMode(ConstantesJuego.AnchoVentana, ConstantesJuego.AltoVentana);
+        Configuration.setWindowedMode(ConstantesJuego.AnchoVentanaEscritorio, ConstantesJuego.AltoVentanaEscritorio);
         Configuration.setResizable(false);
         Configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return Configuration;
