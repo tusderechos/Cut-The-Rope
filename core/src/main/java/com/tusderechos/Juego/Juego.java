@@ -17,6 +17,7 @@ public class Juego extends Game {
     @Override
     public void create() {
         setScreen(new PantallaSeleccionNivel(this));
+        //setScreen(new Menus.Menu.LoginRegisterScreen(this));
     }
 
     public void CambiarPantalla(Screen NuevaPantalla) {
