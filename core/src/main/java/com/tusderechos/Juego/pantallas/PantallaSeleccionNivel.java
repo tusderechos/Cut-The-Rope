@@ -34,6 +34,7 @@ import com.tusderechos.Juego.graficos.TexturasInterfaz;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
+import Menus.Menu.MainMenuScreen;
 
 public class PantallaSeleccionNivel extends ScreenAdapter {
     private final Juego JuegoAplicacion;
@@ -172,6 +173,15 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         Raiz.add(BotonDulce).colspan(3).width(330f).height(62f).padTop(8f).padBottom(8f);
         Raiz.row();
         Raiz.add(BotonMonstruo).colspan(3).width(330f).height(62f).pad(8f);
+        Raiz.row();
+        TextButton BotonMenuPrincipal = new TextButton("Menu principal", EstiloBoton);
+        BotonMenuPrincipal.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                JuegoAplicacion.CambiarPantalla(new MainMenuScreen(JuegoAplicacion));
+            }
+        });
+        Raiz.add(BotonMenuPrincipal).colspan(3).width(330f).height(58f).padTop(8f);
     }
 
     @Override

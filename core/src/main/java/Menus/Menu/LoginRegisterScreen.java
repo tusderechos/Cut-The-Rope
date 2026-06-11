@@ -50,7 +50,7 @@ public class LoginRegisterScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = SkinMenu.Crear();
 
         Table root = new Table();
         root.setFillParent(true);

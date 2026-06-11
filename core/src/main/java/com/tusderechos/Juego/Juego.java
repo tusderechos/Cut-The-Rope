@@ -15,8 +15,7 @@ import com.badlogic.gdx.Screen;
 public abstract class Juego extends Game {
     @Override
     public void create() {
-        setScreen(new PantallaSeleccionNivel(this));
-        //setScreen(new Menus.Menu.LoginRegisterScreen(this));
+        setScreen(CrearPantallaInicial());
     }
 
     protected abstract Screen CrearPantallaInicial();
@@ -37,4 +36,3 @@ public abstract class Juego extends Game {
         super.dispose();
     }
 }
-

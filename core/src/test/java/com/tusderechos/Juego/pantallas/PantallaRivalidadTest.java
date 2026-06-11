@@ -37,7 +37,7 @@ class PantallaRivalidadTest {
 
         assertEquals(5, Pantalla.ObtenerNumeroNivelActual());
         assertEquals(3, Pantalla.ObtenerEstrellasObjetivo());
-        assertEquals(9999, Pantalla.ObtenerPuntajeObjetivo());
+        assertEquals(4000, Pantalla.ObtenerPuntajeObjetivo());
 
         Pantalla.AjustarNivel(-99);
         Pantalla.AjustarEstrellasObjetivo(-99);

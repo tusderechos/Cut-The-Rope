@@ -58,6 +58,9 @@ import com.tusderechos.Juego.utilidades.CalculadoraPuntaje;
 import com.tusderechos.Juego.enums.EstadoNivel;
 import com.tusderechos.Juego.obstaculos.Obstaculo;
 import com.tusderechos.Juego.obstaculos.ObstaculoPeligroso;
+import LogicaArchivos.Usuarios.SistemaAutenticacion;
+import LogicaArchivos.Usuarios.Usuario;
+import ManejoArchivos.Archivos.ManejadorArchivos;
 import java.util.List;
 
 public class PantallaJuego extends ScreenAdapter {
@@ -73,7 +76,9 @@ public class PantallaJuego extends ScreenAdapter {
     private ShapeRenderer ShapeRendererActual;
     private SpriteBatch Batch;
     private BitmapFont Fuente;
+    private BitmapFont FuenteInterfaz;
     private GlyphLayout MedidorTexto;
+    private GlyphLayout MedidorTextoInterfaz;
     private GestorTexturas GestorTexturasActual;
     private Dulce DulceActual;
     private Monstruo MonstruoActual;
@@ -83,13 +88,13 @@ public class PantallaJuego extends ScreenAdapter {
     private final Array<Burbuja> Burbujas = new Array<>();
     private final Array<Obstaculo> Obstaculos = new Array<>();
     private final Array<EfectoVisualTemporal> EfectosVisuales = new Array<>();
-    private final Rectangle BotonSalir = new Rectangle(0.15f, 7.45f, 0.95f, 0.38f);
+    private final Rectangle BotonSalir = new Rectangle(0.23f, 7.38f, 1.00f, 0.46f);
     private final Rectangle BotonResultadoSalir = new Rectangle(0.65f, 1.55f, 1.35f, 0.52f);
     private final Rectangle BotonSiguiente = new Rectangle(2.75f, 1.55f, 1.35f, 0.52f);
     private final Rectangle PanelConfirmacionSalir = new Rectangle(0.55f, 2.65f, 3.7f, 1.85f);
     private final Rectangle BotonCancelarSalida = new Rectangle(0.85f, 2.94f, 1.25f, 0.50f);
     private final Rectangle BotonConfirmarSalida = new Rectangle(2.75f, 2.94f, 1.05f, 0.50f);
-    private final Rectangle FondoHud = new Rectangle(0f, 7.25f, ConstantesJuego.AnchoMundo, 0.75f);
+    private final Rectangle FondoHud = new Rectangle(0f, 7.12f, ConstantesJuego.AnchoMundo, 0.88f);
     private float TiempoNivel;
     private int FallosNivel;
     private int EstrellasRecolectadas;
@@ -130,7 +135,10 @@ public class PantallaJuego extends ScreenAdapter {
         ShapeRendererActual = new ShapeRenderer();
         Batch = new SpriteBatch();
         MedidorTexto = new GlyphLayout();
+        MedidorTextoInterfaz = new GlyphLayout();
         Fuente = GestorFuentes.CrearFuenteGoodDog(34);
+        FuenteInterfaz = new BitmapFont();
+        FuenteInterfaz.getData().setScale(1.05f);
         GestorTexturasActual = new GestorTexturas();
         GestorAudioActual = new GestorAudio();
         GestorAudioActual.IniciarMusica();
@@ -503,6 +511,11 @@ public class PantallaJuego extends ScreenAdapter {
     private void GuardarResultadoPartida() {
         RegistroPartida Registro = RegistroPartida.CrearDesdeResultado(DatosNivelActual, ResultadoNivelActual, FallosNivel, RetoActual);
         GuardadorPartidasBinario.GuardarEnHilo(Gdx.files.local("datos/partidas_cut_the_rope.bin").file().toPath(), Registro);
+        Usuario UsuarioActivo = SistemaAutenticacion.getUsuarioActivo();
+        if (UsuarioActivo != null) {
+            UsuarioActivo.registrarPartida(DatosNivelActual.ObtenerNumero(), true, EstrellasRecolectadas, TiempoNivel);
+            ManejadorArchivos.guardarUsuario(UsuarioActivo);
+        }
     }
 
     private void ActualizarEfectosVisuales(float Delta) {
@@ -557,7 +570,7 @@ public class PantallaJuego extends ScreenAdapter {
 
     private void DibujarPanelResultado(ShapeRenderer Renderer) {
         DibujarPanelRedondeado(Renderer, 0.35f, 1.0f, 4.1f, 5.15f, 0.18f, new Color(0.05f, 0.07f, 0.10f, 0.98f), new Color(0.20f, 0.28f, 0.35f, 0.92f));
-        DibujarPanelRedondeado(Renderer, 0.56f, 2.68f, 3.68f, 2.12f, 0.12f, new Color(0.10f, 0.14f, 0.19f, 1f), new Color(0.25f, 0.34f, 0.42f, 0.85f));
+        DibujarPanelRedondeado(Renderer, 0.56f, 2.55f, 3.68f, 2.25f, 0.12f, new Color(0.10f, 0.14f, 0.19f, 1f), new Color(0.25f, 0.34f, 0.42f, 0.85f));
         if (GestorTexturasActual.ObtenerEstrella(false) == null || GestorTexturasActual.ObtenerEstrella(true) == null) {
             DibujarEstrellasResultado(Renderer);
         }
@@ -702,10 +715,9 @@ public class PantallaJuego extends ScreenAdapter {
         PrepararBatchTexto();
         Batch.begin();
         Fuente.setColor(Color.WHITE);
-        Fuente.getData().setScale(0.68f);
+        FuenteInterfaz.setColor(Color.WHITE);
         if (!NivelCompletado()) {
-            DibujarTextoMundo(TextoHudNivel.CrearTexto(DatosNivelActual.ObtenerNumero(), EstrellasRecolectadas, TiempoNivel), 1.16f, 7.72f);
-            DibujarTextoCentradoMundo("Salir", BotonSalir.x + BotonSalir.width / 2f, BotonSalir.y + 0.30f);
+            DibujarTextosHud();
         }
         if (NivelCompletado() && !ConfirmacionSalidaActiva) {
             DibujarTextosResultado();
@@ -719,32 +731,36 @@ public class PantallaJuego extends ScreenAdapter {
         Batch.end();
     }
 
+    private void DibujarTextosHud() {
+        DibujarTextoInterfazCentradoEnRectanguloMundo("Salir", BotonSalir, 1.35f);
+        DibujarTextoInterfazCentradoMundo("Nivel " + DatosNivelActual.ObtenerNumero(), 1.72f, 7.60f, 1.22f);
+        DibujarTextoInterfazCentradoMundo(EstrellasRecolectadas + "/3", 2.65f, 7.60f, 1.22f);
+        DibujarTextoInterfazCentradoMundo(Math.round(TiempoNivel) + " s", 3.58f, 7.60f, 1.22f);
+    }
+
     private void DibujarTextosResultado() {
         Fuente.setColor(Color.WHITE);
         Fuente.getData().setScale(1.05f);
         DibujarTextoCentradoMundo("Nivel completado", 2.4f, 5.84f);
-        Fuente.getData().setScale(RetoActual == null ? 0.86f : 0.78f);
         int PuntajeVisible = AnimacionResultadoActual == null ? PuntajeFinal : AnimacionResultadoActual.ObtenerPuntajeVisible();
         List<String> LineasResultado = RetoActual == null ? TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeVisible, TiempoNivel, FallosNivel) : TextoPanelResultado.CrearLineasReto(RetoActual, ResultadoRetoActual, PuntajeVisible, TiempoNivel, FallosNivel);
         int LineasVisibles = AnimacionResultadoActual == null ? LineasResultado.size() : AnimacionResultadoActual.ObtenerCantidadLineasVisibles(LineasResultado.size());
-        float SeparacionLineas = RetoActual == null ? 0.45f : 0.38f;
+        float InicioLineas = RetoActual == null ? 4.34f : 4.42f;
+        float SeparacionLineas = RetoActual == null ? 0.45f : 0.34f;
         for (int Indice = 0; Indice < LineasVisibles; Indice++) {
-            DibujarTextoCentradoMundo(LineasResultado.get(Indice), 2.4f, 4.34f - Indice * SeparacionLineas);
+            DibujarTextoInterfazCentradoMundo(LineasResultado.get(Indice), 2.4f, InicioLineas - Indice * SeparacionLineas, RetoActual == null ? 1.0f : 0.9f);
         }
-        Fuente.getData().setScale(0.78f);
-        DibujarTextoCentradoMundo("Salir", BotonResultadoSalir.x + BotonResultadoSalir.width / 2f, BotonResultadoSalir.y + 0.34f);
-        DibujarTextoCentradoMundo(RetoActual == null ? TextoPanelResultado.CrearTextoSiguiente(DatosNivelActual) : "Retos", BotonSiguiente.x + BotonSiguiente.width / 2f, BotonSiguiente.y + 0.34f);
+        DibujarTextoInterfazCentradoEnRectanguloMundo("Salir", BotonResultadoSalir, 1.18f);
+        DibujarTextoInterfazCentradoEnRectanguloMundo(RetoActual == null ? TextoPanelResultado.CrearTextoSiguiente(DatosNivelActual) : "Retos", BotonSiguiente, 1.18f);
     }
 
     private void DibujarTextosConfirmacionSalida() {
         Fuente.setColor(Color.WHITE);
         Fuente.getData().setScale(1.0f);
         DibujarTextoCentradoMundo("Salir del nivel?", 2.4f, 4.22f);
-        Fuente.getData().setScale(0.72f);
-        DibujarTextoCentradoMundo("El intento se reiniciara.", 2.4f, 3.82f);
-        Fuente.getData().setScale(0.82f);
-        DibujarTextoCentradoMundo("Cancelar", BotonCancelarSalida.x + BotonCancelarSalida.width / 2f, BotonCancelarSalida.y + 0.33f);
-        DibujarTextoCentradoMundo("Salir", BotonConfirmarSalida.x + BotonConfirmarSalida.width / 2f, BotonConfirmarSalida.y + 0.33f);
+        DibujarTextoInterfazCentradoMundo("El intento se reiniciara.", 2.4f, 3.82f, 1.0f);
+        DibujarTextoInterfazCentradoEnRectanguloMundo("Cancelar", BotonCancelarSalida, 1.12f);
+        DibujarTextoInterfazCentradoEnRectanguloMundo("Salir", BotonConfirmarSalida, 1.12f);
     }
 
     private void PrepararBatchTexto() {
@@ -752,16 +768,35 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void DibujarTextoMundo(String Texto, float MundoX, float MundoY) {
-        Vector3 PuntoPantalla = new Vector3(MundoX, MundoY, 0f);
-        Viewport.project(PuntoPantalla);
+        Vector2 PuntoPantalla = ConvertirMundoAPantalla(MundoX, MundoY);
         Fuente.draw(Batch, Texto, PuntoPantalla.x, PuntoPantalla.y);
     }
 
     private void DibujarTextoCentradoMundo(String Texto, float MundoX, float MundoY) {
-        Vector3 PuntoPantalla = new Vector3(MundoX, MundoY, 0f);
-        Viewport.project(PuntoPantalla);
+        Vector2 PuntoPantalla = ConvertirMundoAPantalla(MundoX, MundoY);
         MedidorTexto.setText(Fuente, Texto);
         Fuente.draw(Batch, Texto, PuntoPantalla.x - MedidorTexto.width / 2f, PuntoPantalla.y);
+    }
+
+    private void DibujarTextoInterfazCentradoMundo(String Texto, float MundoX, float MundoY, float Escala) {
+        FuenteInterfaz.getData().setScale(Escala);
+        Vector2 PuntoPantalla = ConvertirMundoAPantalla(MundoX, MundoY);
+        MedidorTextoInterfaz.setText(FuenteInterfaz, Texto);
+        FuenteInterfaz.draw(Batch, Texto, PuntoPantalla.x - MedidorTextoInterfaz.width / 2f, PuntoPantalla.y);
+    }
+
+    private void DibujarTextoInterfazCentradoEnRectanguloMundo(String Texto, Rectangle Rectangulo, float Escala) {
+        FuenteInterfaz.getData().setScale(Escala);
+        Vector2 CentroPantalla = ConvertirMundoAPantalla(Rectangulo.x + Rectangulo.width / 2f, Rectangulo.y + Rectangulo.height / 2f);
+        MedidorTextoInterfaz.setText(FuenteInterfaz, Texto);
+        FuenteInterfaz.draw(Batch, Texto, CentroPantalla.x - MedidorTextoInterfaz.width / 2f, CentroPantalla.y + MedidorTextoInterfaz.height / 2f);
+    }
+
+    private Vector2 ConvertirMundoAPantalla(float MundoX, float MundoY) {
+        float PantallaX = Viewport.getScreenX() + MundoX / ConstantesJuego.AnchoMundo * Viewport.getScreenWidth();
+        float PantallaY = Viewport.getScreenY() + MundoY / ConstantesJuego.AltoMundo * Viewport.getScreenHeight();
+
+        return new Vector2(PantallaX, PantallaY);
     }
 
     private Vector2 ConvertirPantallaAMundo(int ScreenX, int ScreenY) {
@@ -823,6 +858,9 @@ public class PantallaJuego extends ScreenAdapter {
         }
         if (Fuente != null) {
             Fuente.dispose();
+        }
+        if (FuenteInterfaz != null) {
+            FuenteInterfaz.dispose();
         }
         if (GestorTexturasActual != null) {
             GestorTexturasActual.dispose();

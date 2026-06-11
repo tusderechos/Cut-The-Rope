@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public final class GestorFuentes {
-    private static final String RutaGoodDog = "fuentes/GOODDC__.TTF";
+    private static final String RutaGoodDog = "fuentes/GOODDP__.TTF";
 
     private GestorFuentes() {
     }

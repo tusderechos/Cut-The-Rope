@@ -36,7 +36,7 @@ public class ProfileScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = SkinMenu.Crear();
         Usuario usuarioActivo = SistemaAutenticacion.getUsuarioActivo();
 
         Table root = new Table();
@@ -125,4 +125,3 @@ public class ProfileScreen implements Screen {
         skin.dispose();
     }
 }
-

@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.tusderechos.Juego.pantallas.PantallaSeleccionNivel;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
 
@@ -35,7 +36,7 @@ public class MainMenuScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uiskin.json"));
+        skin = SkinMenu.Crear();
 
         Usuario usuarioActivo = SistemaAutenticacion.getUsuarioActivo();
         String nombreJugador = (usuarioActivo != null) ? usuarioActivo.getNombreCompleto() : "Jugador";
@@ -62,7 +63,7 @@ public class MainMenuScreen implements Screen {
         btnJugar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log("Menu", "Abriendo el mapa del juego...");
+                parentGame.setScreen(new PantallaSeleccionNivel((com.tusderechos.Juego.Juego) parentGame));
             }
         });
 

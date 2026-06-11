@@ -10,11 +10,11 @@ package com.tusderechos.Juego;
  */
 
 import com.badlogic.gdx.Screen;
-import com.tusderechos.Juego.pantallas.PantallaSeleccionNivel;
+import Menus.Menu.LoginRegisterScreen;
 
 public final class CutTheRope extends Juego {
     @Override
     protected Screen CrearPantallaInicial() {
-        return new PantallaSeleccionNivel(this);
+        return new LoginRegisterScreen(this);
     }
 }

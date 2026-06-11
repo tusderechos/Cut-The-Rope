@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.Juego;
@@ -36,6 +37,9 @@ import com.tusderechos.Juego.rivalidad.DatosReto;
 import com.tusderechos.Juego.rivalidad.GestorRetos;
 
 public class PantallaRivalidad extends ScreenAdapter {
+    private static final int PuntajeObjetivoMinimo = 0;
+    private static final int PuntajeObjetivoMaximo = 4000;
+    private static final int PasoPuntajeObjetivo = 250;
     private final Juego JuegoAplicacion;
     private final ColorDulce ColorDulceActual;
     private final ColorMonstruo ColorMonstruoActual;
@@ -106,7 +110,7 @@ public class PantallaRivalidad extends ScreenAdapter {
     }
 
     public void AjustarPuntajeObjetivo(int Cambio) {
-        PuntajeObjetivo = LimitarValor(PuntajeObjetivo + Cambio, 0, 9999);
+        PuntajeObjetivo = LimitarValor(PuntajeObjetivo + Cambio, PuntajeObjetivoMinimo, PuntajeObjetivoMaximo);
     }
 
     public DatosReto CrearRetoActual() {
@@ -117,7 +121,7 @@ public class PantallaRivalidad extends ScreenAdapter {
     public void show() {
         StageActual = new Stage(new ScreenViewport());
         FuenteTitulo = GestorFuentes.CrearFuenteGoodDog(40);
-        FuenteBoton = GestorFuentes.CrearFuenteGoodDog(28);
+        FuenteBoton = GestorFuentes.CrearFuenteGoodDog(25);
         EstiloTitulo = new Label.LabelStyle(FuenteTitulo, Color.WHITE);
         EstiloTexto = new Label.LabelStyle(FuenteBoton, Color.WHITE);
         CrearTexturas();
@@ -157,16 +161,24 @@ public class PantallaRivalidad extends ScreenAdapter {
         return Estilo;
     }
 
+    private TextButton CrearBoton(String Texto, TextButton.TextButtonStyle Estilo) {
+        TextButton Boton = new TextButton(Texto, Estilo);
+        Boton.getLabel().setAlignment(Align.center);
+        Boton.getLabelCell().padBottom(4f);
+
+        return Boton;
+    }
+
     private void ConstruirContenido() {
         Raiz.clearChildren();
         Raiz.top();
         Table Panel = new Table();
-        Raiz.add(Panel).width(520f).padTop(16f);
-        Panel.add(new Label("Rivalidad", EstiloTitulo)).padBottom(14f);
+        Raiz.add(Panel).width(540f).padTop(18f);
+        Panel.add(new Label("Rivalidad", EstiloTitulo)).padBottom(20f);
         Panel.row();
         Table FilaCategorias = new Table();
         for (final CategoriaDificultad Categoria : CategoriaDificultad.values()) {
-            TextButton BotonCategoria = new TextButton(Categoria.name(), Categoria == CategoriaActual ? EstiloDificultadSeleccionada : EstiloDificultad);
+            TextButton BotonCategoria = CrearBoton(Categoria.name(), Categoria == CategoriaActual ? EstiloDificultadSeleccionada : EstiloDificultad);
             BotonCategoria.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -174,11 +186,11 @@ public class PantallaRivalidad extends ScreenAdapter {
                     ConstruirContenido();
                 }
             });
-            FilaCategorias.add(BotonCategoria).width(126f).height(52f).pad(5f);
+            FilaCategorias.add(BotonCategoria).width(130f).height(54f).pad(7f);
         }
-        Panel.add(FilaCategorias).padBottom(10f);
+        Panel.add(FilaCategorias).padBottom(14f);
         Panel.row();
-        AgregarControlNumerico(Panel, "Nivel", String.valueOf(NumeroNivelActual), 110f, new Runnable() {
+        AgregarControlNumerico(Panel, "Nivel", String.valueOf(NumeroNivelActual), 120f, new Runnable() {
             @Override
             public void run() {
                 AjustarNivel(-1);
@@ -189,7 +201,7 @@ public class PantallaRivalidad extends ScreenAdapter {
                 AjustarNivel(1);
             }
         });
-        AgregarControlNumerico(Panel, "Estrellas", String.valueOf(EstrellasObjetivo), 110f, new Runnable() {
+        AgregarControlNumerico(Panel, "Estrellas", String.valueOf(EstrellasObjetivo), 120f, new Runnable() {
             @Override
             public void run() {
                 AjustarEstrellasObjetivo(-1);
@@ -203,27 +215,28 @@ public class PantallaRivalidad extends ScreenAdapter {
         AgregarControlNumerico(Panel, "Puntaje", String.valueOf(PuntajeObjetivo), 140f, new Runnable() {
             @Override
             public void run() {
-                AjustarPuntajeObjetivo(-250);
+                AjustarPuntajeObjetivo(-PasoPuntajeObjetivo);
             }
         }, new Runnable() {
             @Override
             public void run() {
-                AjustarPuntajeObjetivo(250);
+                AjustarPuntajeObjetivo(PasoPuntajeObjetivo);
             }
         });
         Label ResumenReto = new Label(TextoResumenReto(), EstiloTexto);
         ResumenReto.setWrap(true);
-        Panel.add(ResumenReto).width(480f).padTop(12f).padBottom(14f);
+        ResumenReto.setAlignment(Align.center);
+        Panel.add(ResumenReto).width(500f).padTop(18f).padBottom(16f);
         Panel.row();
         Table FilaAcciones = new Table();
-        TextButton BotonVolver = new TextButton("Volver", EstiloSecundario);
+        TextButton BotonVolver = CrearBoton("Volver", EstiloSecundario);
         BotonVolver.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
                 JuegoAplicacion.CambiarPantalla(new PantallaSeleccionNivel(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
             }
         });
-        TextButton BotonIniciar = new TextButton("Iniciar reto", EstiloPrincipal);
+        TextButton BotonIniciar = CrearBoton("Iniciar reto", EstiloPrincipal);
         BotonIniciar.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -240,7 +253,8 @@ public class PantallaRivalidad extends ScreenAdapter {
         Table FilaControl = new Table();
         Label Etiqueta = new Label(Titulo, EstiloTexto);
         Label EtiquetaValor = new Label(Valor, EstiloTexto);
-        TextButton BotonMenos = new TextButton("-", EstiloSecundario);
+        EtiquetaValor.setAlignment(Align.center);
+        TextButton BotonMenos = CrearBoton("-", EstiloSecundario);
         BotonMenos.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -248,7 +262,7 @@ public class PantallaRivalidad extends ScreenAdapter {
                 ConstruirContenido();
             }
         });
-        TextButton BotonMas = new TextButton("+", EstiloSecundario);
+        TextButton BotonMas = CrearBoton("+", EstiloSecundario);
         BotonMas.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -256,11 +270,11 @@ public class PantallaRivalidad extends ScreenAdapter {
                 ConstruirContenido();
             }
         });
-        FilaControl.add(Etiqueta).width(130f).left().padRight(8f);
-        FilaControl.add(BotonMenos).width(64f).height(42f).pad(4f);
-        FilaControl.add(EtiquetaValor).width(AnchoValor).center().padLeft(8f).padRight(8f);
-        FilaControl.add(BotonMas).width(64f).height(42f).pad(4f);
-        Panel.add(FilaControl).width(480f).padTop(8f);
+        FilaControl.add(Etiqueta).width(150f).left().padRight(10f);
+        FilaControl.add(BotonMenos).width(64f).height(44f).pad(5f);
+        FilaControl.add(EtiquetaValor).width(AnchoValor).center().padLeft(12f).padRight(12f);
+        FilaControl.add(BotonMas).width(64f).height(44f).pad(5f);
+        Panel.add(FilaControl).width(500f).padTop(10f).padBottom(2f);
         Panel.row();
     }
 
