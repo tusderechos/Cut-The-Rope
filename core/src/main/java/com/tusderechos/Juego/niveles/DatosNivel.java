@@ -10,6 +10,7 @@ package com.tusderechos.Juego.niveles;
  */
 
 import com.badlogic.gdx.math.Vector2;
+import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.enums.DificultadNivel;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,8 @@ import java.util.List;
 
 public final class DatosNivel {
     private final int Numero;
+    private final CategoriaDificultad Categoria;
+    private final int NumeroEnCategoria;
     private final String Nombre;
     private final DificultadNivel Dificultad;
     private final Vector2 PosicionDulce;
@@ -27,8 +30,8 @@ public final class DatosNivel {
     private final List<DatosObstaculo> Obstaculos;
     private final boolean PlataformaMovilActual;
 
-    public DatosNivel(int Numero, String Nombre, DificultadNivel Dificultad, Vector2 PosicionDulce, Vector2 PosicionMonstruo, List<DatosCuerda> Cuerdas, List<DatosEstrella> Estrellas, List<DatosBurbuja> Burbujas, List<DatosObstaculo> Obstaculos, boolean PlataformaMovilActual) {
-        if (Numero < 1 || Nombre == null || Nombre.trim().isEmpty() || Dificultad == null) {
+    public DatosNivel(int Numero, CategoriaDificultad Categoria, int NumeroEnCategoria, String Nombre, DificultadNivel Dificultad, Vector2 PosicionDulce, Vector2 PosicionMonstruo, List<DatosCuerda> Cuerdas, List<DatosEstrella> Estrellas, List<DatosBurbuja> Burbujas, List<DatosObstaculo> Obstaculos, boolean PlataformaMovilActual) {
+        if (Numero < 1 || Categoria == null || NumeroEnCategoria < 1 || Nombre == null || Nombre.trim().isEmpty() || Dificultad == null) {
             throw new IllegalArgumentException("Los datos principales del nivel no son validos");
         }
         ValidacionDatosNivel.ValidarVector(PosicionDulce, "La posicion del dulce");
@@ -38,6 +41,8 @@ public final class DatosNivel {
         ValidacionDatosNivel.ValidarLista(Burbujas, "Las Burbujas");
         ValidacionDatosNivel.ValidarLista(Obstaculos, "Los Obstaculos");
         this.Numero = Numero;
+        this.Categoria = Categoria;
+        this.NumeroEnCategoria = NumeroEnCategoria;
         this.Nombre = Nombre;
         this.Dificultad = Dificultad;
         this.PosicionDulce = new Vector2(PosicionDulce);
@@ -52,6 +57,15 @@ public final class DatosNivel {
     public int ObtenerNumero() {
         return Numero;
     }
+
+    public CategoriaDificultad ObtenerCategoria() {
+        return Categoria;
+    }
+
+    public int ObtenerNumeroEnCategoria() {
+        return NumeroEnCategoria;
+    }
+
     public String ObtenerNombre() {
         return Nombre;
     }

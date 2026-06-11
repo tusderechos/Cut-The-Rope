@@ -36,9 +36,18 @@ class RutasTexturasTest {
         List<String> Rutas = RutasTexturas.ObtenerRutas();
         Set<String> RutasUnicas = new HashSet<>(Rutas);
 
-        assertEquals(10, Rutas.size());
+        assertEquals(15, Rutas.size());
         assertEquals(Rutas.size(), RutasUnicas.size());
         assertTrue(Rutas.contains(RutasTexturas.Estrella));
         assertTrue(Rutas.contains(RutasTexturas.EstrellaVacia));
+    }
+
+    @Test
+    void ObtieneUnFondoParaCadaNivel() {
+        assertEquals("imagenes/fondo_1.PNG", RutasTexturas.ObtenerFondoNivel(1));
+        assertEquals("imagenes/fondo_2.PNG", RutasTexturas.ObtenerFondoNivel(2));
+        assertEquals("imagenes/fondo_3.png", RutasTexturas.ObtenerFondoNivel(3));
+        assertEquals("imagenes/fondo_4.png", RutasTexturas.ObtenerFondoNivel(4));
+        assertEquals("imagenes/fondo_5.png", RutasTexturas.ObtenerFondoNivel(5));
     }
 }

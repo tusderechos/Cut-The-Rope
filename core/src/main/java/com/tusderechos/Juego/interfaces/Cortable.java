@@ -12,7 +12,7 @@ package com.tusderechos.Juego.interfaces;
 import com.badlogic.gdx.math.Vector2;
 
 public interface Cortable {
-    boolean ContienePuntoDeCorte(Vector2 PuntoMundo);
+    boolean IntersectaTrazoDeCorte(Vector2 InicioTrazo, Vector2 FinTrazo);
     void Cortar();
     boolean EstaCortada();
 }

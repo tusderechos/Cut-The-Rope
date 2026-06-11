@@ -12,7 +12,6 @@ package com.tusderechos.Juego.pantallas;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,10 +25,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.Juego;
+import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.GestorFuentes;
 import com.tusderechos.Juego.graficos.RutasTexturas;
+import com.tusderechos.Juego.graficos.TexturasInterfaz;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
@@ -40,67 +41,115 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     private BitmapFont Fuente;
     private Texture TexturaBoton;
     private Texture TexturaBotonPresionado;
+    private Texture TexturaBotonNivel;
+    private Texture TexturaBotonNivelPresionado;
     private Texture TexturaDulcePreview;
     private Texture TexturaMonstruoPreview;
     private Image ImagenDulcePreview;
     private Image ImagenMonstruoPreview;
+    private Table Raiz;
+    private TextButton.TextButtonStyle EstiloBoton;
+    private TextButton.TextButtonStyle EstiloBotonNivel;
+    private Label.LabelStyle EstiloTexto;
     private ColorDulce ColorDulceActual = ColorDulce.Rojo;
     private ColorMonstruo ColorMonstruoActual = ColorMonstruo.Verde;
+    private final CategoriaDificultad CategoriaActual = CategoriaDificultad.Facil;
 
     public PantallaSeleccionNivel(Juego JuegoAplicacion) {
         this.JuegoAplicacion = JuegoAplicacion;
     }
 
     public PantallaSeleccionNivel(Juego JuegoAplicacion, ColorDulce ColorDulceElegido, ColorMonstruo ColorMonstruoElegido) {
+        this(JuegoAplicacion, ColorDulceElegido, ColorMonstruoElegido, CategoriaDificultad.Facil);
+    }
+
+    public PantallaSeleccionNivel(Juego JuegoAplicacion, ColorDulce ColorDulceElegido, ColorMonstruo ColorMonstruoElegido, CategoriaDificultad CategoriaElegida) {
         this.JuegoAplicacion = JuegoAplicacion;
         ColorDulceActual = ColorDulceElegido;
         ColorMonstruoActual = ColorMonstruoElegido;
     }
 
+    public CategoriaDificultad ObtenerCategoriaActual() {
+        return CategoriaActual;
+    }
+
+    public int ObtenerCantidadNivelesMostrados() {
+        return FabricaNiveles.CantidadNiveles(CategoriaActual);
+    }
+
     @Override
     public void show() {
         StageActual = new Stage(new ScreenViewport());
-        Fuente = GestorFuentes.CrearFuenteGoodDog(26);
-        TexturaBoton = CrearTextura(Color.valueOf("30445b"));
-        TexturaBotonPresionado = CrearTextura(Color.valueOf("1e2b3a"));
-        TextButton.TextButtonStyle EstiloBoton = new TextButton.TextButtonStyle();
+        Fuente = GestorFuentes.CrearFuenteGoodDog(36);
+        TexturaBoton = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("2f9f91"), Color.valueOf("9ff5df"), Color.valueOf("43c7b6"));
+        TexturaBotonPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("21766d"), Color.valueOf("c6fff0"), Color.valueOf("2fa394"));
+        TexturaBotonNivel = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("f0a13a"), Color.valueOf("ffe0a2"), Color.valueOf("ffc65a"));
+        TexturaBotonNivelPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("c87425"), Color.valueOf("fff0c9"), Color.valueOf("e99a36"));
+        EstiloBoton = new TextButton.TextButtonStyle();
         EstiloBoton.font = Fuente;
+        EstiloBoton.fontColor = Color.WHITE;
+        EstiloBoton.downFontColor = Color.WHITE;
         EstiloBoton.up = new TextureRegionDrawable(TexturaBoton);
         EstiloBoton.down = new TextureRegionDrawable(TexturaBotonPresionado);
-        Label.LabelStyle EstiloTexto = new Label.LabelStyle(Fuente, Color.WHITE);
+        EstiloBotonNivel = new TextButton.TextButtonStyle();
+        EstiloBotonNivel.font = Fuente;
+        EstiloBotonNivel.fontColor = Color.WHITE;
+        EstiloBotonNivel.downFontColor = Color.WHITE;
+        EstiloBotonNivel.up = new TextureRegionDrawable(TexturaBotonNivel);
+        EstiloBotonNivel.down = new TextureRegionDrawable(TexturaBotonNivelPresionado);
+        EstiloTexto = new Label.LabelStyle(Fuente, Color.WHITE);
 
-        Table Raiz = new Table();
+        Raiz = new Table();
         Raiz.setFillParent(true);
         Raiz.pad(28f);
         StageActual.addActor(Raiz);
+        ConstruirContenido();
+        Gdx.input.setInputProcessor(StageActual);
+    }
+
+    private void ConstruirContenido() {
+        Raiz.clearChildren();
         Raiz.add(new Label("Seleccion de niveles", EstiloTexto)).colspan(3).padBottom(22f);
         Raiz.row();
-        for (int NumeroNivel = 1; NumeroNivel <= FabricaNiveles.CantidadNiveles(); NumeroNivel++) {
+        for (int NumeroNivel = 1; NumeroNivel <= ObtenerCantidadNivelesMostrados(); NumeroNivel++) {
             final int NivelElegido = NumeroNivel;
-            TextButton BotonNivel = new TextButton(String.valueOf(NumeroNivel), EstiloBoton);
+            TextButton BotonNivel = new TextButton(String.valueOf(NumeroNivel), EstiloBotonNivel);
             BotonNivel.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent Event, Actor ActorActual) {
-                    JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(NivelElegido), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual)));
+                    JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(CategoriaActual, NivelElegido), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual)));
                 }
             });
-            Raiz.add(BotonNivel).width(92f).height(72f).pad(8f);
+            Raiz.add(BotonNivel).width(112f).height(84f).pad(9f);
             if (NumeroNivel % 3 == 0) {
                 Raiz.row();
             }
         }
         Raiz.row();
-        Raiz.add(new Label("------------------------------", EstiloTexto)).colspan(3).padTop(28f).padBottom(8f);
+        TextButton BotonRivalidad = new TextButton("Rivalidad", EstiloBoton);
+        BotonRivalidad.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                JuegoAplicacion.CambiarPantalla(new PantallaRivalidad(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
+            }
+        });
+        Raiz.add(BotonRivalidad).colspan(3).width(260f).height(58f).padTop(16f).padBottom(10f);
         Raiz.row();
-        Raiz.add(new Label("Personalizacion", EstiloTexto)).colspan(3).padBottom(16f);
+        Raiz.add(new Image(TexturaBotonPresionado)).colspan(3).width(320f).height(2f).padTop(28f).padBottom(8f);
         Raiz.row();
-        TexturaDulcePreview = CargarTextura(RutasTexturas.ObtenerDulce(ColorDulceActual));
-        TexturaMonstruoPreview = CargarTextura(RutasTexturas.ObtenerMonstruo(ColorMonstruoActual));
+        Raiz.add(new Label("Personalizacion", EstiloTexto)).colspan(3).padBottom(10f);
+        Raiz.row();
+        if (TexturaDulcePreview == null) {
+            TexturaDulcePreview = CargarTextura(RutasTexturas.ObtenerDulce(ColorDulceActual));
+        }
+        if (TexturaMonstruoPreview == null) {
+            TexturaMonstruoPreview = CargarTextura(RutasTexturas.ObtenerMonstruo(ColorMonstruoActual));
+        }
         ImagenDulcePreview = new Image(TexturaDulcePreview);
         ImagenMonstruoPreview = new Image(TexturaMonstruoPreview);
-        Raiz.add(ImagenDulcePreview).width(74f).height(74f).pad(4f);
-        Raiz.add().width(28f);
-        Raiz.add(ImagenMonstruoPreview).width(86f).height(86f).pad(4f);
+        Raiz.add(ImagenDulcePreview).width(112f).height(112f).pad(6f);
+        Raiz.add().width(36f);
+        Raiz.add(ImagenMonstruoPreview).width(128f).height(128f).pad(6f);
         Raiz.row();
         TextButton BotonDulce = new TextButton(TextoDulce(), EstiloBoton);
         BotonDulce.addListener(new ChangeListener() {
@@ -120,10 +169,9 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
                 ActualizarPreviewMonstruo();
             }
         });
-        Raiz.add(BotonDulce).colspan(3).width(260f).height(56f).pad(8f);
+        Raiz.add(BotonDulce).colspan(3).width(330f).height(62f).padTop(8f).padBottom(8f);
         Raiz.row();
-        Raiz.add(BotonMonstruo).colspan(3).width(260f).height(56f).pad(8f);
-        Gdx.input.setInputProcessor(StageActual);
+        Raiz.add(BotonMonstruo).colspan(3).width(330f).height(62f).pad(8f);
     }
 
     @Override
@@ -170,15 +218,6 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         ImagenMonstruoPreview.setDrawable(new TextureRegionDrawable(TexturaMonstruoPreview));
     }
 
-    private Texture CrearTextura(Color ColorActual) {
-        Pixmap PixmapActual = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        PixmapActual.setColor(ColorActual);
-        PixmapActual.fill();
-        Texture Textura = new Texture(PixmapActual);
-        PixmapActual.dispose();
-        return Textura;
-    }
-
     @Override
     public void hide() {
         Gdx.input.setInputProcessor(null);
@@ -197,6 +236,12 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         }
         if (TexturaBotonPresionado != null) {
             TexturaBotonPresionado.dispose();
+        }
+        if (TexturaBotonNivel != null) {
+            TexturaBotonNivel.dispose();
+        }
+        if (TexturaBotonNivelPresionado != null) {
+            TexturaBotonNivelPresionado.dispose();
         }
         if (TexturaDulcePreview != null) {
             TexturaDulcePreview.dispose();

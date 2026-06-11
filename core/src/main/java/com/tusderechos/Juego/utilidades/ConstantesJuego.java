@@ -12,6 +12,8 @@ package com.tusderechos.Juego.utilidades;
 public final class ConstantesJuego {
     public static final int AnchoVentana = 480;
     public static final int AltoVentana = 800;
+    public static final int AnchoVentanaEscritorio = 640;
+    public static final int AltoVentanaEscritorio = 860;
     public static final float PixelesPorMetro = 100f;
     public static final float AnchoMundo = AnchoVentana / PixelesPorMetro;
     public static final float AltoMundo = AltoVentana / PixelesPorMetro;
