@@ -7,25 +7,37 @@ package Menus.Menu;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.pantallas.PantallaSeleccionNivel;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
-import LogicaArchivos.Usuarios.Usuario;
 
 /**
  *
  * @author HP
  */
 public class MainMenuScreen implements Screen {
+
     private final Game parentGame;
     private Stage stage;
     private Skin skin;
+
+    private Texture fondoMenuTex;
+    private Texture btnJugarTex;
+    private Texture btnPerfilTex;
+    private Texture btnEstadisticasTex;
+    private Texture btnCerrarSesionTex;
+    private Texture btnConfigTex;
 
     public MainMenuScreen(Game game) {
         this.parentGame = game;
@@ -38,39 +50,50 @@ public class MainMenuScreen implements Screen {
 
         skin = SkinMenu.Crear();
 
-        Usuario usuarioActivo = SistemaAutenticacion.getUsuarioActivo();
-        String nombreJugador = (usuarioActivo != null) ? usuarioActivo.getNombreCompleto() : "Jugador";
+        fondoMenuTex = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal.png"));
+        btnJugarTex = new Texture(Gdx.files.internal("imgMenus/btn_juego.png"));
+        btnPerfilTex = new Texture(Gdx.files.internal("imgMenus/btn_perfil.png"));
+        btnEstadisticasTex = new Texture(Gdx.files.internal("imgMenus/btn_estadisticas.png"));
+        btnCerrarSesionTex = new Texture(Gdx.files.internal("imgMenus/btn_cerrar_sesion.png"));
+        btnConfigTex = new Texture(Gdx.files.internal("imgMenus/btn_config.png"));
 
-        Table root = new Table();
-        root.setFillParent(true);
-        stage.addActor(root);
+        Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        rootTable.setBackground(new TextureRegionDrawable(new TextureRegion(fondoMenuTex)));
+        stage.addActor(rootTable);
 
-        Label lblBienvenida = new Label("Bienvenido, " + nombreJugador, skin);
-        lblBienvenida.setFontScale(1.4f);
-        lblBienvenida.setColor(Color.GREEN);
-        root.add(lblBienvenida).padBottom(35).row();
+        ImageButton btnConfig = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnConfigTex)));
+        btnConfig.getImage().setScaling(Scaling.fill);
+        btnConfig.setSize(65, 65);
 
-        TextButton btnJugar = new TextButton("INICIAR JUEGO", skin);
-        TextButton btnEstadisticas = new TextButton("VER ESTADISTICAS", skin);
-        TextButton btnPerfil = new TextButton("MI PERFIL", skin);
-        TextButton btnConfig = new TextButton("CONFIGURACION", skin);
-        TextButton btnCerrarSesion = new TextButton("CERRAR SESION", skin);
+        btnConfig.setPosition(stage.getWidth() - btnConfig.getWidth() - 20, stage.getHeight() - btnConfig.getHeight() - 20);
 
-        float anchoBoton = 240;
-        float altoBoton = 45;
-        float espaciado = 15;
+        btnConfig.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                parentGame.setScreen(new ConfiguracionScreen(parentGame));
+            }
+        });
+
+        stage.addActor(btnConfig);
+
+        Table contenedorBotones = new Table();
+        contenedorBotones.top();
+
+        ImageButton btnJugar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnJugarTex)));
+        ImageButton btnPerfil = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnPerfilTex)));
+        ImageButton btnEstadisticas = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnEstadisticasTex)));
+        ImageButton btnCerrarSesion = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnCerrarSesionTex)));
+
+        btnJugar.getImage().setScaling(Scaling.fill);
+        btnPerfil.getImage().setScaling(Scaling.fill);
+        btnEstadisticas.getImage().setScaling(Scaling.fill);
+        btnCerrarSesion.getImage().setScaling(Scaling.fill);
 
         btnJugar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 parentGame.setScreen(new PantallaSeleccionNivel((com.tusderechos.Juego.Juego) parentGame));
-            }
-        });
-
-        btnEstadisticas.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                parentGame.setScreen(new StatsScreen(parentGame));
             }
         });
 
@@ -81,10 +104,10 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        btnConfig.addListener(new ClickListener() {
+        btnEstadisticas.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                parentGame.setScreen(new ConfiguracionScreen(parentGame));
+                parentGame.setScreen(new StatsScreen(parentGame));
             }
         });
 
@@ -92,21 +115,23 @@ public class MainMenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 SistemaAutenticacion.cerrarSesion();
-                parentGame.setScreen(new LoginRegisterScreen(parentGame));
+                parentGame.setScreen(new MenuInicioScreen(parentGame));
             }
         });
 
-        root.add(btnJugar).width(anchoBoton).height(altoBoton).padBottom(espaciado).row();
-        root.add(btnEstadisticas).width(anchoBoton).height(altoBoton).padBottom(espaciado).row();
-        root.add(btnPerfil).width(anchoBoton).height(altoBoton).padBottom(espaciado).row();
-        root.add(btnConfig).width(anchoBoton).height(altoBoton).padBottom(espaciado).row();
-        root.add(btnCerrarSesion).width(anchoBoton).height(altoBoton).padTop(15).row();
+        contenedorBotones.add(btnJugar).width(245).height(50).padTop(350).padRight(5).row();
+        contenedorBotones.add(btnPerfil).width(245).height(50).padTop(26).padRight(5).row();
+        contenedorBotones.add(btnEstadisticas).width(245).height(50).padTop(26).padRight(5).row();
+        contenedorBotones.add(btnCerrarSesion).width(245).height(50).padTop(26).padRight(5).row();
+
+        rootTable.add(contenedorBotones).expand().top();
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.12f, 0.28f, 0.18f, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         stage.act(delta);
         stage.draw();
     }
@@ -114,6 +139,11 @@ public class MainMenuScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
+        for (com.badlogic.gdx.scenes.scene2d.Actor actor : stage.getActors()) {
+            if (actor instanceof ImageButton && actor != null && actor.getWidth() == 65) {
+                actor.setPosition(width - actor.getWidth() - 20, height - actor.getHeight() - 20);
+            }
+        }
     }
 
     @Override
@@ -126,11 +156,18 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void hide() {
+        dispose();
     }
 
     @Override
     public void dispose() {
         stage.dispose();
         skin.dispose();
+        fondoMenuTex.dispose();
+        btnJugarTex.dispose();
+        btnPerfilTex.dispose();
+        btnEstadisticasTex.dispose();
+        btnCerrarSesionTex.dispose();
+        btnConfigTex.dispose();
     }
 }
