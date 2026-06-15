@@ -69,4 +69,11 @@ class PantallaRivalidadTest {
 
         assertThrows(IllegalArgumentException.class, () -> Pantalla.CambiarCategoria(null));
     }
+
+    @Test
+    void AjustaAnchoDelPanelAlTamanoDeLaVentana() {
+        assertEquals(580f, PantallaRivalidad.CalcularAnchoPanel(900f));
+        assertEquals(336f, PantallaRivalidad.CalcularAnchoPanel(360f));
+        assertEquals(0f, PantallaRivalidad.CalcularAnchoPanel(20f));
+    }
 }

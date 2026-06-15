@@ -140,6 +140,10 @@ public class Usuario implements Serializable {
     }
 
     public ArrayList<String> getListaRivales() {
+        if (listaRivales == null) {
+            listaRivales = new ArrayList<>();
+        }
+
         return listaRivales;
     }
 
