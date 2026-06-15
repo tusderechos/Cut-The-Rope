@@ -5,6 +5,7 @@
 package LogicaArchivos.Usuarios;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -19,6 +20,7 @@ public class Usuario implements Serializable {
     private String username;
     private String password;
     private String nombreCompleto;
+    private String rutaFotoPerfil;
     private Date fechaRegistro;
     private Date ultimaSesion;
 
@@ -34,10 +36,11 @@ public class Usuario implements Serializable {
     private float volumenSonido;
     private String avatarPath;
 
-    public Usuario(String username, String password, String nombreCompleto) {
+    public Usuario(String username, String password, String nombreCompleto, String rutaFotoPerfil) {
         this.username = username;
         this.password = password;
         this.nombreCompleto = nombreCompleto;
+        this.rutaFotoPerfil = rutaFotoPerfil;
         this.fechaRegistro = new Date();
         this.ultimaSesion = new Date();
 
@@ -69,6 +72,12 @@ public class Usuario implements Serializable {
                 + " | Estrellas: " + estrellasObtenidas + " | Tiempo: " + tiempoEnNivel + "s | Fecha: " + new Date();
         this.historialPartidas.add(resultado);
     }
+    
+    public String getFechaIngreso() {
+        if (this.fechaRegistro == null) return "No registrada";
+        SimpleDateFormat formateador = new SimpleDateFormat("dd/MM/yyyy");
+        return formateador.format(this.fechaRegistro);
+    }
 
     public String getUsername() {
         return username;
@@ -88,6 +97,14 @@ public class Usuario implements Serializable {
 
     public void setNombreCompleto(String nombreCompleto) {
         this.nombreCompleto = nombreCompleto;
+    }
+    
+    public String getRutaFotoPerfil() {
+        return rutaFotoPerfil;
+    }
+
+    public void setRutaFotoPerfil(String rutaFotoPerfil) {
+        this.rutaFotoPerfil = rutaFotoPerfil;
     }
 
     public Date getFechaRegistro() {

@@ -9,10 +9,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
@@ -22,10 +27,15 @@ import LogicaArchivos.Usuarios.Usuario;
  * @author HP
  */
 public class ProfileScreen implements Screen {
-    
+
     private final Game parentGame;
     private Stage stage;
     private Skin skin;
+
+    private Texture fondoPerfilTexture;
+    private Texture btnVolverTex;
+    private Texture fotoPerfilTex;
+    private BitmapFont fuenteDatos;
 
     public ProfileScreen(Game game) {
         this.parentGame = game;
@@ -39,64 +49,89 @@ public class ProfileScreen implements Screen {
         skin = SkinMenu.Crear();
         Usuario usuarioActivo = SistemaAutenticacion.getUsuarioActivo();
 
-        Table root = new Table();
-        root.setFillParent(true);
-        stage.addActor(root);
+        fondoPerfilTexture = new Texture(Gdx.files.internal("imgMenus/fondo_perfil.png"));
+        btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png")); 
 
-        Label lblTitulo = new Label("MI PERFIL", skin);
-        lblTitulo.setFontScale(1.4f);
-        lblTitulo.setColor(Color.GOLD);
-        root.add(lblTitulo).padBottom(25).row();
+        if (usuarioActivo != null && usuarioActivo.getRutaFotoPerfil() != null) {
+            String ruta = usuarioActivo.getRutaFotoPerfil();
+            if (ruta.startsWith("imgMenus")) {
+                fotoPerfilTex = new Texture(Gdx.files.internal(ruta)); 
+            } else {
+                fotoPerfilTex = new Texture(Gdx.files.absolute(ruta)); 
+            }
+        } else {
+            fotoPerfilTex = new Texture(Gdx.files.internal("imgMenus/avatar1.png")); 
+        }
+
+        Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        rootTable.setBackground(new TextureRegionDrawable(new TextureRegion(fondoPerfilTexture)));
+        stage.addActor(rootTable);
+
+        Table contenedorCentral = new Table();
+        contenedorCentral.top();
+        rootTable.add(contenedorCentral).expand().fill();
+
+        Label.LabelStyle estiloBase = skin.get(Label.LabelStyle.class);
+        Label.LabelStyle estiloDatos = new Label.LabelStyle(estiloBase);
+        if (estiloBase.font != null) {
+            fuenteDatos = new BitmapFont(estiloBase.font.getData().getFontFile(), false);
+            fuenteDatos.getData().setScale(1.6f); 
+            estiloDatos.font = fuenteDatos;
+            estiloDatos.fontColor = Color.WHITE;
+        }
+
+        contenedorCentral.add().height(190).row();
 
         if (usuarioActivo != null) {
 
-            Table cajaPrincipal = new Table();
-            cajaPrincipal.defaults().pad(10);
+            Image imgFoto = new Image(fotoPerfilTex);
+            imgFoto.setScaling(Scaling.fill);
+            contenedorCentral.add(imgFoto).width(120).height(120).center().row();
 
-            Table infoTable = new Table();
-            infoTable.defaults().left().pad(6);
+            contenedorCentral.add().height(55).row();
 
-            Label lblDatos = new Label("INFORMACION GENERAL", skin);
-            lblDatos.setColor(Color.GOLD);
-            infoTable.add(lblDatos).colspan(2).padBottom(15).row();
+            Label lblUser = new Label(usuarioActivo.getUsername(), estiloDatos);
+            contenedorCentral.add(lblUser).height(45).center().row();
 
-            infoTable.add(new Label("Nombre de Usuario: ", skin)).left();
-            Label lblUser = new Label(usuarioActivo.getUsername(), skin);
-            lblUser.setColor(Color.CYAN);
-            infoTable.add(lblUser).row();
+            contenedorCentral.add().height(50).row();
 
-            infoTable.add(new Label("Nombre Completo: ", skin)).left();
-            Label lblNombre = new Label(usuarioActivo.getNombreCompleto(), skin);
-            lblNombre.setColor(Color.WHITE);
-            infoTable.add(lblNombre).row();
+            Label lblNombre = new Label(usuarioActivo.getNombreCompleto(), estiloDatos);
+            contenedorCentral.add(lblNombre).height(45).center().row();
 
-            infoTable.add(new Label("Fecha de Registro: ", skin)).left();
-            Label lblFecha = new Label("07/06/2026", skin);
-            lblFecha.setColor(Color.LIGHT_GRAY);
-            infoTable.add(lblFecha).row();
+            contenedorCentral.add().height(50).row();
 
-            cajaPrincipal.add(infoTable).width(360).row();
-            root.add(cajaPrincipal).padBottom(35).row();
+            Label lblFecha = new Label(usuarioActivo.getFechaIngreso(), estiloDatos);
+            contenedorCentral.add(lblFecha).height(45).center().row();
 
         } else {
-            Label lblError = new Label("No se encontro un perfil de usuario activo.", skin);
+            Label lblError = new Label("SIN SESIÓN ACTIVA", estiloDatos);
             lblError.setColor(Color.RED);
-            root.add(lblError).padBottom(35).row();
+            contenedorCentral.add(lblError).padTop(150).row();
         }
 
-        TextButton btnVolver = new TextButton("VOLVER AL MENU", skin);
+        contenedorCentral.add().expandY();
+        contenedorCentral.row();
+
+        ImageButton btnVolver = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnVolverTex)));
+        btnVolver.getImage().setScaling(Scaling.fill);
         btnVolver.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 parentGame.setScreen(new MainMenuScreen(parentGame));
             }
         });
-        root.add(btnVolver).width(180).height(40).row();
+
+        Table filaInferior = new Table();
+        filaInferior.left();
+        filaInferior.add(btnVolver).width(55).height(55).padLeft(20).padBottom(20);
+
+        contenedorCentral.add(filaInferior).fillX().left();
     }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.12f, 0.28f, 0.18f, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(delta);
         stage.draw();
@@ -117,11 +152,19 @@ public class ProfileScreen implements Screen {
 
     @Override
     public void hide() {
+        dispose();
     }
 
     @Override
     public void dispose() {
         stage.dispose();
-        skin.dispose();
+        fondoPerfilTexture.dispose();
+        btnVolverTex.dispose();
+        if (fotoPerfilTex != null) {
+            fotoPerfilTex.dispose();
+        }
+        if (fuenteDatos != null) {
+            fuenteDatos.dispose();
+        }
     }
 }
