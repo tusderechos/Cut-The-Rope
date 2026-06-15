@@ -23,7 +23,7 @@ public class SistemaAutenticacion {
         }
     }
 
-    public static String registrarNuevoUsuario(String username, String password, String nombreCompleto) {
+    public static String registrarNuevoUsuario(String username, String password, String nombreCompleto, String rutaFotoPerfil) {
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             return "Campos vacios no permitidos.";
         }
@@ -34,7 +34,7 @@ public class SistemaAutenticacion {
             return "El nombre de usuario ya se encuentra registrado.";
         }
         
-        Usuario nuevoUsuario = new Usuario(userLimpio, password, nombreCompleto);
+        Usuario nuevoUsuario = new Usuario(userLimpio, password, nombreCompleto, rutaFotoPerfil);
         boolean exito = ManejadorArchivos.guardarUsuario(nuevoUsuario);
         
         if (exito) {
