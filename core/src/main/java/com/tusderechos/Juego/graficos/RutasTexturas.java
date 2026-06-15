@@ -20,6 +20,10 @@ public final class RutasTexturas {
     public static final String Estrella = "imagenes/estrella.png";
     public static final String EstrellaVacia = "imagenes/estrella_placeholder.png";
     public static final String BloqueoNivel = "imagenes/bloqueo_nivel.png";
+    public static final String BotonSalir = "imagenes/salir_alto.png";
+    public static final String BotonSiguiente = "imagenes/siguiente.png";
+    public static final String BotonVolver = "imagenes/volver_alto.png";
+    public static final String BotonRetos = "imagenes/retos.png";
     private static final Map<ColorDulce, String> RutasDulces = new EnumMap<>(ColorDulce.class);
     private static final Map<ColorMonstruo, String> RutasMonstruos = new EnumMap<>(ColorMonstruo.class);
     private static final List<String> RutasFondos = Arrays.asList("imagenes/fondo_1.PNG", "imagenes/fondo_2.PNG", "imagenes/fondo_3.png", "imagenes/fondo_4.png", "imagenes/fondo_5.png");
@@ -58,7 +62,7 @@ public final class RutasTexturas {
         Rutas.addAll(RutasDulces.values());
         Rutas.addAll(RutasMonstruos.values());
         Rutas.addAll(RutasFondos);
-        Rutas.addAll(Arrays.asList(Estrella, EstrellaVacia, BloqueoNivel));
+        Rutas.addAll(Arrays.asList(Estrella, EstrellaVacia, BloqueoNivel, BotonSalir, BotonSiguiente, BotonVolver, BotonRetos));
         return Rutas;
     }
 }

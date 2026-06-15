@@ -4,9 +4,11 @@
  */
 package ManejoArchivos.Archivos;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import LogicaArchivos.Usuarios.Usuario;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 /**
  *
  * @author HP
@@ -58,5 +60,29 @@ public class ManejadorArchivos {
             Gdx.app.error("ManejadorArchivos", "Error cargando usuario binario: " + e.getMessage());
             return null;
         }
+    }
+
+    public static List<Usuario> listarUsuarios() {
+        List<Usuario> usuariosRegistrados = new ArrayList<>();
+        File carpetaUsuarios = new File(ROOT_DIR);
+
+        if (!carpetaUsuarios.exists() || !carpetaUsuarios.isDirectory()) {
+            return usuariosRegistrados;
+        }
+
+        File[] carpetasEncontradas = carpetaUsuarios.listFiles(File::isDirectory);
+        if (carpetasEncontradas == null) {
+            return usuariosRegistrados;
+        }
+
+        for (File carpetaUsuario : carpetasEncontradas) {
+            Usuario usuarioActual = cargarUsuario(carpetaUsuario.getName());
+            if (usuarioActual != null) {
+                usuariosRegistrados.add(usuarioActual);
+            }
+        }
+
+        usuariosRegistrados.sort(Comparator.comparing(Usuario::getUsername, String.CASE_INSENSITIVE_ORDER));
+        return usuariosRegistrados;
     }
 }

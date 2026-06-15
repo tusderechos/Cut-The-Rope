@@ -44,6 +44,22 @@ public final class GestorTexturas implements Disposable {
         return Texturas.get(RutasTexturas.ObtenerFondoNivel(NumeroNivel));
     }
 
+    public Texture ObtenerBotonSalir() {
+        return Texturas.get(RutasTexturas.BotonSalir);
+    }
+
+    public Texture ObtenerBotonSiguiente() {
+        return Texturas.get(RutasTexturas.BotonSiguiente);
+    }
+
+    public Texture ObtenerBotonVolver() {
+        return Texturas.get(RutasTexturas.BotonVolver);
+    }
+
+    public Texture ObtenerBotonRetos() {
+        return Texturas.get(RutasTexturas.BotonRetos);
+    }
+
     private Texture CargarTextura(String Ruta) {
         try {
             Texture Textura = new Texture(Gdx.files.internal(Ruta));

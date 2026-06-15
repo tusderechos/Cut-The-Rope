@@ -14,14 +14,16 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.Juego;
@@ -29,7 +31,6 @@ import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.GestorFuentes;
-import com.tusderechos.Juego.graficos.TexturasInterfaz;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
@@ -40,24 +41,24 @@ public class PantallaRivalidad extends ScreenAdapter {
     private static final int PuntajeObjetivoMinimo = 0;
     private static final int PuntajeObjetivoMaximo = 4000;
     private static final int PasoPuntajeObjetivo = 250;
+    private static final float AnchoPanelMaximo = 580f;
+    private static final float AnchoFilaMaximo = 540f;
+    private static final float MargenRaiz = 12f;
     private final Juego JuegoAplicacion;
     private final ColorDulce ColorDulceActual;
     private final ColorMonstruo ColorMonstruoActual;
     private Stage StageActual;
     private BitmapFont FuenteTitulo;
-    private BitmapFont FuenteBoton;
-    private Texture TexturaBotonPrincipal;
-    private Texture TexturaBotonPrincipalPresionado;
-    private Texture TexturaBotonSecundario;
-    private Texture TexturaBotonSecundarioPresionado;
-    private Texture TexturaBotonDificultad;
-    private Texture TexturaBotonDificultadSeleccionada;
-    private TextButton.TextButtonStyle EstiloPrincipal;
-    private TextButton.TextButtonStyle EstiloSecundario;
-    private TextButton.TextButtonStyle EstiloDificultad;
-    private TextButton.TextButtonStyle EstiloDificultadSeleccionada;
+    private BitmapFont FuenteTexto;
     private Label.LabelStyle EstiloTitulo;
     private Label.LabelStyle EstiloTexto;
+    private Texture TexturaFacil;
+    private Texture TexturaMedia;
+    private Texture TexturaDificil;
+    private Texture TexturaSumar;
+    private Texture TexturaRestar;
+    private Texture TexturaVolver;
+    private Texture TexturaIniciarReto;
     private Table Raiz;
     private CategoriaDificultad CategoriaActual = CategoriaDificultad.Media;
     private int NumeroNivelActual = 1;
@@ -120,12 +121,11 @@ public class PantallaRivalidad extends ScreenAdapter {
     @Override
     public void show() {
         StageActual = new Stage(new ScreenViewport());
-        FuenteTitulo = GestorFuentes.CrearFuenteGoodDog(40);
-        FuenteBoton = GestorFuentes.CrearFuenteGoodDog(25);
+        FuenteTitulo = GestorFuentes.CrearFuenteGoodDog(42);
+        FuenteTexto = GestorFuentes.CrearFuenteGoodDog(31);
         EstiloTitulo = new Label.LabelStyle(FuenteTitulo, Color.WHITE);
-        EstiloTexto = new Label.LabelStyle(FuenteBoton, Color.WHITE);
+        EstiloTexto = new Label.LabelStyle(FuenteTexto, Color.WHITE);
         CrearTexturas();
-        CrearEstilos();
         Raiz = new Table();
         Raiz.setFillParent(true);
         Raiz.pad(22f);
@@ -135,36 +135,26 @@ public class PantallaRivalidad extends ScreenAdapter {
     }
 
     private void CrearTexturas() {
-        TexturaBotonPrincipal = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("2fae63"), Color.valueOf("a6f5b8"), Color.valueOf("51d985"));
-        TexturaBotonPrincipalPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("247f4b"), Color.valueOf("d0ffd9"), Color.valueOf("38b96a"));
-        TexturaBotonSecundario = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("3b77c4"), Color.valueOf("b9dcff"), Color.valueOf("67a9f0"));
-        TexturaBotonSecundarioPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("285996"), Color.valueOf("d5ecff"), Color.valueOf("4c8bd2"));
-        TexturaBotonDificultad = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("7852bf"), Color.valueOf("d5c3ff"), Color.valueOf("9d76e8"));
-        TexturaBotonDificultadSeleccionada = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("f0a13a"), Color.valueOf("ffe0a2"), Color.valueOf("ffc65a"));
+        TexturaFacil = CargarTextura("imagenes/facil-removebg-preview.png");
+        TexturaMedia = CargarTextura("imagenes/media.png");
+        TexturaDificil = CargarTextura("imagenes/dificil.png");
+        TexturaSumar = CargarTextura("imagenes/sumar.png");
+        TexturaRestar = CargarTextura("imagenes/restar.png");
+        TexturaVolver = CargarTextura("imagenes/volver_alto.png");
+        TexturaIniciarReto = CargarTextura("imagenes/iniciar_reto.png");
     }
 
-    private void CrearEstilos() {
-        EstiloPrincipal = CrearEstilo(TexturaBotonPrincipal, TexturaBotonPrincipalPresionado);
-        EstiloSecundario = CrearEstilo(TexturaBotonSecundario, TexturaBotonSecundarioPresionado);
-        EstiloDificultad = CrearEstilo(TexturaBotonDificultad, TexturaBotonDificultadSeleccionada);
-        EstiloDificultadSeleccionada = CrearEstilo(TexturaBotonDificultadSeleccionada, TexturaBotonDificultad);
+    private Texture CargarTextura(String Ruta) {
+        Texture Textura = new Texture(Gdx.files.internal(Ruta));
+        Textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
+        return Textura;
     }
 
-    private TextButton.TextButtonStyle CrearEstilo(Texture TexturaNormal, Texture TexturaPresionada) {
-        TextButton.TextButtonStyle Estilo = new TextButton.TextButtonStyle();
-        Estilo.font = FuenteBoton;
-        Estilo.fontColor = Color.WHITE;
-        Estilo.downFontColor = Color.WHITE;
-        Estilo.up = new TextureRegionDrawable(TexturaNormal);
-        Estilo.down = new TextureRegionDrawable(TexturaPresionada);
-
-        return Estilo;
-    }
-
-    private TextButton CrearBoton(String Texto, TextButton.TextButtonStyle Estilo) {
-        TextButton Boton = new TextButton(Texto, Estilo);
-        Boton.getLabel().setAlignment(Align.center);
-        Boton.getLabelCell().padBottom(4f);
+    private ImageButton CrearBotonImagen(Texture Textura) {
+        ImageButton Boton = new ImageButton(new TextureRegionDrawable(new TextureRegion(Textura)));
+        Boton.getImage().setScaling(Scaling.fit);
+        Boton.getImage().setAlign(Align.center);
 
         return Boton;
     }
@@ -172,25 +162,22 @@ public class PantallaRivalidad extends ScreenAdapter {
     private void ConstruirContenido() {
         Raiz.clearChildren();
         Raiz.top();
+        Raiz.pad(MargenRaiz);
+
+        float AnchoPanel = CalcularAnchoPanel(ObtenerAnchoVentana());
+        float AnchoFila = CalcularAnchoFila(AnchoPanel);
+        float EscalaLayout = CalcularEscalaLayout(AnchoFila);
+
         Table Panel = new Table();
-        Raiz.add(Panel).width(540f).padTop(18f);
-        Panel.add(new Label("Rivalidad", EstiloTitulo)).padBottom(20f);
+        Raiz.add(Panel).width(AnchoPanel).padTop(6f * EscalaLayout);
+
+        Label Titulo = new Label("Rivalidad", EstiloTitulo);
+        Titulo.setAlignment(Align.center);
+        Panel.add(Titulo).padBottom(10f * EscalaLayout);
         Panel.row();
-        Table FilaCategorias = new Table();
-        for (final CategoriaDificultad Categoria : CategoriaDificultad.values()) {
-            TextButton BotonCategoria = CrearBoton(Categoria.name(), Categoria == CategoriaActual ? EstiloDificultadSeleccionada : EstiloDificultad);
-            BotonCategoria.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent Event, Actor ActorActual) {
-                    CambiarCategoria(Categoria);
-                    ConstruirContenido();
-                }
-            });
-            FilaCategorias.add(BotonCategoria).width(130f).height(54f).pad(7f);
-        }
-        Panel.add(FilaCategorias).padBottom(14f);
-        Panel.row();
-        AgregarControlNumerico(Panel, "Nivel", String.valueOf(NumeroNivelActual), 120f, new Runnable() {
+
+        AgregarCategorias(Panel, EscalaLayout);
+        AgregarControlNumerico(Panel, "Nivel", String.valueOf(NumeroNivelActual), 120f, AnchoFila, EscalaLayout, new Runnable() {
             @Override
             public void run() {
                 AjustarNivel(-1);
@@ -201,7 +188,7 @@ public class PantallaRivalidad extends ScreenAdapter {
                 AjustarNivel(1);
             }
         });
-        AgregarControlNumerico(Panel, "Estrellas", String.valueOf(EstrellasObjetivo), 120f, new Runnable() {
+        AgregarControlNumerico(Panel, "Estrellas", String.valueOf(EstrellasObjetivo), 120f, AnchoFila, EscalaLayout, new Runnable() {
             @Override
             public void run() {
                 AjustarEstrellasObjetivo(-1);
@@ -212,7 +199,7 @@ public class PantallaRivalidad extends ScreenAdapter {
                 AjustarEstrellasObjetivo(1);
             }
         });
-        AgregarControlNumerico(Panel, "Puntaje", String.valueOf(PuntajeObjetivo), 140f, new Runnable() {
+        AgregarControlNumerico(Panel, "Puntaje", String.valueOf(PuntajeObjetivo), 140f, AnchoFila, EscalaLayout, new Runnable() {
             @Override
             public void run() {
                 AjustarPuntajeObjetivo(-PasoPuntajeObjetivo);
@@ -223,38 +210,45 @@ public class PantallaRivalidad extends ScreenAdapter {
                 AjustarPuntajeObjetivo(PasoPuntajeObjetivo);
             }
         });
+
         Label ResumenReto = new Label(TextoResumenReto(), EstiloTexto);
         ResumenReto.setWrap(true);
         ResumenReto.setAlignment(Align.center);
-        Panel.add(ResumenReto).width(500f).padTop(18f).padBottom(16f);
+        Panel.add(ResumenReto).width(AnchoFila).padTop(10f * EscalaLayout).padBottom(10f * EscalaLayout);
         Panel.row();
-        Table FilaAcciones = new Table();
-        TextButton BotonVolver = CrearBoton("Volver", EstiloSecundario);
-        BotonVolver.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent Event, Actor ActorActual) {
-                JuegoAplicacion.CambiarPantalla(new PantallaSeleccionNivel(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
-            }
-        });
-        TextButton BotonIniciar = CrearBoton("Iniciar reto", EstiloPrincipal);
-        BotonIniciar.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent Event, Actor ActorActual) {
-                DatosReto Reto = CrearRetoActual();
-                JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, GestorRetos.ObtenerNivelReto(Reto), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual), Reto));
-            }
-        });
-        FilaAcciones.add(BotonVolver).width(150f).height(56f).pad(8f);
-        FilaAcciones.add(BotonIniciar).width(190f).height(56f).pad(8f);
-        Panel.add(FilaAcciones);
+
+        AgregarAcciones(Panel, EscalaLayout);
     }
 
-    private void AgregarControlNumerico(Table Panel, String Titulo, String Valor, float AnchoValor, final Runnable AccionMenos, final Runnable AccionMas) {
+    private void AgregarCategorias(Table Panel, float EscalaLayout) {
+        Table FilaCategorias = new Table();
+        AgregarBotonCategoria(FilaCategorias, CategoriaDificultad.Facil, TexturaFacil, EscalaLayout);
+        AgregarBotonCategoria(FilaCategorias, CategoriaDificultad.Media, TexturaMedia, EscalaLayout);
+        AgregarBotonCategoria(FilaCategorias, CategoriaDificultad.Dificil, TexturaDificil, EscalaLayout);
+        Panel.add(FilaCategorias).padBottom(8f * EscalaLayout);
+        Panel.row();
+    }
+
+    private void AgregarBotonCategoria(Table FilaCategorias, final CategoriaDificultad Categoria, Texture Textura, float EscalaLayout) {
+        ImageButton BotonCategoria = CrearBotonImagen(Textura);
+        BotonCategoria.setColor(Categoria == CategoriaActual ? Color.WHITE : new Color(0.72f, 0.72f, 0.72f, 1f));
+        BotonCategoria.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                CambiarCategoria(Categoria);
+                ConstruirContenido();
+            }
+        });
+        FilaCategorias.add(BotonCategoria).width(120f * EscalaLayout).height(52f * EscalaLayout).pad(4f * EscalaLayout);
+    }
+
+    private void AgregarControlNumerico(Table Panel, String Titulo, String Valor, float AnchoValor, float AnchoFila, float EscalaLayout, final Runnable AccionMenos, final Runnable AccionMas) {
         Table FilaControl = new Table();
         Label Etiqueta = new Label(Titulo, EstiloTexto);
         Label EtiquetaValor = new Label(Valor, EstiloTexto);
         EtiquetaValor.setAlignment(Align.center);
-        TextButton BotonMenos = CrearBoton("-", EstiloSecundario);
+
+        ImageButton BotonMenos = CrearBotonImagen(TexturaRestar);
         BotonMenos.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -262,7 +256,8 @@ public class PantallaRivalidad extends ScreenAdapter {
                 ConstruirContenido();
             }
         });
-        TextButton BotonMas = CrearBoton("+", EstiloSecundario);
+
+        ImageButton BotonMas = CrearBotonImagen(TexturaSumar);
         BotonMas.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -270,12 +265,56 @@ public class PantallaRivalidad extends ScreenAdapter {
                 ConstruirContenido();
             }
         });
-        FilaControl.add(Etiqueta).width(150f).left().padRight(10f);
-        FilaControl.add(BotonMenos).width(64f).height(44f).pad(5f);
-        FilaControl.add(EtiquetaValor).width(AnchoValor).center().padLeft(12f).padRight(12f);
-        FilaControl.add(BotonMas).width(64f).height(44f).pad(5f);
-        Panel.add(FilaControl).width(500f).padTop(10f).padBottom(2f);
+
+        FilaControl.add(Etiqueta).width(140f * EscalaLayout).left().padRight(8f * EscalaLayout);
+        FilaControl.add(BotonMenos).width(68f * EscalaLayout).height(42f * EscalaLayout).pad(3f * EscalaLayout);
+        FilaControl.add(EtiquetaValor).width(AnchoValor * EscalaLayout).center().padLeft(8f * EscalaLayout).padRight(8f * EscalaLayout);
+        FilaControl.add(BotonMas).width(68f * EscalaLayout).height(42f * EscalaLayout).pad(3f * EscalaLayout);
+        Panel.add(FilaControl).width(AnchoFila).padTop(6f * EscalaLayout).padBottom(2f * EscalaLayout);
         Panel.row();
+    }
+
+    private void AgregarAcciones(Table Panel, float EscalaLayout) {
+        Table FilaAcciones = new Table();
+        ImageButton BotonVolver = CrearBotonImagen(TexturaVolver);
+        BotonVolver.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                JuegoAplicacion.CambiarPantalla(new PantallaSeleccionNivel(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
+            }
+        });
+
+        ImageButton BotonIniciar = CrearBotonImagen(TexturaIniciarReto);
+        BotonIniciar.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent Event, Actor ActorActual) {
+                DatosReto Reto = CrearRetoActual();
+                JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, GestorRetos.ObtenerNivelReto(Reto), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual), Reto));
+            }
+        });
+
+        FilaAcciones.add(BotonVolver).width(140f * EscalaLayout).height(50f * EscalaLayout).pad(5f * EscalaLayout);
+        FilaAcciones.add(BotonIniciar).width(180f * EscalaLayout).height(50f * EscalaLayout).pad(5f * EscalaLayout);
+        Panel.add(FilaAcciones);
+    }
+
+    private float ObtenerAnchoVentana() {
+        if (StageActual == null) {
+            return AnchoPanelMaximo + (MargenRaiz * 2f);
+        }
+        return StageActual.getViewport().getWorldWidth();
+    }
+
+    static float CalcularAnchoPanel(float AnchoVentana) {
+        return Math.min(AnchoPanelMaximo, Math.max(0f, AnchoVentana - (MargenRaiz * 2f)));
+    }
+
+    private float CalcularAnchoFila(float AnchoPanel) {
+        return Math.min(AnchoFilaMaximo, AnchoPanel);
+    }
+
+    private float CalcularEscalaLayout(float AnchoFila) {
+        return Math.max(0.62f, Math.min(1f, AnchoFila / AnchoFilaMaximo));
     }
 
     private String TextoResumenReto() {
@@ -297,6 +336,9 @@ public class PantallaRivalidad extends ScreenAdapter {
     public void resize(int Width, int Height) {
         if (StageActual != null && Width > 0 && Height > 0) {
             StageActual.getViewport().update(Width, Height, true);
+            if (Raiz != null) {
+                ConstruirContenido();
+            }
         }
     }
 
@@ -313,26 +355,21 @@ public class PantallaRivalidad extends ScreenAdapter {
         if (FuenteTitulo != null) {
             FuenteTitulo.dispose();
         }
-        if (FuenteBoton != null) {
-            FuenteBoton.dispose();
+        if (FuenteTexto != null) {
+            FuenteTexto.dispose();
         }
-        if (TexturaBotonPrincipal != null) {
-            TexturaBotonPrincipal.dispose();
-        }
-        if (TexturaBotonPrincipalPresionado != null) {
-            TexturaBotonPrincipalPresionado.dispose();
-        }
-        if (TexturaBotonSecundario != null) {
-            TexturaBotonSecundario.dispose();
-        }
-        if (TexturaBotonSecundarioPresionado != null) {
-            TexturaBotonSecundarioPresionado.dispose();
-        }
-        if (TexturaBotonDificultad != null) {
-            TexturaBotonDificultad.dispose();
-        }
-        if (TexturaBotonDificultadSeleccionada != null) {
-            TexturaBotonDificultadSeleccionada.dispose();
+        Disponer(TexturaFacil);
+        Disponer(TexturaMedia);
+        Disponer(TexturaDificil);
+        Disponer(TexturaSumar);
+        Disponer(TexturaRestar);
+        Disponer(TexturaVolver);
+        Disponer(TexturaIniciarReto);
+    }
+
+    private void Disponer(Texture Textura) {
+        if (Textura != null) {
+            Textura.dispose();
         }
     }
 }

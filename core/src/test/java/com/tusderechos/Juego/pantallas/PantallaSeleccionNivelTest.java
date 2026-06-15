@@ -30,4 +30,14 @@ class PantallaSeleccionNivelTest {
 
         assertEquals(5, Pantalla.ObtenerCantidadNivelesMostrados());
     }
+
+    @Test
+    void SeleccionNormalUsaImagenesDeBotonesDisponibles() {
+        assertEquals("imagenes/fondo_1.PNG", PantallaSeleccionNivel.ObtenerRutaImagenNivel(1));
+        assertEquals("imagenes/fondo_5.png", PantallaSeleccionNivel.ObtenerRutaImagenNivel(5));
+        assertEquals("imagenes/boton_dulce_rojo.png", PantallaSeleccionNivel.ObtenerRutaBotonDulce(ColorDulce.Rojo));
+        assertEquals("imagenes/boton_monstruo_azul.png", PantallaSeleccionNivel.ObtenerRutaBotonMonstruo(ColorMonstruo.Azul));
+        assertEquals("imagenes/menu_principal.png", PantallaSeleccionNivel.ObtenerRutaBotonMenuPrincipal());
+        assertEquals("imagenes/seleccion_de_niveles.png", PantallaSeleccionNivel.ObtenerRutaTituloSeleccionNiveles());
+    }
 }

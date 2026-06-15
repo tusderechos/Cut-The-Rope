@@ -26,7 +26,7 @@ class ProgresoNivelesTest {
 
     @Test
     void UsuarioNuevoSoloTieneDesbloqueadoElPrimerNivel() {
-        Usuario UsuarioActual = new Usuario("ana", "123", "Ana");
+        Usuario UsuarioActual = new Usuario("ana", "123", "Ana", "avatars/default.png");
 
         assertTrue(ProgresoNiveles.NivelEstaDesbloqueado(UsuarioActual, 1));
         assertFalse(ProgresoNiveles.NivelEstaDesbloqueado(UsuarioActual, 2));
@@ -34,7 +34,7 @@ class ProgresoNivelesTest {
 
     @Test
     void UsuarioDesbloqueaElSiguienteNivelAlCompletarElAnterior() {
-        Usuario UsuarioActual = new Usuario("ana", "123", "Ana");
+        Usuario UsuarioActual = new Usuario("ana", "123", "Ana", "avatars/default.png");
         UsuarioActual.registrarPartida(1, true, 2, 8f);
 
         assertTrue(ProgresoNiveles.NivelEstaDesbloqueado(UsuarioActual, 1));
@@ -44,7 +44,7 @@ class ProgresoNivelesTest {
 
     @Test
     void UsuarioConNivelCuatroCompletadoTieneTodosLosNivelesNormalesDisponibles() {
-        Usuario UsuarioActual = new Usuario("ana", "123", "Ana");
+        Usuario UsuarioActual = new Usuario("ana", "123", "Ana", "avatars/default.png");
         UsuarioActual.registrarPartida(4, true, 3, 8f);
 
         assertTrue(ProgresoNiveles.NivelEstaDesbloqueado(UsuarioActual, 5));
