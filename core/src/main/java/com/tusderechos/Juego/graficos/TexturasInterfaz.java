@@ -34,6 +34,16 @@ public final class TexturasInterfaz {
         return Textura;
     }
 
+    public static Texture CrearTexturaSolida(Color ColorFondo) {
+        Pixmap PixmapActual = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        PixmapActual.setColor(ColorFondo);
+        PixmapActual.fill();
+        Texture Textura = new Texture(PixmapActual);
+        PixmapActual.dispose();
+
+        return Textura;
+    }
+
     private static void DibujarRectanguloRedondeado(Pixmap PixmapActual, int X, int Y, int Ancho, int Alto, int Radio) {
         PixmapActual.fillRectangle(X + Radio, Y, Ancho - Radio * 2, Alto);
         PixmapActual.fillRectangle(X, Y + Radio, Ancho, Alto - Radio * 2);

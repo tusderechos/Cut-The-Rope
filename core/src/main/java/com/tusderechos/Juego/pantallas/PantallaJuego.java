@@ -746,9 +746,9 @@ public class PantallaJuego extends ScreenAdapter {
         List<String> LineasResultado = RetoActual == null ? TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeVisible, TiempoNivel, FallosNivel) : TextoPanelResultado.CrearLineasReto(RetoActual, ResultadoRetoActual, PuntajeVisible, TiempoNivel, FallosNivel);
         int LineasVisibles = AnimacionResultadoActual == null ? LineasResultado.size() : AnimacionResultadoActual.ObtenerCantidadLineasVisibles(LineasResultado.size());
         float InicioLineas = RetoActual == null ? 4.34f : 4.42f;
-        float SeparacionLineas = RetoActual == null ? 0.45f : 0.34f;
+        float SeparacionLineas = RetoActual == null ? 0.48f : 0.38f;
         for (int Indice = 0; Indice < LineasVisibles; Indice++) {
-            DibujarTextoInterfazCentradoMundo(LineasResultado.get(Indice), 2.4f, InicioLineas - Indice * SeparacionLineas, RetoActual == null ? 1.0f : 0.9f);
+            DibujarTextoInterfazCentradoMundo(LineasResultado.get(Indice), 2.4f, InicioLineas - Indice * SeparacionLineas, RetoActual == null ? 1.18f : 1.03f);
         }
         DibujarTextoInterfazCentradoEnRectanguloMundo("Salir", BotonResultadoSalir, 1.18f);
         DibujarTextoInterfazCentradoEnRectanguloMundo(RetoActual == null ? TextoPanelResultado.CrearTextoSiguiente(DatosNivelActual) : "Retos", BotonSiguiente, 1.18f);

@@ -18,10 +18,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.Juego;
@@ -34,7 +38,12 @@ import com.tusderechos.Juego.graficos.TexturasInterfaz;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
+import com.tusderechos.Juego.progreso.ProgresoNiveles;
 import Menus.Menu.MainMenuScreen;
+import LogicaArchivos.Usuarios.SistemaAutenticacion;
+import LogicaArchivos.Usuarios.Usuario;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PantallaSeleccionNivel extends ScreenAdapter {
     private final Juego JuegoAplicacion;
@@ -44,6 +53,9 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     private Texture TexturaBotonPresionado;
     private Texture TexturaBotonNivel;
     private Texture TexturaBotonNivelPresionado;
+    private Texture TexturaBloqueoNivel;
+    private Texture TexturaOverlayBloqueado;
+    private final List<Texture> TexturasFondosNivel = new ArrayList<>();
     private Texture TexturaDulcePreview;
     private Texture TexturaMonstruoPreview;
     private Image ImagenDulcePreview;
@@ -86,6 +98,8 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         TexturaBotonPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("21766d"), Color.valueOf("c6fff0"), Color.valueOf("2fa394"));
         TexturaBotonNivel = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("f0a13a"), Color.valueOf("ffe0a2"), Color.valueOf("ffc65a"));
         TexturaBotonNivelPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("c87425"), Color.valueOf("fff0c9"), Color.valueOf("e99a36"));
+        TexturaBloqueoNivel = CargarTextura(RutasTexturas.BloqueoNivel);
+        TexturaOverlayBloqueado = TexturasInterfaz.CrearTexturaSolida(new Color(0.18f, 0.18f, 0.18f, 0.64f));
         EstiloBoton = new TextButton.TextButtonStyle();
         EstiloBoton.font = Fuente;
         EstiloBoton.fontColor = Color.WHITE;
@@ -102,7 +116,8 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
 
         Raiz = new Table();
         Raiz.setFillParent(true);
-        Raiz.pad(28f);
+        Raiz.top();
+        Raiz.pad(12f);
         StageActual.addActor(Raiz);
         ConstruirContenido();
         Gdx.input.setInputProcessor(StageActual);
@@ -110,36 +125,22 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
 
     private void ConstruirContenido() {
         Raiz.clearChildren();
-        Raiz.add(new Label("Seleccion de niveles", EstiloTexto)).colspan(3).padBottom(22f);
+        AgregarBarraSuperior();
         Raiz.row();
+        Table TablaNiveles = new Table();
         for (int NumeroNivel = 1; NumeroNivel <= ObtenerCantidadNivelesMostrados(); NumeroNivel++) {
-            final int NivelElegido = NumeroNivel;
-            TextButton BotonNivel = new TextButton(String.valueOf(NumeroNivel), EstiloBotonNivel);
-            BotonNivel.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent Event, Actor ActorActual) {
-                    JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(CategoriaActual, NivelElegido), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual)));
-                }
-            });
-            Raiz.add(BotonNivel).width(112f).height(84f).pad(9f);
+            TablaNiveles.add(CrearTarjetaNivel(NumeroNivel)).width(124f).height(128f).pad(6f);
             if (NumeroNivel % 3 == 0) {
-                Raiz.row();
+                TablaNiveles.row();
             }
         }
+        Raiz.add(TablaNiveles).width(420f).padTop(12f);
         Raiz.row();
-        TextButton BotonRivalidad = new TextButton("Rivalidad", EstiloBoton);
-        BotonRivalidad.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent Event, Actor ActorActual) {
-                JuegoAplicacion.CambiarPantalla(new PantallaRivalidad(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
-            }
-        });
-        Raiz.add(BotonRivalidad).colspan(3).width(260f).height(58f).padTop(16f).padBottom(10f);
+        Raiz.add(new Image(TexturaBotonPresionado)).width(360f).height(2f).padTop(18f).padBottom(6f);
         Raiz.row();
-        Raiz.add(new Image(TexturaBotonPresionado)).colspan(3).width(320f).height(2f).padTop(28f).padBottom(8f);
+        Raiz.add(new Label("Personalizacion", EstiloTexto)).padBottom(6f);
         Raiz.row();
-        Raiz.add(new Label("Personalizacion", EstiloTexto)).colspan(3).padBottom(10f);
-        Raiz.row();
+        Table TablaPersonalizacion = new Table();
         if (TexturaDulcePreview == null) {
             TexturaDulcePreview = CargarTextura(RutasTexturas.ObtenerDulce(ColorDulceActual));
         }
@@ -148,11 +149,13 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         }
         ImagenDulcePreview = new Image(TexturaDulcePreview);
         ImagenMonstruoPreview = new Image(TexturaMonstruoPreview);
-        Raiz.add(ImagenDulcePreview).width(112f).height(112f).pad(6f);
-        Raiz.add().width(36f);
-        Raiz.add(ImagenMonstruoPreview).width(128f).height(128f).pad(6f);
+        TablaPersonalizacion.add(ImagenDulcePreview).width(82f).height(82f).pad(4f);
+        TablaPersonalizacion.add().width(88f);
+        TablaPersonalizacion.add(ImagenMonstruoPreview).width(92f).height(92f).pad(4f);
+        Raiz.add(TablaPersonalizacion).padBottom(4f);
         Raiz.row();
         TextButton BotonDulce = new TextButton(TextoDulce(), EstiloBoton);
+        CentrarTextoBoton(BotonDulce);
         BotonDulce.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -162,6 +165,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
             }
         });
         TextButton BotonMonstruo = new TextButton(TextoMonstruo(), EstiloBoton);
+        CentrarTextoBoton(BotonMonstruo);
         BotonMonstruo.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
@@ -170,18 +174,84 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
                 ActualizarPreviewMonstruo();
             }
         });
-        Raiz.add(BotonDulce).colspan(3).width(330f).height(62f).padTop(8f).padBottom(8f);
+        Raiz.add(BotonMonstruo).width(260f).height(50f).padTop(2f).padBottom(6f);
         Raiz.row();
-        Raiz.add(BotonMonstruo).colspan(3).width(330f).height(62f).pad(8f);
+        Raiz.add(BotonDulce).width(260f).height(50f).padBottom(6f);
         Raiz.row();
         TextButton BotonMenuPrincipal = new TextButton("Menu principal", EstiloBoton);
+        CentrarTextoBoton(BotonMenuPrincipal);
         BotonMenuPrincipal.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
                 JuegoAplicacion.CambiarPantalla(new MainMenuScreen(JuegoAplicacion));
             }
         });
-        Raiz.add(BotonMenuPrincipal).colspan(3).width(330f).height(58f).padTop(8f);
+        Raiz.add(BotonMenuPrincipal).right().width(170f).height(48f).padTop(2f);
+    }
+
+    private void AgregarBarraSuperior() {
+        Table BarraSuperior = new Table();
+        BarraSuperior.setBackground(new TextureRegionDrawable(TexturaBotonPresionado));
+        Label Titulo = new Label("Seleccion de niveles", EstiloTexto);
+        Titulo.setAlignment(Align.left);
+        BarraSuperior.add(Titulo).expandX().left().padLeft(8f);
+        BarraSuperior.add(CrearPerfilPlaceholder()).width(166f).height(44f).right().padRight(4f);
+        Raiz.add(BarraSuperior).width(440f).height(48f);
+    }
+
+    private Table CrearPerfilPlaceholder() {
+        Table Perfil = new Table();
+        Usuario UsuarioActual = SistemaAutenticacion.getUsuarioActivo();
+        String NombreUsuario = UsuarioActual == null ? "Invitado" : UsuarioActual.getUsername();
+        Image Avatar = new Image(TexturaBotonNivelPresionado);
+        Label Nombre = new Label(NombreUsuario, EstiloTexto);
+        Nombre.setAlignment(Align.left);
+        Perfil.add(Avatar).width(28f).height(28f).padRight(8f);
+        Perfil.add(Nombre).expandX().left();
+
+        return Perfil;
+    }
+
+    private Stack CrearTarjetaNivel(final int NumeroNivel) {
+        boolean NivelDesbloqueado = ProgresoNiveles.NivelEstaDesbloqueado(SistemaAutenticacion.getUsuarioActivo(), NumeroNivel);
+        Stack Tarjeta = new Stack();
+        Image FondoNivel = new Image(CargarFondoNivel(NumeroNivel));
+        FondoNivel.setScaling(Scaling.fill);
+        Tarjeta.add(FondoNivel);
+        Label Numero = new Label(String.valueOf(NumeroNivel), EstiloTexto);
+        Numero.setAlignment(Align.center);
+        Tarjeta.add(Numero);
+        if (!NivelDesbloqueado) {
+            Image Overlay = new Image(TexturaOverlayBloqueado);
+            Overlay.setScaling(Scaling.fill);
+            Image Candado = new Image(TexturaBloqueoNivel);
+            Candado.setScaling(Scaling.fit);
+            Table ContenedorCandado = new Table();
+            ContenedorCandado.add(Candado).width(46f).height(46f);
+            Tarjeta.add(Overlay);
+            Tarjeta.add(ContenedorCandado);
+            return Tarjeta;
+        }
+        Tarjeta.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent Event, float X, float Y) {
+                JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(CategoriaActual, NumeroNivel), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual)));
+            }
+        });
+
+        return Tarjeta;
+    }
+
+    private Texture CargarFondoNivel(int NumeroNivel) {
+        Texture Textura = CargarTextura(RutasTexturas.ObtenerFondoNivel(NumeroNivel));
+        TexturasFondosNivel.add(Textura);
+
+        return Textura;
+    }
+
+    private void CentrarTextoBoton(TextButton Boton) {
+        Boton.getLabel().setAlignment(Align.center);
+        Boton.getLabelCell().center();
     }
 
     @Override
@@ -253,6 +323,18 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         if (TexturaBotonNivelPresionado != null) {
             TexturaBotonNivelPresionado.dispose();
         }
+        if (TexturaBloqueoNivel != null) {
+            TexturaBloqueoNivel.dispose();
+        }
+        if (TexturaOverlayBloqueado != null) {
+            TexturaOverlayBloqueado.dispose();
+        }
+        for (Texture TexturaFondoNivel : TexturasFondosNivel) {
+            if (TexturaFondoNivel != null) {
+                TexturaFondoNivel.dispose();
+            }
+        }
+        TexturasFondosNivel.clear();
         if (TexturaDulcePreview != null) {
             TexturaDulcePreview.dispose();
         }

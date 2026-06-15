@@ -19,6 +19,7 @@ import java.util.Map;
 public final class RutasTexturas {
     public static final String Estrella = "imagenes/estrella.png";
     public static final String EstrellaVacia = "imagenes/estrella_placeholder.png";
+    public static final String BloqueoNivel = "imagenes/bloqueo_nivel.png";
     private static final Map<ColorDulce, String> RutasDulces = new EnumMap<>(ColorDulce.class);
     private static final Map<ColorMonstruo, String> RutasMonstruos = new EnumMap<>(ColorMonstruo.class);
     private static final List<String> RutasFondos = Arrays.asList("imagenes/fondo_1.PNG", "imagenes/fondo_2.PNG", "imagenes/fondo_3.png", "imagenes/fondo_4.png", "imagenes/fondo_5.png");
@@ -57,7 +58,7 @@ public final class RutasTexturas {
         Rutas.addAll(RutasDulces.values());
         Rutas.addAll(RutasMonstruos.values());
         Rutas.addAll(RutasFondos);
-        Rutas.addAll(Arrays.asList(Estrella, EstrellaVacia));
+        Rutas.addAll(Arrays.asList(Estrella, EstrellaVacia, BloqueoNivel));
         return Rutas;
     }
 }
