@@ -36,10 +36,11 @@ class RutasTexturasTest {
         List<String> Rutas = RutasTexturas.ObtenerRutas();
         Set<String> RutasUnicas = new HashSet<>(Rutas);
 
-        assertEquals(15, Rutas.size());
+        assertEquals(16, Rutas.size());
         assertEquals(Rutas.size(), RutasUnicas.size());
         assertTrue(Rutas.contains(RutasTexturas.Estrella));
         assertTrue(Rutas.contains(RutasTexturas.EstrellaVacia));
+        assertTrue(Rutas.contains(RutasTexturas.BloqueoNivel));
     }
 
     @Test
