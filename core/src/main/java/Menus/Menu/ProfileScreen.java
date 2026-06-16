@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -39,7 +40,6 @@ import com.tusderechos.Juego.social.GestorSeguimiento;
  * @author HP
  */
 public class ProfileScreen implements Screen {
-
     private final Game parentGame;
     private final String usernamePerfil;
     private Stage stage;
@@ -68,7 +68,9 @@ public class ProfileScreen implements Screen {
         Usuario usuarioPerfil = ObtenerUsuarioPerfil(usuarioActivo);
         boolean perfilPropio = EsPerfilPropio(usuarioActivo, usuarioPerfil);
 
-        fondoPerfilTexture = new Texture(Gdx.files.internal("imgMenus/fondo_perfil.png"));
+        String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
+
+        fondoPerfilTexture = new Texture(Gdx.files.internal("imgMenus/fondo_perfil_" + idm + ".png"));
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
         fotoPerfilTex = CargarFotoPerfil(usuarioPerfil);
 
@@ -90,7 +92,7 @@ public class ProfileScreen implements Screen {
                 AgregarAccionesSociales(contenedorCentral, usuarioActivo, usuarioPerfil, estiloDatos);
             }
         } else {
-            Label lblError = new Label("PERFIL NO ENCONTRADO", estiloDatos);
+            Label lblError = new Label("PERFIL NO ENCONTRADO / PROFILE NOT FOUND", estiloDatos);
             lblError.setColor(Color.RED);
             contenedorCentral.add(lblError).padTop(150).row();
         }
@@ -177,7 +179,8 @@ public class ProfileScreen implements Screen {
         contenedorCentral.add().height(18).row();
 
         if (GestorSeguimiento.SonRivalesMutuos(usuarioActivo, usuarioPerfil)) {
-            TextButton btnReto = new TextButton("Enviar reto", skin);
+            String textoReto = ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Send Challenge" : "Enviar reto";
+            TextButton btnReto = new TextButton(textoReto, skin);
             btnReto.getLabel().setAlignment(Align.center);
             btnReto.addListener(new ClickListener() {
                 @Override
@@ -187,22 +190,26 @@ public class ProfileScreen implements Screen {
             });
             contenedorCentral.add(btnReto).width(210).height(44).center().row();
         } else {
-            Label lblRivalidad = new Label("Rivalidad disponible cuando ambos se sigan", estiloDatos);
+            String textoRivalidad = ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG")
+                    ? "Rivalry available when both follow each other"
+                    : "Rivalidad disponible cuando ambos se sigan";
+            Label lblRivalidad = new Label(textoRivalidad, estiloDatos);
             lblRivalidad.setFontScale(0.72f);
             contenedorCentral.add(lblRivalidad).height(36).center().row();
         }
     }
 
     private String TextoBotonSeguir(Usuario usuarioActivo, Usuario usuarioPerfil) {
+        boolean esEng = ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG");
         if (usuarioActivo == null) {
-            return "Inicia sesion";
+            return esEng ? "Log In" : "Inicia sesion";
         }
 
         if (GestorSeguimiento.YaSigue(usuarioActivo, usuarioPerfil)) {
-            return "Siguiendo";
+            return esEng ? "Following" : "Siguiendo";
         }
 
-        return "Seguir";
+        return esEng ? "Follow" : "Seguir";
     }
 
     private void AgregarBotonVolver(Table contenedorCentral) {
@@ -251,8 +258,12 @@ public class ProfileScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
-        fondoPerfilTexture.dispose();
-        btnVolverTex.dispose();
+        if (fondoPerfilTexture != null) {
+            fondoPerfilTexture.dispose();
+        }
+        if (btnVolverTex != null) {
+            btnVolverTex.dispose();
+        }
         if (fotoPerfilTex != null) {
             fotoPerfilTex.dispose();
         }

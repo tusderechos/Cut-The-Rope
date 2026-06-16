@@ -13,6 +13,7 @@ import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.rivalidad.DatosReto;
+import com.tusderechos.Juego.rivalidad.SolicitudRivalidad;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,6 +62,17 @@ class PantallaRivalidadTest {
         assertEquals(3, Reto.ObtenerNumeroEnCategoria());
         assertEquals(3, Reto.ObtenerEstrellasObjetivo());
         assertEquals(3700, Reto.ObtenerPuntajeObjetivo());
+    }
+
+    @Test
+    void CreaSolicitudConUsuarioRetadoParaFlujoPorTurnos() {
+        PantallaRivalidad Pantalla = new PantallaRivalidad(null, ColorDulce.Verde, ColorMonstruo.Naranja, CategoriaDificultad.Media, "Clara_09");
+
+        SolicitudRivalidad Solicitud = Pantalla.CrearSolicitudActual("Clara_09");
+
+        assertEquals("admin", Solicitud.ObtenerUsernameRetador());
+        assertEquals("clara_09", Solicitud.ObtenerUsernameRetado());
+        assertEquals(CategoriaDificultad.Media, Solicitud.ObtenerReto().ObtenerCategoria());
     }
 
     @Test

@@ -35,7 +35,6 @@ import java.io.File;
  * @author HP
  */
 public class RegisterScreen implements Screen {
-
     private final Game parentGame;
     private Stage stage;
     private Skin skin;
@@ -72,7 +71,7 @@ public class RegisterScreen implements Screen {
         "imgMenus/avatar5.png"
     };
     private int indiceAvatarActual = 0;
-    private String rutaImagenSeleccionada = "imgMenus/avatar1.png"; 
+    private String rutaImagenSeleccionada = "imgMenus/avatar1.png";
 
     public RegisterScreen(Game game) {
         this.parentGame = game;
@@ -85,15 +84,17 @@ public class RegisterScreen implements Screen {
 
         skin = SkinMenu.Crear();
 
-        fondoRegistroTexture = new Texture(Gdx.files.internal("imgMenus/fondo_registro_completo.png"));
-        btnCrearTex = new Texture(Gdx.files.internal("imgMenus/btn_crear.png"));
+        String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
+
+        fondoRegistroTexture = new Texture(Gdx.files.internal("imgMenus/fondo_registro_completo_" + idm + ".png"));
+        btnCrearTex = new Texture(Gdx.files.internal("imgMenus/btn_crear_" + idm + ".png"));
+
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
         iconoOjoTex = new Texture(Gdx.files.internal("imgMenus/ojo.png"));
-
         btnFlechaIzqTex = new Texture(Gdx.files.internal("imgMenus/btn_flecha_izq.png"));
         btnFlechaDerTex = new Texture(Gdx.files.internal("imgMenus/btn_flecha_der.png"));
         btnSubirTex = new Texture(Gdx.files.internal("imgMenus/btn_subir.png"));
-        avatarActualTex = new Texture(Gdx.files.internal("imgMenus/avatar1.png")); 
+        avatarActualTex = new Texture(Gdx.files.internal("imgMenus/avatar1.png"));
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
@@ -155,7 +156,7 @@ public class RegisterScreen implements Screen {
         });
 
         seccionAvatar.add(btnFlechaIzq).width(35).height(35).padRight(15);
-        seccionAvatar.add(imgAvatarVisor).width(82).height(82); 
+        seccionAvatar.add(imgAvatarVisor).width(82).height(82);
         seccionAvatar.add(btnFlechaDer).width(35).height(35).padLeft(15).row();
 
         contenedorCentral.add(seccionAvatar).row();
@@ -313,7 +314,7 @@ public class RegisterScreen implements Screen {
         }
 
         visor.setDrawable(new TextureRegionDrawable(new TextureRegion(avatarActualTex)));
-        rutaImagenSeleccionada = ruta; 
+        rutaImagenSeleccionada = ruta;
     }
 
     private void validarContrasenaEnTiempoReal(String password) {
@@ -369,9 +370,15 @@ public class RegisterScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        fondoRegistroTexture.dispose();
-        btnCrearTex.dispose();
-        btnVolverTex.dispose();
+        if (fondoRegistroTexture != null) {
+            fondoRegistroTexture.dispose();
+        }
+        if (btnCrearTex != null) {
+            btnCrearTex.dispose();
+        }
+        if (btnVolverTex != null) {
+            btnVolverTex.dispose();
+        }
         if (iconoOjoTex != null) {
             iconoOjoTex.dispose();
         }

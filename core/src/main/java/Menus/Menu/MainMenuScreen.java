@@ -27,7 +27,6 @@ import LogicaArchivos.Usuarios.SistemaAutenticacion;
  * @author HP
  */
 public class MainMenuScreen implements Screen {
-
     private final Game parentGame;
     private Stage stage;
     private Skin skin;
@@ -51,12 +50,16 @@ public class MainMenuScreen implements Screen {
 
         skin = SkinMenu.Crear();
 
+        String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
+
+        //fondoMenuTex = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal_" + idm + ".png"));
         fondoMenuTex = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal.png"));
-        btnJugarTex = new Texture(Gdx.files.internal("imgMenus/btn_juego.png"));
-        btnPerfilTex = new Texture(Gdx.files.internal("imgMenus/btn_perfil.png"));
-        btnBuscarJugadoresTex = new Texture(Gdx.files.internal("imagenes/buscar_jugadores.png"));
-        btnEstadisticasTex = new Texture(Gdx.files.internal("imgMenus/btn_estadisticas.png"));
-        btnCerrarSesionTex = new Texture(Gdx.files.internal("imgMenus/btn_cerrar_sesion.png"));
+        btnJugarTex = new Texture(Gdx.files.internal("imgMenus/btn_juego_" + idm + ".png"));
+        btnPerfilTex = new Texture(Gdx.files.internal("imgMenus/btn_perfil_" + idm + ".png"));
+        btnEstadisticasTex = new Texture(Gdx.files.internal("imgMenus/btn_estadisticas_" + idm + ".png"));
+        btnCerrarSesionTex = new Texture(Gdx.files.internal("imgMenus/btn_cerrar_sesion_" + idm + ".png"));
+
+        btnBuscarJugadoresTex = new Texture(Gdx.files.internal("imgMenus/buscar_jugadores_" + idm + ".png"));
         btnConfigTex = new Texture(Gdx.files.internal("imgMenus/btn_config.png"));
 
         Table rootTable = new Table();
@@ -175,12 +178,26 @@ public class MainMenuScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
-        fondoMenuTex.dispose();
-        btnJugarTex.dispose();
-        btnPerfilTex.dispose();
-        btnBuscarJugadoresTex.dispose();
-        btnEstadisticasTex.dispose();
-        btnCerrarSesionTex.dispose();
-        btnConfigTex.dispose();
+        if (fondoMenuTex != null) {
+            fondoMenuTex.dispose();
+        }
+        if (btnJugarTex != null) {
+            btnJugarTex.dispose();
+        }
+        if (btnPerfilTex != null) {
+            btnPerfilTex.dispose();
+        }
+        if (btnBuscarJugadoresTex != null) {
+            btnBuscarJugadoresTex.dispose();
+        }
+        if (btnEstadisticasTex != null) {
+            btnEstadisticasTex.dispose();
+        }
+        if (btnCerrarSesionTex != null) {
+            btnCerrarSesionTex.dispose();
+        }
+        if (btnConfigTex != null) {
+            btnConfigTex.dispose();
+        }
     }
 }
