@@ -12,39 +12,6 @@ import com.badlogic.gdx.Preferences;
  * @author HP
  */
 public class ConfiguracionJuego {
-
-    /*public static float volumenGeneral;
-    public static String idiomaActivo;
-    public static String modoControl;
-
-    private static Preferences prefs;
-
-    public static void inicializar() {
-        prefs = Gdx.app.getPreferences("CutTheRope_Config");
-
-        volumenGeneral = prefs.getFloat("volumen", 0.8f);
-        idiomaActivo = prefs.getString("idioma", "ESP");
-        modoControl = prefs.getString("control", "MOUSE");
-    }
-
-    public static void guardarVolumen(float nuevoVolumen) {
-        volumenGeneral = nuevoVolumen;
-        prefs.putFloat("volumen", nuevoVolumen);
-        prefs.flush(); 
-    }
-
-    public static void guardarIdioma(String nuevoIdioma) {
-        idiomaActivo = nuevoIdioma;
-        prefs.putString("idioma", nuevoIdioma);
-        prefs.flush();
-    }
-
-    public static void guardarControl(String nuevoControl) {
-        modoControl = nuevoControl;
-        prefs.putString("control", nuevoControl);
-        prefs.flush();
-    }*/
-
     public static float volumenGeneral;
     public static String idiomaActivo;
     public static String modoControl;

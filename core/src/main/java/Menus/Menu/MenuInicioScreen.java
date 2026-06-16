@@ -40,11 +40,13 @@ public class MenuInicioScreen implements Screen {
     public void show() {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
+        
+        String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
 
         fondoTexture = new Texture(Gdx.files.internal("imgMenus/fondo_auth.png"));
-        btnLoginTexture = new Texture(Gdx.files.internal("imgMenus/btn_iniciar_sesion.png"));
-        btnRegisterTexture = new Texture(Gdx.files.internal("imgMenus/btn_crear_cuenta.png"));
-        btnSalirTexture = new Texture(Gdx.files.internal("imgMenus/btn_salir.png"));
+        btnLoginTexture = new Texture(Gdx.files.internal("imgMenus/btn_iniciar_sesion_" + idm + ".png"));
+        btnRegisterTexture = new Texture(Gdx.files.internal("imgMenus/btn_crear_cuenta_" + idm + ".png"));
+        btnSalirTexture = new Texture(Gdx.files.internal("imgMenus/btn_salir_" + idm + ".png"));
 
         TextureRegionDrawable drawableLogin = new TextureRegionDrawable(new TextureRegion(btnLoginTexture));
         TextureRegionDrawable drawableRegister = new TextureRegionDrawable(new TextureRegion(btnRegisterTexture));
