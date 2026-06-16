@@ -35,7 +35,16 @@ import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
 import com.tusderechos.Juego.rivalidad.DatosReto;
+import com.tusderechos.Juego.rivalidad.GestorRivalidades;
 import com.tusderechos.Juego.rivalidad.GestorRetos;
+import com.tusderechos.Juego.rivalidad.GuardadorRivalidadesBinario;
+import com.tusderechos.Juego.rivalidad.SolicitudRivalidad;
+import LogicaArchivos.Usuarios.SistemaAutenticacion;
+import LogicaArchivos.Usuarios.Usuario;
+import Menus.Menu.PantallaSolicitudesRivalidad;
+import Menus.Menu.ProfileScreen;
+import java.nio.file.Path;
+import java.util.List;
 
 public class PantallaRivalidad extends ScreenAdapter {
     private static final int PuntajeObjetivoMinimo = 0;
@@ -47,6 +56,7 @@ public class PantallaRivalidad extends ScreenAdapter {
     private final Juego JuegoAplicacion;
     private final ColorDulce ColorDulceActual;
     private final ColorMonstruo ColorMonstruoActual;
+    private final String UsernameRetado;
     private Stage StageActual;
     private BitmapFont FuenteTitulo;
     private BitmapFont FuenteTexto;
@@ -66,13 +76,22 @@ public class PantallaRivalidad extends ScreenAdapter {
     private int PuntajeObjetivo = 3200;
 
     public PantallaRivalidad(Juego JuegoAplicacion, ColorDulce ColorDulceActual, ColorMonstruo ColorMonstruoActual) {
-        this(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual, CategoriaDificultad.Media);
+        this(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual, CategoriaDificultad.Media, null);
     }
 
     public PantallaRivalidad(Juego JuegoAplicacion, ColorDulce ColorDulceActual, ColorMonstruo ColorMonstruoActual, CategoriaDificultad CategoriaInicial) {
+        this(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual, CategoriaInicial, null);
+    }
+
+    public PantallaRivalidad(Juego JuegoAplicacion, ColorDulce ColorDulceActual, ColorMonstruo ColorMonstruoActual, String UsernameRetado) {
+        this(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual, CategoriaDificultad.Media, UsernameRetado);
+    }
+
+    public PantallaRivalidad(Juego JuegoAplicacion, ColorDulce ColorDulceActual, ColorMonstruo ColorMonstruoActual, CategoriaDificultad CategoriaInicial, String UsernameRetado) {
         this.JuegoAplicacion = JuegoAplicacion;
         this.ColorDulceActual = ColorDulceActual;
         this.ColorMonstruoActual = ColorMonstruoActual;
+        this.UsernameRetado = NormalizarUsuario(UsernameRetado);
         CambiarCategoria(CategoriaInicial == null ? CategoriaDificultad.Media : CategoriaInicial);
     }
 
@@ -115,7 +134,11 @@ public class PantallaRivalidad extends ScreenAdapter {
     }
 
     public DatosReto CrearRetoActual() {
-        return new DatosReto(CategoriaActual, NumeroNivelActual, "Admin", PuntajeObjetivo, EstrellasObjetivo);
+        return new DatosReto(CategoriaActual, NumeroNivelActual, ObtenerUsernameRetador(), PuntajeObjetivo, EstrellasObjetivo);
+    }
+
+    public SolicitudRivalidad CrearSolicitudActual(String UsernameRetado) {
+        return GestorRivalidades.CrearSolicitud(CrearRetoActual(), ObtenerUsernameRetador(), UsernameRetado);
     }
 
     @Override
@@ -140,7 +163,7 @@ public class PantallaRivalidad extends ScreenAdapter {
         TexturaDificil = CargarTextura("imagenes/dificil.png");
         TexturaSumar = CargarTextura("imagenes/sumar.png");
         TexturaRestar = CargarTextura("imagenes/restar.png");
-        TexturaVolver = CargarTextura("imagenes/volver_alto.png");
+        TexturaVolver = CargarTextura("imagenes/volver.png");
         TexturaIniciarReto = CargarTextura("imagenes/iniciar_reto.png");
     }
 
@@ -280,6 +303,10 @@ public class PantallaRivalidad extends ScreenAdapter {
         BotonVolver.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
+                if (UsernameRetado != null && !UsernameRetado.isEmpty()) {
+                    JuegoAplicacion.CambiarPantalla(new ProfileScreen(JuegoAplicacion, UsernameRetado));
+                    return;
+                }
                 JuegoAplicacion.CambiarPantalla(new PantallaSeleccionNivel(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
             }
         });
@@ -289,6 +316,11 @@ public class PantallaRivalidad extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
                 DatosReto Reto = CrearRetoActual();
+                if (UsernameRetado != null && !UsernameRetado.isEmpty()) {
+                    GuardarSolicitudRivalidad(Reto);
+                    JuegoAplicacion.CambiarPantalla(new PantallaSolicitudesRivalidad(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
+                    return;
+                }
                 JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, GestorRetos.ObtenerNivelReto(Reto), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual), Reto));
             }
         });
@@ -319,6 +351,30 @@ public class PantallaRivalidad extends ScreenAdapter {
 
     private String TextoResumenReto() {
         return CategoriaActual.name() + " " + NumeroNivelActual + " - " + PuntajeObjetivo + " pts / " + EstrellasObjetivo + " estrellas";
+    }
+
+    private String ObtenerUsernameRetador() {
+        Usuario UsuarioActivo = SistemaAutenticacion.getUsuarioActivo();
+        if (UsuarioActivo == null || UsuarioActivo.getUsername() == null || UsuarioActivo.getUsername().trim().isEmpty()) {
+            return "Admin";
+        }
+
+        return UsuarioActivo.getUsername().trim().toLowerCase();
+    }
+
+    private String NormalizarUsuario(String Username) {
+        if (Username == null || Username.trim().isEmpty()) {
+            return null;
+        }
+
+        return Username.trim().toLowerCase();
+    }
+
+    private void GuardarSolicitudRivalidad(DatosReto Reto) {
+        Path Ruta = Gdx.files.local("datos/rivalidades_cut_the_rope.bin").file().toPath();
+        List<SolicitudRivalidad> Solicitudes = GuardadorRivalidadesBinario.Cargar(Ruta);
+        Solicitudes.add(GestorRivalidades.CrearSolicitud(Reto, ObtenerUsernameRetador(), UsernameRetado));
+        GuardadorRivalidadesBinario.Guardar(Ruta, Solicitudes);
     }
 
     private int LimitarValor(int Valor, int Minimo, int Maximo) {

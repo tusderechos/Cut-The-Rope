@@ -24,6 +24,10 @@ public final class TextoPanelResultado {
         return Arrays.asList("Puntaje conseguido: " + PuntajeFinal, "Tiempo usado: " + Math.round(TiempoNivel) + " s", "Fallos del intento: " + FallosNivel, "Estrellas faltantes: " + (3 - EstrellasRecolectadas));
     }
 
+    public static List<String> CrearLineasFinal(int EstrellasRecolectadas, int PuntajeFinal, float TiempoNivel, int FallosNivel) {
+        return Arrays.asList("Completaste todos los niveles", "Puntaje conseguido: " + PuntajeFinal, "Tiempo usado: " + Math.round(TiempoNivel) + " s", "Fallos del intento: " + FallosNivel, "Estrellas faltantes: " + (3 - EstrellasRecolectadas));
+    }
+
     public static List<String> CrearLineasReto(DatosReto Reto, ResultadoReto Resultado, int PuntajeFinalVisible, float TiempoNivel, int FallosNivel) {
         if (Reto == null || Resultado == null) {
             throw new IllegalArgumentException("Los datos del reto no pueden ser nulos");

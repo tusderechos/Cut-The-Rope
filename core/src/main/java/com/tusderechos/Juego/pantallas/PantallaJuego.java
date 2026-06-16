@@ -52,7 +52,10 @@ import com.tusderechos.Juego.persistencia.GuardadorPartidasBinario;
 import com.tusderechos.Juego.persistencia.RegistroPartida;
 import com.tusderechos.Juego.rivalidad.DatosReto;
 import com.tusderechos.Juego.rivalidad.GestorRetos;
+import com.tusderechos.Juego.rivalidad.GestorRivalidades;
+import com.tusderechos.Juego.rivalidad.GuardadorRivalidadesBinario;
 import com.tusderechos.Juego.rivalidad.ResultadoReto;
+import com.tusderechos.Juego.rivalidad.SolicitudRivalidad;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 import com.tusderechos.Juego.utilidades.CalculadoraPuntaje;
 import com.tusderechos.Juego.enums.EstadoNivel;
@@ -60,16 +63,22 @@ import com.tusderechos.Juego.obstaculos.Obstaculo;
 import com.tusderechos.Juego.obstaculos.ObstaculoPeligroso;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
+import Menus.Menu.PantallaSolicitudesRivalidad;
 import ManejoArchivos.Archivos.ManejadorArchivos;
+import java.nio.file.Path;
 import java.util.List;
 
 public class PantallaJuego extends ScreenAdapter {
     private static final float PasoFisica = 1f / 60f;
+    private static final float AnchoPlataformaVisual = 1.18f;
+    private static final float AltoPlataformaVisual = 0.16f;
+    private static final float SeparacionPlataformaVisualMonstruo = 0.04f;
     private final Juego JuegoAplicacion;
     private final DatosNivel DatosNivelActual;
     private final PersonalizacionDulce PersonalizacionDulceActual;
     private final PersonalizacionMonstruo PersonalizacionMonstruoActual;
     private final DatosReto RetoActual;
+    private final String IdRivalidadActual;
     private World Mundo;
     private OrthographicCamera Camara;
     private FitViewport Viewport;
@@ -119,11 +128,16 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     public PantallaJuego(Juego JuegoAplicacion, DatosNivel DatosNivelActual, PersonalizacionDulce PersonalizacionDulceActual, PersonalizacionMonstruo PersonalizacionMonstruoActual, DatosReto RetoActual) {
+        this(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual, RetoActual, null);
+    }
+
+    public PantallaJuego(Juego JuegoAplicacion, DatosNivel DatosNivelActual, PersonalizacionDulce PersonalizacionDulceActual, PersonalizacionMonstruo PersonalizacionMonstruoActual, DatosReto RetoActual, String IdRivalidadActual) {
         this.JuegoAplicacion = JuegoAplicacion;
         this.DatosNivelActual = DatosNivelActual;
         this.PersonalizacionDulceActual = PersonalizacionDulceActual;
         this.PersonalizacionMonstruoActual = PersonalizacionMonstruoActual;
         this.RetoActual = RetoActual;
+        this.IdRivalidadActual = IdRivalidadActual;
     }
 
     @Override
@@ -232,7 +246,7 @@ public class PantallaJuego extends ScreenAdapter {
             ActualizarTransicionFallo(Delta);
         }
         if (EstadoNivelActual == EstadoNivel.Reiniciando) {
-            PantallaJuego Reinicio = new PantallaJuego(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual, RetoActual);
+            PantallaJuego Reinicio = new PantallaJuego(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual, RetoActual, IdRivalidadActual);
             Reinicio.FallosNivel = FallosNivel;
             JuegoAplicacion.CambiarPantalla(Reinicio);
             return;
@@ -277,6 +291,7 @@ public class PantallaJuego extends ScreenAdapter {
         for (Obstaculo ObstaculoActual : Obstaculos) {
             ObstaculoActual.Dibujar(ShapeRendererActual);
         }
+        DibujarBaseMonstruo(ShapeRendererActual);
         if (PlataformaMovilActual != null) {
             PlataformaMovilActual.Dibujar(ShapeRendererActual);
         }
@@ -499,6 +514,7 @@ public class PantallaJuego extends ScreenAdapter {
             ResultadoRetoActual = GestorRetos.EvaluarResultado(RetoActual, ResultadoNivelActual);
         }
         GuardarResultadoPartida();
+        GuardarResultadoRivalidad();
         AnimacionResultadoActual = new AnimacionPanelResultado(PuntajeFinal);
         CrearEfecto(MonstruoActual.ObtenerPosicion(), 0.24f, 0.95f, new Color(0.25f, 0.90f, 0.35f, 1f));
         GestorAudioActual.ReproducirVictoria();
@@ -516,6 +532,24 @@ public class PantallaJuego extends ScreenAdapter {
             UsuarioActivo.registrarPartida(DatosNivelActual.ObtenerNumero(), true, EstrellasRecolectadas, TiempoNivel);
             ManejadorArchivos.guardarUsuario(UsuarioActivo);
         }
+    }
+
+    private void GuardarResultadoRivalidad() {
+        if (IdRivalidadActual == null || IdRivalidadActual.trim().isEmpty()) {
+            return;
+        }
+        Usuario UsuarioActivo = SistemaAutenticacion.getUsuarioActivo();
+        if (UsuarioActivo == null || UsuarioActivo.getUsername() == null || UsuarioActivo.getUsername().trim().isEmpty()) {
+            return;
+        }
+        Path RutaRivalidades = Gdx.files.local("datos/rivalidades_cut_the_rope.bin").file().toPath();
+        List<SolicitudRivalidad> Solicitudes = GuardadorRivalidadesBinario.Cargar(RutaRivalidades);
+        SolicitudRivalidad Solicitud = GestorRivalidades.BuscarPorId(Solicitudes, IdRivalidadActual);
+        if (Solicitud == null) {
+            return;
+        }
+        GestorRivalidades.RegistrarResultado(Solicitud, UsuarioActivo.getUsername(), ResultadoNivelActual);
+        GuardadorRivalidadesBinario.Guardar(RutaRivalidades, Solicitudes);
     }
 
     private void ActualizarEfectosVisuales(float Delta) {
@@ -561,6 +595,10 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void VolverASeleccion() {
+        if (IdRivalidadActual != null && !IdRivalidadActual.trim().isEmpty()) {
+            JuegoAplicacion.CambiarPantalla(new PantallaSolicitudesRivalidad(JuegoAplicacion, PersonalizacionDulceActual.ObtenerColorDulce(), PersonalizacionMonstruoActual.ObtenerColorMonstruo()));
+            return;
+        }
         if (RetoActual != null) {
             JuegoAplicacion.CambiarPantalla(new PantallaRivalidad(JuegoAplicacion, PersonalizacionDulceActual.ObtenerColorDulce(), PersonalizacionMonstruoActual.ObtenerColorMonstruo(), RetoActual.ObtenerCategoria()));
             return;
@@ -619,6 +657,27 @@ public class PantallaJuego extends ScreenAdapter {
         Renderer.setColor(new Color(0f, 0f, 0f, 0.58f));
         Renderer.rect(0f, 0f, ConstantesJuego.AnchoMundo, ConstantesJuego.AltoMundo);
         DibujarPanelRedondeado(Renderer, PanelConfirmacionSalir.x, PanelConfirmacionSalir.y, PanelConfirmacionSalir.width, PanelConfirmacionSalir.height, 0.16f, new Color(0.05f, 0.07f, 0.10f, 0.98f), new Color(0.22f, 0.30f, 0.38f, 0.94f));
+    }
+
+    private void DibujarBaseMonstruo(ShapeRenderer Renderer) {
+        Rectangle PlataformaVisual = CrearRectanguloPlataformaVisual(MonstruoActual.ObtenerPosicion());
+        Renderer.setColor(new Color(0f, 0f, 0f, 0.30f));
+        Renderer.rect(PlataformaVisual.x + 0.03f, PlataformaVisual.y - 0.03f, PlataformaVisual.width, PlataformaVisual.height);
+        Renderer.setColor(new Color(0.84f, 0.87f, 0.90f, 1f));
+        Renderer.rect(PlataformaVisual.x, PlataformaVisual.y, PlataformaVisual.width, PlataformaVisual.height);
+        Renderer.setColor(new Color(1f, 1f, 1f, 0.82f));
+        Renderer.rect(PlataformaVisual.x + 0.08f, PlataformaVisual.y + PlataformaVisual.height - 0.045f, PlataformaVisual.width - 0.16f, 0.035f);
+    }
+
+    static Rectangle CrearRectanguloPlataformaVisual(Vector2 PosicionMonstruo) {
+        float X = PosicionMonstruo.x - AnchoPlataformaVisual / 2f;
+        float Y = PosicionMonstruo.y - ConstantesJuego.RadioMonstruo - SeparacionPlataformaVisualMonstruo - AltoPlataformaVisual;
+
+        return new Rectangle(X, Y, AnchoPlataformaVisual, AltoPlataformaVisual);
+    }
+
+    static float ObtenerAnchoPlataformaVisual() {
+        return AnchoPlataformaVisual;
     }
 
     private void DibujarSpritesMundo() {
@@ -761,15 +820,27 @@ public class PantallaJuego extends ScreenAdapter {
     private void DibujarTextosResultado() {
         Fuente.setColor(Color.WHITE);
         Fuente.getData().setScale(1.05f);
-        DibujarTextoCentradoMundo("Nivel completado", 2.4f, 5.84f);
+        DibujarTextoCentradoMundo(EsNivelFinalDelJuego() ? "Juego completado" : "Nivel completado", 2.4f, 5.84f);
         int PuntajeVisible = AnimacionResultadoActual == null ? PuntajeFinal : AnimacionResultadoActual.ObtenerPuntajeVisible();
-        List<String> LineasResultado = RetoActual == null ? TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeVisible, TiempoNivel, FallosNivel) : TextoPanelResultado.CrearLineasReto(RetoActual, ResultadoRetoActual, PuntajeVisible, TiempoNivel, FallosNivel);
-        int LineasVisibles = AnimacionResultadoActual == null ? LineasResultado.size() : AnimacionResultadoActual.ObtenerCantidadLineasVisibles(LineasResultado.size());
-        float InicioLineas = RetoActual == null ? 4.34f : 4.42f;
-        float SeparacionLineas = RetoActual == null ? 0.48f : 0.38f;
-        for (int Indice = 0; Indice < LineasVisibles; Indice++) {
-            DibujarTextoInterfazCentradoMundo(LineasResultado.get(Indice), 2.4f, InicioLineas - Indice * SeparacionLineas, RetoActual == null ? 1.18f : 1.03f);
+        List<String> LineasResultado;
+        if (RetoActual != null) {
+            LineasResultado = TextoPanelResultado.CrearLineasReto(RetoActual, ResultadoRetoActual, PuntajeVisible, TiempoNivel, FallosNivel);
+        } else if (EsNivelFinalDelJuego()) {
+            LineasResultado = TextoPanelResultado.CrearLineasFinal(EstrellasRecolectadas, PuntajeVisible, TiempoNivel, FallosNivel);
+        } else {
+            LineasResultado = TextoPanelResultado.CrearLineas(EstrellasRecolectadas, PuntajeVisible, TiempoNivel, FallosNivel);
         }
+        int LineasVisibles = AnimacionResultadoActual == null ? LineasResultado.size() : AnimacionResultadoActual.ObtenerCantidadLineasVisibles(LineasResultado.size());
+        float InicioLineas = RetoActual == null && !EsNivelFinalDelJuego() ? 4.34f : 4.42f;
+        float SeparacionLineas = RetoActual == null && !EsNivelFinalDelJuego() ? 0.48f : 0.38f;
+        float EscalaLineas = RetoActual == null && !EsNivelFinalDelJuego() ? 1.18f : 1.03f;
+        for (int Indice = 0; Indice < LineasVisibles; Indice++) {
+            DibujarTextoInterfazCentradoMundo(LineasResultado.get(Indice), 2.4f, InicioLineas - Indice * SeparacionLineas, EscalaLineas);
+        }
+    }
+
+    private boolean EsNivelFinalDelJuego() {
+        return RetoActual == null && DatosNivelActual.ObtenerNumeroEnCategoria() >= FabricaNiveles.CantidadNiveles(DatosNivelActual.ObtenerCategoria());
     }
 
     private void DibujarTextosConfirmacionSalida() {

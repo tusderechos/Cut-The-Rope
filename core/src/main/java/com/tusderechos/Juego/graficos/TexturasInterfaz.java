@@ -44,6 +44,39 @@ public final class TexturasInterfaz {
         return Textura;
     }
 
+    public static Texture CrearTexturaCircular(Color ColorFondo, int Tamano) {
+        Pixmap PixmapActual = new Pixmap(Tamano, Tamano, Pixmap.Format.RGBA8888);
+        PixmapActual.setColor(0f, 0f, 0f, 0f);
+        PixmapActual.fill();
+        PixmapActual.setColor(ColorFondo);
+        PixmapActual.fillCircle(Tamano / 2, Tamano / 2, Tamano / 2 - 1);
+        Texture Textura = new Texture(PixmapActual);
+        Textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        PixmapActual.dispose();
+
+        return Textura;
+    }
+
+    public static Texture CrearTexturaAnillo(Color ColorFondo, int Tamano, int Grosor) {
+        Pixmap PixmapActual = new Pixmap(Tamano, Tamano, Pixmap.Format.RGBA8888);
+        int Centro = Tamano / 2;
+        int RadioExterior = Tamano / 2 - 1;
+        int RadioInterior = Math.max(1, RadioExterior - Grosor);
+        PixmapActual.setColor(0f, 0f, 0f, 0f);
+        PixmapActual.fill();
+        PixmapActual.setColor(ColorFondo);
+        PixmapActual.fillCircle(Centro, Centro, RadioExterior);
+        PixmapActual.setBlending(Pixmap.Blending.None);
+        PixmapActual.setColor(0f, 0f, 0f, 0f);
+        PixmapActual.fillCircle(Centro, Centro, RadioInterior);
+        PixmapActual.setBlending(Pixmap.Blending.SourceOver);
+        Texture Textura = new Texture(PixmapActual);
+        Textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        PixmapActual.dispose();
+
+        return Textura;
+    }
+
     private static void DibujarRectanguloRedondeado(Pixmap PixmapActual, int X, int Y, int Ancho, int Alto, int Radio) {
         PixmapActual.fillRectangle(X + Radio, Y, Ancho - Radio * 2, Alto);
         PixmapActual.fillRectangle(X, Y + Radio, Ancho, Alto - Radio * 2);
