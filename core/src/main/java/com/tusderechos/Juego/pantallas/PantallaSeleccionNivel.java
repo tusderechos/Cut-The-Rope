@@ -15,16 +15,19 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.Juego;
@@ -53,6 +56,9 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     private Texture TexturaBloqueoNivel;
     private Texture TexturaOverlayBloqueado;
     private Texture TexturaMarcoNivel;
+    private Texture TexturaMarcoPreview;
+    private Texture TexturaFondoMenuNiveles;
+    private Texture TexturaHeaderSuperior;
     private Texture TexturaBotonDulce;
     private Texture TexturaBotonMonstruo;
     private Texture TexturaBotonMenuPrincipal;
@@ -98,7 +104,10 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         TexturaBotonPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("21766d"), Color.valueOf("c6fff0"), Color.valueOf("2fa394"));
         TexturaBloqueoNivel = CargarTextura(RutasTexturas.BloqueoNivel);
         TexturaOverlayBloqueado = TexturasInterfaz.CrearTexturaSolida(new Color(0.18f, 0.18f, 0.18f, 0.64f));
-        TexturaMarcoNivel = TexturasInterfaz.CrearTexturaSolida(new Color(1f, 0.78f, 0.38f, 1f));
+        TexturaMarcoNivel = TexturasInterfaz.CrearTexturaSolida(ObtenerColorMarcoNivel());
+        TexturaMarcoPreview = TexturasInterfaz.CrearTexturaAnillo(ObtenerColorMarcoPreview(), 128, 12);
+        TexturaFondoMenuNiveles = CargarTextura(ObtenerRutaFondoMenuNiveles());
+        TexturaHeaderSuperior = TexturasInterfaz.CrearTexturaSolida(new Color(0.03f, 0.05f, 0.06f, 0.86f));
         TexturaBotonDulce = CargarTextura(ObtenerRutaBotonDulce(ColorDulceActual));
         TexturaBotonMonstruo = CargarTextura(ObtenerRutaBotonMonstruo(ColorMonstruoActual));
         TexturaBotonMenuPrincipal = CargarTextura(ObtenerRutaBotonMenuPrincipal());
@@ -109,6 +118,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         Raiz.setFillParent(true);
         Raiz.center();
         Raiz.pad(12f);
+        Raiz.setBackground(new TextureRegionDrawable(new TextureRegion(TexturaFondoMenuNiveles)).tint(new Color(0.48f, 0.48f, 0.48f, 1f)));
         StageActual.addActor(Raiz);
         ConstruirContenido();
         Gdx.input.setInputProcessor(StageActual);
@@ -140,9 +150,9 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         }
         ImagenDulcePreview = new Image(TexturaDulcePreview);
         ImagenMonstruoPreview = new Image(TexturaMonstruoPreview);
-        TablaPersonalizacion.add(ImagenDulcePreview).width(72f).height(72f).pad(4f);
+        TablaPersonalizacion.add(CrearPreviewCircular(ImagenDulcePreview)).width(82f).height(82f).pad(4f);
         TablaPersonalizacion.add().width(100f);
-        TablaPersonalizacion.add(ImagenMonstruoPreview).width(82f).height(82f).pad(4f);
+        TablaPersonalizacion.add(CrearPreviewCircular(ImagenMonstruoPreview)).width(92f).height(92f).pad(4f);
         Raiz.add(TablaPersonalizacion).padTop(2f).padBottom(8f);
         Raiz.row();
         ImageButton BotonDulce = new ImageButton(CrearEstiloBotonImagen(TexturaBotonDulce));
@@ -174,11 +184,16 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
                 JuegoAplicacion.CambiarPantalla(new MainMenuScreen(JuegoAplicacion));
             }
         });
-        Raiz.add(BotonMenuPrincipal).right().width(190f).height(54f).padTop(2f);
+        Table FilaMenuPrincipal = new Table();
+        FilaMenuPrincipal.left();
+        FilaMenuPrincipal.add(BotonMenuPrincipal).width(68f).height(75f);
+        Raiz.add(FilaMenuPrincipal).width(440f).left().padTop(2f);
     }
 
     private void AgregarBarraSuperior() {
         Table BarraSuperior = new Table();
+        BarraSuperior.setBackground(new TextureRegionDrawable(new TextureRegion(TexturaHeaderSuperior)));
+        BarraSuperior.pad(3f, 10f, 3f, 10f);
         Image Titulo = new Image(TexturaTituloSeleccionNiveles);
         BarraSuperior.add(Titulo).width(230f).height(42f).left();
         BarraSuperior.add().expandX();
@@ -269,11 +284,34 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     }
 
     static String ObtenerRutaBotonMenuPrincipal() {
-        return "imagenes/menu_principal.png";
+        return "imgMenus/btn_volver.png";
+    }
+
+    static String ObtenerRutaFondoMenuNiveles() {
+        return "imagenes/fondo_menu_niveles.png";
     }
 
     static String ObtenerRutaTituloSeleccionNiveles() {
         return "imagenes/seleccion_de_niveles.png";
+    }
+
+    static Color ObtenerColorMarcoNivel() {
+        return Color.WHITE;
+    }
+
+    static Color ObtenerColorMarcoPreview() {
+        return Color.WHITE;
+    }
+
+    private Stack CrearPreviewCircular(Image ImagenPreview) {
+        Stack ContenedorPreview = new Stack();
+        Image MarcoCircular = new Image(TexturaMarcoPreview);
+        MarcoCircular.setScaling(Scaling.fill);
+        ImagenPreview.setScaling(Scaling.fit);
+        ContenedorPreview.add(MarcoCircular);
+        ContenedorPreview.add(ImagenPreview);
+
+        return ContenedorPreview;
     }
 
     private ImageButton.ImageButtonStyle CrearEstiloBotonImagen(Texture TexturaBotonImagen) {
@@ -398,6 +436,15 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         }
         if (TexturaMarcoNivel != null) {
             TexturaMarcoNivel.dispose();
+        }
+        if (TexturaMarcoPreview != null) {
+            TexturaMarcoPreview.dispose();
+        }
+        if (TexturaFondoMenuNiveles != null) {
+            TexturaFondoMenuNiveles.dispose();
+        }
+        if (TexturaHeaderSuperior != null) {
+            TexturaHeaderSuperior.dispose();
         }
         if (TexturaBotonDulce != null) {
             TexturaBotonDulce.dispose();

@@ -11,8 +11,11 @@ package com.tusderechos.Juego.rivalidad;
 
 import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
+import java.io.Serializable;
 
-public final class DatosReto {
+public final class DatosReto implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final CategoriaDificultad Categoria;
     private final int NumeroEnCategoria;
     private final String NombreRetador;

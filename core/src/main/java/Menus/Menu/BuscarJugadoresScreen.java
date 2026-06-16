@@ -14,8 +14,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -26,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.social.BusquedaJugadores;
 import com.tusderechos.Juego.social.GestorSeguimiento;
@@ -41,6 +46,11 @@ public class BuscarJugadoresScreen implements Screen {
     private Stage StageActual;
     private Skin SkinActual;
     private Texture FondoMenuTextura;
+    private Texture TituloBuscarJugadoresTexture;
+    private Texture BotonPerfilTexture;
+    private Texture BotonSeguirTexture;
+    private Texture BotonSiguiendoTexture;
+    private Texture BotonVolverTexture;
     private TextField CampoBusqueda;
     private Table TablaResultados;
     private Label LabelEstado;
@@ -56,6 +66,21 @@ public class BuscarJugadoresScreen implements Screen {
 
         SkinActual = SkinMenu.Crear();
         FondoMenuTextura = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal.png"));
+        if (Gdx.files.internal("imagenes/buscar_jugadores.png").exists()) {
+            TituloBuscarJugadoresTexture = new Texture(Gdx.files.internal("imagenes/buscar_jugadores.png"));
+        }
+        if (Gdx.files.internal("imagenes/perfil.png").exists()) {
+            BotonPerfilTexture = new Texture(Gdx.files.internal("imagenes/perfil.png"));
+        }
+        if (Gdx.files.internal("imagenes/seguir.png").exists()) {
+            BotonSeguirTexture = new Texture(Gdx.files.internal("imagenes/seguir.png"));
+        }
+        if (Gdx.files.internal("imagenes/siguiendo.png").exists()) {
+            BotonSiguiendoTexture = new Texture(Gdx.files.internal("imagenes/siguiendo.png"));
+        }
+        if (Gdx.files.internal("imagenes/volver.png").exists()) {
+            BotonVolverTexture = new Texture(Gdx.files.internal("imagenes/volver.png"));
+        }
 
         Table TablaRaiz = new Table();
         TablaRaiz.setFillParent(true);
@@ -63,10 +88,7 @@ public class BuscarJugadoresScreen implements Screen {
         TablaRaiz.pad(42, 54, 36, 54);
         StageActual.addActor(TablaRaiz);
 
-        Label LabelTitulo = new Label("Buscar jugadores", SkinActual);
-        LabelTitulo.setAlignment(Align.center);
-        LabelTitulo.setFontScale(1.65f);
-        TablaRaiz.add(LabelTitulo).growX().padBottom(18).row();
+        AgregarTitulo(TablaRaiz);
 
         CampoBusqueda = new TextField("", SkinActual);
         CampoBusqueda.setMessageText("Username o nombre");
@@ -90,8 +112,7 @@ public class BuscarJugadoresScreen implements Screen {
         ScrollResultados.setFadeScrollBars(false);
         TablaRaiz.add(ScrollResultados).grow().padBottom(18).row();
 
-        TextButton BotonVolver = new TextButton("Volver", SkinActual);
-        BotonVolver.getLabel().setAlignment(Align.center);
+        Button BotonVolver = CrearBotonVolver();
         BotonVolver.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent EventActual, float PosicionX, float PosicionY) {
@@ -139,8 +160,8 @@ public class BuscarJugadoresScreen implements Screen {
         DatosUsuario.add(LabelNombre).left().row();
         DatosUsuario.add(LabelUsername).left();
 
-        TextButton BotonSeguir = CrearBotonSeguimiento(UsuarioActivo, UsuarioEncontrado);
-        TextButton BotonPerfil = CrearBotonPerfil(UsuarioEncontrado);
+        Button BotonSeguir = CrearBotonSeguimiento(UsuarioActivo, UsuarioEncontrado);
+        Actor BotonPerfil = CrearBotonPerfil(UsuarioEncontrado);
 
         FilaUsuario.add(DatosUsuario).growX().left().padLeft(12);
         FilaUsuario.add(BotonPerfil).width(110).height(42).padRight(8);
@@ -149,9 +170,18 @@ public class BuscarJugadoresScreen implements Screen {
         TablaResultados.add(FilaUsuario).growX().height(76).padBottom(10).row();
     }
 
-    private TextButton CrearBotonPerfil(Usuario UsuarioEncontrado) {
-        TextButton BotonPerfil = new TextButton("Perfil", SkinActual);
-        BotonPerfil.getLabel().setAlignment(Align.center);
+    private Actor CrearBotonPerfil(Usuario UsuarioEncontrado) {
+        Actor BotonPerfil;
+        if (BotonPerfilTexture != null) {
+            ImageButton BotonPerfilImagen = new ImageButton(new TextureRegionDrawable(new TextureRegion(BotonPerfilTexture)));
+            BotonPerfilImagen.getImage().setScaling(Scaling.fill);
+            BotonPerfil = BotonPerfilImagen;
+        } else {
+            TextButton BotonPerfilTexto = new TextButton("Perfil", SkinActual);
+            BotonPerfilTexto.getLabel().setAlignment(Align.center);
+            BotonPerfil = BotonPerfilTexto;
+        }
+
         BotonPerfil.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent EventActual, float PosicionX, float PosicionY) {
@@ -162,10 +192,33 @@ public class BuscarJugadoresScreen implements Screen {
         return BotonPerfil;
     }
 
-    private TextButton CrearBotonSeguimiento(Usuario UsuarioActivo, Usuario UsuarioEncontrado) {
+    private void AgregarTitulo(Table TablaRaiz) {
+        if (TituloBuscarJugadoresTexture != null) {
+            Image TituloBuscarJugadores = new Image(TituloBuscarJugadoresTexture);
+            TituloBuscarJugadores.setScaling(Scaling.fill);
+            TablaRaiz.add(TituloBuscarJugadores).width(260).height(65).center().padBottom(18).row();
+            return;
+        }
+
+        Label LabelTitulo = new Label("Buscar jugadores", SkinActual);
+        LabelTitulo.setAlignment(Align.center);
+        LabelTitulo.setFontScale(1.65f);
+        TablaRaiz.add(LabelTitulo).growX().padBottom(18).row();
+    }
+
+    private Button CrearBotonSeguimiento(Usuario UsuarioActivo, Usuario UsuarioEncontrado) {
         String TextoBoton = ObtenerTextoBotonSeguimiento(UsuarioActivo, UsuarioEncontrado);
-        TextButton BotonSeguir = new TextButton(TextoBoton, SkinActual);
-        BotonSeguir.getLabel().setAlignment(Align.center);
+        Button BotonSeguir;
+        Texture TexturaBoton = GestorSeguimiento.YaSigue(UsuarioActivo, UsuarioEncontrado) ? BotonSiguiendoTexture : BotonSeguirTexture;
+        if (UsuarioActivo != null && TexturaBoton != null) {
+            ImageButton BotonImagen = new ImageButton(new TextureRegionDrawable(new TextureRegion(TexturaBoton)));
+            BotonImagen.getImage().setScaling(Scaling.fill);
+            BotonSeguir = BotonImagen;
+        } else {
+            TextButton BotonTexto = new TextButton(TextoBoton, SkinActual);
+            BotonTexto.getLabel().setAlignment(Align.center);
+            BotonSeguir = BotonTexto;
+        }
         BotonSeguir.setDisabled(!GestorSeguimiento.PuedeSeguir(UsuarioActivo, UsuarioEncontrado));
 
         BotonSeguir.addListener(new ClickListener() {
@@ -179,6 +232,18 @@ public class BuscarJugadoresScreen implements Screen {
         });
 
         return BotonSeguir;
+    }
+
+    private Button CrearBotonVolver() {
+        if (BotonVolverTexture != null) {
+            ImageButton BotonVolver = new ImageButton(new TextureRegionDrawable(new TextureRegion(BotonVolverTexture)));
+            BotonVolver.getImage().setScaling(Scaling.fill);
+            return BotonVolver;
+        }
+
+        TextButton BotonVolver = new TextButton("Volver", SkinActual);
+        BotonVolver.getLabel().setAlignment(Align.center);
+        return BotonVolver;
     }
 
     private String ObtenerTextoBotonSeguimiento(Usuario UsuarioActivo, Usuario UsuarioEncontrado) {
@@ -233,5 +298,20 @@ public class BuscarJugadoresScreen implements Screen {
         StageActual.dispose();
         SkinActual.dispose();
         FondoMenuTextura.dispose();
+        if (TituloBuscarJugadoresTexture != null) {
+            TituloBuscarJugadoresTexture.dispose();
+        }
+        if (BotonPerfilTexture != null) {
+            BotonPerfilTexture.dispose();
+        }
+        if (BotonSeguirTexture != null) {
+            BotonSeguirTexture.dispose();
+        }
+        if (BotonSiguiendoTexture != null) {
+            BotonSiguiendoTexture.dispose();
+        }
+        if (BotonVolverTexture != null) {
+            BotonVolverTexture.dispose();
+        }
     }
 }

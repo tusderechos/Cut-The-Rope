@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -47,6 +48,9 @@ public class ProfileScreen implements Screen {
     private Texture fondoPerfilTexture;
     private Texture btnVolverTex;
     private Texture fotoPerfilTex;
+    private Texture RetarTexture;
+    private Texture SeguirTexture;
+    private Texture SiguiendoTexture;
     private BitmapFont fuenteDatos;
 
     public ProfileScreen(Game game) {
@@ -68,9 +72,14 @@ public class ProfileScreen implements Screen {
         Usuario usuarioPerfil = ObtenerUsuarioPerfil(usuarioActivo);
         boolean perfilPropio = EsPerfilPropio(usuarioActivo, usuarioPerfil);
 
-        fondoPerfilTexture = new Texture(Gdx.files.internal("imgMenus/fondo_perfil.png"));
+        fondoPerfilTexture = new Texture(Gdx.files.internal(ObtenerRutaFondoPerfil(perfilPropio)));
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
         fotoPerfilTex = CargarFotoPerfil(usuarioPerfil);
+        if (!perfilPropio) {
+            RetarTexture = new Texture(Gdx.files.internal("imagenes/retar.png"));
+            SeguirTexture = new Texture(Gdx.files.internal("imagenes/seguir.png"));
+            SiguiendoTexture = new Texture(Gdx.files.internal("imagenes/siguiendo.png"));
+        }
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
@@ -82,7 +91,7 @@ public class ProfileScreen implements Screen {
         rootTable.add(contenedorCentral).expand().fill();
 
         Label.LabelStyle estiloDatos = CrearEstiloDatos();
-        contenedorCentral.add().height(190).row();
+        contenedorCentral.add().height(perfilPropio ? 190 : 208).row();
 
         if (usuarioPerfil != null) {
             AgregarDatosPerfil(contenedorCentral, usuarioPerfil, estiloDatos);
@@ -96,8 +105,7 @@ public class ProfileScreen implements Screen {
         }
 
         contenedorCentral.add().expandY();
-        contenedorCentral.row();
-        AgregarBotonVolver(contenedorCentral);
+        AgregarBotonVolver();
     }
 
     private Usuario ObtenerUsuarioPerfil(Usuario usuarioActivo) {
@@ -112,6 +120,10 @@ public class ProfileScreen implements Screen {
         return usuarioActivo != null
                 && usuarioPerfil != null
                 && usuarioActivo.getUsername().equalsIgnoreCase(usuarioPerfil.getUsername());
+    }
+
+    private String ObtenerRutaFondoPerfil(boolean PerfilPropio) {
+        return PerfilPropio ? "imgMenus/fondo_perfil.png" : "imagenes/fondo_perfil_ajeno.PNG";
     }
 
     private Texture CargarFotoPerfil(Usuario usuarioPerfil) {
@@ -147,22 +159,24 @@ public class ProfileScreen implements Screen {
         contenedorCentral.add().height(55).row();
 
         Label lblUser = new Label(usuarioPerfil.getUsername(), estiloDatos);
-        contenedorCentral.add(lblUser).height(45).center().row();
+        lblUser.setAlignment(Align.center);
+        contenedorCentral.add(lblUser).width(340).height(45).center().row();
         contenedorCentral.add().height(50).row();
 
         Label lblNombre = new Label(usuarioPerfil.getNombreCompleto(), estiloDatos);
-        contenedorCentral.add(lblNombre).height(45).center().row();
+        lblNombre.setAlignment(Align.center);
+        contenedorCentral.add(lblNombre).width(340).height(45).center().row();
         contenedorCentral.add().height(50).row();
 
         Label lblFecha = new Label(usuarioPerfil.getFechaIngreso(), estiloDatos);
-        contenedorCentral.add(lblFecha).height(45).center().row();
+        lblFecha.setAlignment(Align.center);
+        contenedorCentral.add(lblFecha).width(260).height(45).center().row();
     }
 
     private void AgregarAccionesSociales(Table contenedorCentral, final Usuario usuarioActivo, final Usuario usuarioPerfil, Label.LabelStyle estiloDatos) {
         contenedorCentral.add().height(28).row();
 
-        TextButton btnSeguir = new TextButton(TextoBotonSeguir(usuarioActivo, usuarioPerfil), skin);
-        btnSeguir.getLabel().setAlignment(Align.center);
+        Button btnSeguir = CrearBotonSeguimiento(usuarioActivo, usuarioPerfil);
         btnSeguir.setDisabled(!GestorSeguimiento.PuedeSeguir(usuarioActivo, usuarioPerfil));
         btnSeguir.addListener(new ClickListener() {
             @Override
@@ -177,19 +191,23 @@ public class ProfileScreen implements Screen {
         contenedorCentral.add().height(18).row();
 
         if (GestorSeguimiento.SonRivalesMutuos(usuarioActivo, usuarioPerfil)) {
-            TextButton btnReto = new TextButton("Enviar reto", skin);
-            btnReto.getLabel().setAlignment(Align.center);
+            ImageButton btnReto = new ImageButton(new TextureRegionDrawable(new TextureRegion(RetarTexture)));
+            btnReto.getImage().setScaling(Scaling.fill);
             btnReto.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    parentGame.setScreen(new PantallaRivalidad((Juego) parentGame, ColorDulce.Rojo, ColorMonstruo.Verde));
+                    parentGame.setScreen(new PantallaRivalidad((Juego) parentGame, ColorDulce.Rojo, ColorMonstruo.Verde, usuarioPerfil.getUsername()));
                 }
             });
             contenedorCentral.add(btnReto).width(210).height(44).center().row();
         } else {
-            Label lblRivalidad = new Label("Rivalidad disponible cuando ambos se sigan", estiloDatos);
-            lblRivalidad.setFontScale(0.72f);
-            contenedorCentral.add(lblRivalidad).height(36).center().row();
+            Label lblRivalidad = new Label("Deben seguirse para retarse", estiloDatos);
+            lblRivalidad.setAlignment(Align.center);
+            lblRivalidad.setFontScale(1.0f);
+            Table FondoAvisoRivalidad = new Table();
+            FondoAvisoRivalidad.setBackground(skin.newDrawable("fondoCampo", new Color(0.04f, 0.09f, 0.07f, 0.88f)));
+            FondoAvisoRivalidad.add(lblRivalidad).width(300).height(34).center();
+            contenedorCentral.add(FondoAvisoRivalidad).width(330).height(42).center().row();
         }
     }
 
@@ -205,7 +223,25 @@ public class ProfileScreen implements Screen {
         return "Seguir";
     }
 
-    private void AgregarBotonVolver(Table contenedorCentral) {
+    private Button CrearBotonSeguimiento(Usuario usuarioActivo, Usuario usuarioPerfil) {
+        if (usuarioActivo == null) {
+            TextButton BotonSeguimientoTexto = new TextButton(TextoBotonSeguir(usuarioActivo, usuarioPerfil), skin);
+            BotonSeguimientoTexto.getLabel().setAlignment(Align.center);
+            return BotonSeguimientoTexto;
+        }
+        Texture TexturaSeguimiento = GestorSeguimiento.YaSigue(usuarioActivo, usuarioPerfil) ? SiguiendoTexture : SeguirTexture;
+        if (TexturaSeguimiento != null) {
+            ImageButton BotonSeguimiento = new ImageButton(new TextureRegionDrawable(new TextureRegion(TexturaSeguimiento)));
+            BotonSeguimiento.getImage().setScaling(Scaling.fill);
+            return BotonSeguimiento;
+        }
+
+        TextButton BotonSeguimientoTexto = new TextButton(TextoBotonSeguir(usuarioActivo, usuarioPerfil), skin);
+        BotonSeguimientoTexto.getLabel().setAlignment(Align.center);
+        return BotonSeguimientoTexto;
+    }
+
+    private void AgregarBotonVolver() {
         ImageButton btnVolver = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnVolverTex)));
         btnVolver.getImage().setScaling(Scaling.fill);
         btnVolver.addListener(new ClickListener() {
@@ -216,9 +252,10 @@ public class ProfileScreen implements Screen {
         });
 
         Table filaInferior = new Table();
-        filaInferior.left();
-        filaInferior.add(btnVolver).width(55).height(55).padLeft(20).padBottom(20);
-        contenedorCentral.add(filaInferior).fillX().left();
+        filaInferior.setFillParent(true);
+        filaInferior.bottom().left();
+        filaInferior.add(btnVolver).width(55).height(55).padLeft(22).padBottom(22);
+        stage.addActor(filaInferior);
     }
 
     @Override
@@ -255,6 +292,15 @@ public class ProfileScreen implements Screen {
         btnVolverTex.dispose();
         if (fotoPerfilTex != null) {
             fotoPerfilTex.dispose();
+        }
+        if (RetarTexture != null) {
+            RetarTexture.dispose();
+        }
+        if (SeguirTexture != null) {
+            SeguirTexture.dispose();
+        }
+        if (SiguiendoTexture != null) {
+            SiguiendoTexture.dispose();
         }
         if (fuenteDatos != null) {
             fuenteDatos.dispose();

@@ -36,6 +36,7 @@ public class MainMenuScreen implements Screen {
     private Texture btnJugarTex;
     private Texture btnPerfilTex;
     private Texture btnBuscarJugadoresTex;
+    private Texture btnRetosTex;
     private Texture btnEstadisticasTex;
     private Texture btnCerrarSesionTex;
     private Texture btnConfigTex;
@@ -55,6 +56,7 @@ public class MainMenuScreen implements Screen {
         btnJugarTex = new Texture(Gdx.files.internal("imgMenus/btn_juego.png"));
         btnPerfilTex = new Texture(Gdx.files.internal("imgMenus/btn_perfil.png"));
         btnBuscarJugadoresTex = new Texture(Gdx.files.internal("imagenes/buscar_jugadores.png"));
+        btnRetosTex = new Texture(Gdx.files.internal("imagenes/retos.png"));
         btnEstadisticasTex = new Texture(Gdx.files.internal("imgMenus/btn_estadisticas.png"));
         btnCerrarSesionTex = new Texture(Gdx.files.internal("imgMenus/btn_cerrar_sesion.png"));
         btnConfigTex = new Texture(Gdx.files.internal("imgMenus/btn_config.png"));
@@ -85,12 +87,14 @@ public class MainMenuScreen implements Screen {
         ImageButton btnJugar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnJugarTex)));
         ImageButton btnPerfil = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnPerfilTex)));
         ImageButton btnBuscarJugadores = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnBuscarJugadoresTex)));
+        ImageButton btnRetos = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnRetosTex)));
         ImageButton btnEstadisticas = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnEstadisticasTex)));
         ImageButton btnCerrarSesion = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnCerrarSesionTex)));
 
         btnJugar.getImage().setScaling(Scaling.fill);
         btnPerfil.getImage().setScaling(Scaling.fill);
         btnBuscarJugadores.getImage().setScaling(Scaling.fill);
+        btnRetos.getImage().setScaling(Scaling.fill);
         btnEstadisticas.getImage().setScaling(Scaling.fill);
         btnCerrarSesion.getImage().setScaling(Scaling.fill);
 
@@ -115,6 +119,13 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        btnRetos.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                parentGame.setScreen(new PantallaSolicitudesRivalidad(parentGame));
+            }
+        });
+
         btnEstadisticas.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -130,11 +141,12 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        contenedorBotones.add(btnJugar).width(245).height(50).padTop(315).padRight(5).row();
-        contenedorBotones.add(btnPerfil).width(245).height(50).padTop(22).padRight(5).row();
-        contenedorBotones.add(btnBuscarJugadores).width(245).height(50).padTop(22).padRight(5).row();
-        contenedorBotones.add(btnEstadisticas).width(245).height(50).padTop(22).padRight(5).row();
-        contenedorBotones.add(btnCerrarSesion).width(245).height(50).padTop(22).padRight(5).row();
+        contenedorBotones.add(btnJugar).width(245).height(50).padTop(285).padRight(5).row();
+        contenedorBotones.add(btnPerfil).width(245).height(50).padTop(18).padRight(5).row();
+        contenedorBotones.add(btnBuscarJugadores).width(245).height(50).padTop(18).padRight(5).row();
+        contenedorBotones.add(btnRetos).width(245).height(50).padTop(16).padRight(5).row();
+        contenedorBotones.add(btnEstadisticas).width(245).height(50).padTop(16).padRight(5).row();
+        contenedorBotones.add(btnCerrarSesion).width(245).height(50).padTop(16).padRight(5).row();
 
         rootTable.add(contenedorBotones).expand().top();
     }
@@ -179,6 +191,7 @@ public class MainMenuScreen implements Screen {
         btnJugarTex.dispose();
         btnPerfilTex.dispose();
         btnBuscarJugadoresTex.dispose();
+        btnRetosTex.dispose();
         btnEstadisticasTex.dispose();
         btnCerrarSesionTex.dispose();
         btnConfigTex.dispose();
