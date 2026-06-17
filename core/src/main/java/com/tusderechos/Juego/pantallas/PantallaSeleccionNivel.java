@@ -35,6 +35,7 @@ import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.GestorFuentes;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.graficos.RutasTexturas;
 import com.tusderechos.Juego.graficos.TexturasInterfaz;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
@@ -47,7 +48,6 @@ import LogicaArchivos.Usuarios.Usuario;
 import Menus.Menu.AudioManager;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class PantallaSeleccionNivel extends ScreenAdapter {
     private final Juego JuegoAplicacion;
@@ -280,11 +280,11 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     }
 
     static String ObtenerRutaBotonDulce(ColorDulce ColorDulceSeleccionado) {
-        return "imagenes/boton_dulce_" + ColorDulceSeleccionado.name().toLowerCase(Locale.ROOT) + ".png";
+        return RutasAssetsIdioma.ObtenerRutaBotonDulce(ColorDulceSeleccionado);
     }
 
     static String ObtenerRutaBotonMonstruo(ColorMonstruo ColorMonstruoSeleccionado) {
-        return "imagenes/boton_monstruo_" + ColorMonstruoSeleccionado.name().toLowerCase(Locale.ROOT) + ".png";
+        return RutasAssetsIdioma.ObtenerRutaBotonMonstruo(ColorMonstruoSeleccionado);
     }
 
     static String ObtenerRutaBotonMenuPrincipal() {
@@ -292,11 +292,11 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     }
 
     static String ObtenerRutaFondoMenuNiveles() {
-        return "imagenes/fondo_menu_niveles.png";
+        return RutasAssetsIdioma.ObtenerRutaFondoMenuNiveles();
     }
 
     static String ObtenerRutaTituloSeleccionNiveles() {
-        return "imagenes/seleccion_de_niveles.png";
+        return RutasAssetsIdioma.ObtenerRutaBoton("seleccion_de_niveles");
     }
 
     static Color ObtenerColorMarcoNivel() {
@@ -479,4 +479,5 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         }
     }
 }
+
 

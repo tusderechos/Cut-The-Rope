@@ -32,6 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.social.BusquedaJugadores;
 import com.tusderechos.Juego.social.GestorSeguimiento;
 import java.util.List;
@@ -66,21 +67,11 @@ public class BuscarJugadoresScreen implements Screen {
 
         SkinActual = SkinMenu.Crear();
         FondoMenuTextura = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal.png"));
-        if (Gdx.files.internal("imagenes/buscar_jugadores.png").exists()) {
-            TituloBuscarJugadoresTexture = new Texture(Gdx.files.internal("imagenes/buscar_jugadores.png"));
-        }
-        if (Gdx.files.internal("imagenes/perfil.png").exists()) {
-            BotonPerfilTexture = new Texture(Gdx.files.internal("imagenes/perfil.png"));
-        }
-        if (Gdx.files.internal("imagenes/seguir.png").exists()) {
-            BotonSeguirTexture = new Texture(Gdx.files.internal("imagenes/seguir.png"));
-        }
-        if (Gdx.files.internal("imagenes/siguiendo.png").exists()) {
-            BotonSiguiendoTexture = new Texture(Gdx.files.internal("imagenes/siguiendo.png"));
-        }
-        if (Gdx.files.internal("imagenes/volver.png").exists()) {
-            BotonVolverTexture = new Texture(Gdx.files.internal("imagenes/volver.png"));
-        }
+        TituloBuscarJugadoresTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("buscar_jugadores"));
+        BotonPerfilTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("perfil"));
+        BotonSeguirTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("seguir"));
+        BotonSiguiendoTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("siguiendo"));
+        BotonVolverTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("volver"));
 
         Table TablaRaiz = new Table();
         TablaRaiz.setFillParent(true);
@@ -132,11 +123,11 @@ public class BuscarJugadoresScreen implements Screen {
         List<Usuario> UsuariosEncontrados = BusquedaJugadores.FiltrarUsuarios(ManejadorArchivos.listarUsuarios(), CampoBusqueda.getText(), UsernameActivo);
 
         if (UsuarioActivo == null) {
-            LabelEstado.setText("Inicia sesion para seguir jugadores.");
+            LabelEstado.setText(ObtenerTextoEstadoSinSesion());
         } else if (UsuariosEncontrados.isEmpty()) {
-            LabelEstado.setText("No se encontraron jugadores.");
+            LabelEstado.setText(ObtenerTextoSinResultados());
         } else {
-            LabelEstado.setText("Toca seguir para preparar futuras rivalidades.");
+            LabelEstado.setText(ObtenerTextoResultados());
         }
 
         for (Usuario UsuarioEncontrado : UsuariosEncontrados) {
@@ -246,16 +237,82 @@ public class BuscarJugadoresScreen implements Screen {
         return BotonVolver;
     }
 
+    private Texture CargarTexturaSiExiste(String Ruta) {
+        if (Ruta != null && Gdx.files.internal(Ruta).exists()) {
+            Texture Textura = new Texture(Gdx.files.internal(Ruta));
+            Textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            return Textura;
+        }
+
+        return null;
+    }
+
+    private String ObtenerTextoEstadoSinSesion() {
+        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
+            case "ENG":
+                return "Log in to follow players.";
+            case "FRA":
+                return "Connecte-toi pour suivre des joueurs.";
+            case "GAR":
+                return "Inicia sesion para seguir jugadores.";
+            case "HEB":
+                return "Inicia sesion para seguir jugadores.";
+            default:
+                return "Inicia sesion para seguir jugadores.";
+        }
+    }
+
+    private String ObtenerTextoSinResultados() {
+        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
+            case "ENG":
+                return "No players found.";
+            case "FRA":
+                return "Aucun joueur trouve.";
+            case "GAR":
+                return "No se encontraron jugadores.";
+            case "HEB":
+                return "No se encontraron jugadores.";
+            default:
+                return "No se encontraron jugadores.";
+        }
+    }
+
+    private String ObtenerTextoResultados() {
+        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
+            case "ENG":
+                return "Follow players to prepare future rivalries.";
+            case "FRA":
+                return "Suis des joueurs pour preparer des rivalites.";
+            case "GAR":
+                return "Toca seguir para preparar futuras rivalidades.";
+            case "HEB":
+                return "Toca seguir para preparar futuras rivalidades.";
+            default:
+                return "Toca seguir para preparar futuras rivalidades.";
+        }
+    }
+
+    private String ObtenerTextoBloqueado() {
+        return ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Locked" : "Bloqueado";
+    }
+
+    private String ObtenerTextoSiguiendo() {
+        return ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Following" : "Siguiendo";
+    }
+
+    private String ObtenerTextoSeguir() {
+        return ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Follow" : "Seguir";
+    }
     private String ObtenerTextoBotonSeguimiento(Usuario UsuarioActivo, Usuario UsuarioEncontrado) {
         if (UsuarioActivo == null) {
-            return "Bloqueado";
+            return ObtenerTextoBloqueado();
         }
 
         if (GestorSeguimiento.YaSigue(UsuarioActivo, UsuarioEncontrado)) {
-            return "Siguiendo";
+            return ObtenerTextoSiguiendo();
         }
 
-        return "Seguir";
+        return ObtenerTextoSeguir();
     }
 
     private String ObtenerNombreVisible(Usuario UsuarioEncontrado) {
@@ -315,3 +372,4 @@ public class BuscarJugadoresScreen implements Screen {
         }
     }
 }
+
