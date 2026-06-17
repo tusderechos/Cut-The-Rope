@@ -9,6 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -42,6 +44,8 @@ public class ConfiguracionScreen implements Screen {
     private Label lblIdiomaSeleccionado;
     private ImageButton btnMouse;
     private ImageButton btnTeclado;
+
+    private BitmapFont fuenteIdiomaGrande;
 
     private final String[] idiomas = {"ESP", "ENG", "GAR", "FRA", "HEB"};
     private int indiceIdiomaActual = 0;
@@ -92,7 +96,7 @@ public class ConfiguracionScreen implements Screen {
     }
 
     private void construirInterfaz() {
-        stage.clear(); 
+        stage.clear();
 
         Table tablaComponentes = new Table();
         tablaComponentes.setFillParent(true);
@@ -116,7 +120,17 @@ public class ConfiguracionScreen implements Screen {
         ImageButton btnIzq = new ImageButton(flechaIzq);
         ImageButton btnDer = new ImageButton(flechaDer);
 
-        lblIdiomaSeleccionado = new Label(idiomas[indiceIdiomaActual], skin);
+        Label.LabelStyle estiloBase = skin.get(Label.LabelStyle.class);
+        Label.LabelStyle estiloIdiomaGrande = new Label.LabelStyle(estiloBase);
+
+        if (estiloBase.font != null) {
+            fuenteIdiomaGrande = new BitmapFont(estiloBase.font.getData().getFontFile(), false);
+            fuenteIdiomaGrande.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+            fuenteIdiomaGrande.getData().setScale(1.6f);
+            estiloIdiomaGrande.font = fuenteIdiomaGrande;
+        }
+
+        lblIdiomaSeleccionado = new Label(idiomas[indiceIdiomaActual], estiloIdiomaGrande);
         lblIdiomaSeleccionado.setAlignment(com.badlogic.gdx.utils.Align.center);
 
         btnIzq.addListener(new ClickListener() {
@@ -204,6 +218,10 @@ public class ConfiguracionScreen implements Screen {
         }
         fondoConfig = new Texture(Gdx.files.internal("imgMenus/fondo_configuracion_" + seleccion.toLowerCase() + ".png"));
 
+        if (fuenteIdiomaGrande != null) {
+            fuenteIdiomaGrande.dispose();
+        }
+
         construirInterfaz();
     }
 
@@ -255,6 +273,9 @@ public class ConfiguracionScreen implements Screen {
         stage.dispose();
         skin.dispose();
 
+        if (fuenteIdiomaGrande != null) {
+            fuenteIdiomaGrande.dispose();
+        }
         if (fondoConfig != null) {
             fondoConfig.dispose();
         }
