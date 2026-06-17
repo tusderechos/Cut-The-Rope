@@ -6,6 +6,7 @@ package Menus.Menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.tusderechos.Juego.audio.VolumenAudio;
 
 /**
  *
@@ -35,8 +36,8 @@ public class ConfiguracionJuego {
 
     public static void guardarVolumen(float nuevoVolumen) {
         asegurarInicializacion();
-        volumenGeneral = nuevoVolumen;
-        prefs.putFloat("volumen", nuevoVolumen);
+        volumenGeneral = VolumenAudio.LimitarVolumen(nuevoVolumen);
+        prefs.putFloat("volumen", volumenGeneral);
         prefs.flush();
     }
 

@@ -605,7 +605,7 @@ public class PantallaJuego extends ScreenAdapter {
         GuardadorPartidasBinario.GuardarEnHilo(Gdx.files.local("datos/partidas_cut_the_rope.bin").file().toPath(), Registro);
         Usuario UsuarioActivo = SistemaAutenticacion.getUsuarioActivo();
         if (UsuarioActivo != null && DebeActualizarProgresoHistoria(RetoActual != null, IdRivalidadActual)) {
-            UsuarioActivo.registrarPartida(DatosNivelActual.ObtenerNumero(), true, EstrellasRecolectadas, TiempoNivel);
+            UsuarioActivo.registrarPartida(DatosNivelActual.ObtenerNumero(), true, EstrellasRecolectadas, TiempoNivel, PuntajeFinal);
             ManejadorArchivos.guardarUsuario(UsuarioActivo);
         }
     }

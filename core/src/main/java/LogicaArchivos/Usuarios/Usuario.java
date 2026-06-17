@@ -26,6 +26,8 @@ public class Usuario implements Serializable {
     private float tiempoTotalJugado;
     private int partidasJugadas;
     private int estrellasTotales;
+    private int puntajeTotal;
+    private int mejorPuntaje;
 
     private ArrayList<String> historialPartidas;
     private ArrayList<String> listaRivales;
@@ -48,6 +50,8 @@ public class Usuario implements Serializable {
         this.tiempoTotalJugado = 0.0f;
         this.partidasJugadas = 0;
         this.estrellasTotales = 0;
+        this.puntajeTotal = 0;
+        this.mejorPuntaje = 0;
         this.historialPartidas = new ArrayList<>();
         this.listaRivales = new ArrayList<>();
         this.volumenMusica = 0.8f;
@@ -64,11 +68,17 @@ public class Usuario implements Serializable {
     }
 
     public void registrarPartida(int nivel, boolean gano, int estrellasObtenidas, float tiempoEnNivel) {
+        registrarPartida(nivel, gano, estrellasObtenidas, tiempoEnNivel, 0);
+    }
+
+    public void registrarPartida(int nivel, boolean gano, int estrellasObtenidas, float tiempoEnNivel, int puntajeObtenido) {
         this.partidasJugadas++;
         this.tiempoTotalJugado += tiempoEnNivel;
 
         if (gano) {
             this.estrellasTotales += estrellasObtenidas;
+            this.puntajeTotal += Math.max(0, puntajeObtenido);
+            this.mejorPuntaje = Math.max(this.mejorPuntaje, puntajeObtenido);
             if (nivel > this.nivelesCompletados) {
                 this.nivelesCompletados = nivel;
             }
@@ -141,6 +151,14 @@ public class Usuario implements Serializable {
 
     public int getEstrellasTotales() {
         return estrellasTotales;
+    }
+
+    public int getPuntajeTotal() {
+        return puntajeTotal;
+    }
+
+    public int getMejorPuntaje() {
+        return mejorPuntaje;
     }
 
     public ArrayList<String> getHistorialPartidas() {

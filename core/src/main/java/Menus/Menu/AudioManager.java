@@ -6,6 +6,7 @@ package Menus.Menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.tusderechos.Juego.audio.VolumenAudio;
 
 /**
  *
@@ -14,7 +15,7 @@ import com.badlogic.gdx.audio.Music;
 public class AudioManager {
     private static AudioManager instancia;
     private Music musicaMenu;
-    private float volumenActual = 0.5f; 
+    private float volumenActual = VolumenAudio.CalcularVolumenMenu(ConfiguracionJuego.volumenGeneral);
 
     private AudioManager() {
         try {
@@ -34,6 +35,7 @@ public class AudioManager {
 
     public void reproducirMusicaMenu() {
         if (musicaMenu != null && !musicaMenu.isPlaying()) {
+            volumenActual = VolumenAudio.CalcularVolumenMenu(ConfiguracionJuego.volumenGeneral);
             musicaMenu.setVolume(volumenActual);
             musicaMenu.play();
         }
@@ -50,7 +52,8 @@ public class AudioManager {
     }
 
     public void actualizarVolumen(float nuevoVolumen) {
-        this.volumenActual = Math.max(0.0f, Math.min(1.0f, nuevoVolumen));
+        ConfiguracionJuego.guardarVolumen(nuevoVolumen);
+        this.volumenActual = VolumenAudio.CalcularVolumenMenu(ConfiguracionJuego.volumenGeneral);
         if (musicaMenu != null) {
             musicaMenu.setVolume(volumenActual);
         }
