@@ -51,6 +51,8 @@ import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
 import com.tusderechos.Juego.persistencia.GuardadorPartidasBinario;
 import com.tusderechos.Juego.persistencia.RegistroPartida;
 import com.tusderechos.Juego.rivalidad.DatosReto;
+import com.tusderechos.Juego.rivalidad.DueloLocal;
+import com.tusderechos.Juego.rivalidad.GestorDueloLocal;
 import com.tusderechos.Juego.rivalidad.GestorRetos;
 import com.tusderechos.Juego.rivalidad.GestorRivalidades;
 import com.tusderechos.Juego.rivalidad.GuardadorRivalidadesBinario;
@@ -63,6 +65,7 @@ import com.tusderechos.Juego.obstaculos.Obstaculo;
 import com.tusderechos.Juego.obstaculos.ObstaculoPeligroso;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
+import Menus.Menu.PantallaDueloLocal;
 import Menus.Menu.PantallaSolicitudesRivalidad;
 import ManejoArchivos.Archivos.ManejadorArchivos;
 import java.nio.file.Path;
@@ -528,14 +531,22 @@ public class PantallaJuego extends ScreenAdapter {
         RegistroPartida Registro = RegistroPartida.CrearDesdeResultado(DatosNivelActual, ResultadoNivelActual, FallosNivel, RetoActual);
         GuardadorPartidasBinario.GuardarEnHilo(Gdx.files.local("datos/partidas_cut_the_rope.bin").file().toPath(), Registro);
         Usuario UsuarioActivo = SistemaAutenticacion.getUsuarioActivo();
-        if (UsuarioActivo != null) {
+        if (UsuarioActivo != null && DebeActualizarProgresoHistoria(RetoActual != null, IdRivalidadActual)) {
             UsuarioActivo.registrarPartida(DatosNivelActual.ObtenerNumero(), true, EstrellasRecolectadas, TiempoNivel);
             ManejadorArchivos.guardarUsuario(UsuarioActivo);
         }
     }
 
+    public static boolean DebeActualizarProgresoHistoria(boolean EsReto, String IdRivalidad) {
+        return !EsReto && (IdRivalidad == null || IdRivalidad.trim().isEmpty());
+    }
+
     private void GuardarResultadoRivalidad() {
         if (IdRivalidadActual == null || IdRivalidadActual.trim().isEmpty()) {
+            return;
+        }
+        if (GestorDueloLocal.EsIdDueloLocal(IdRivalidadActual)) {
+            GestorDueloLocal.IntentarRegistrarResultado(IdRivalidadActual, ResultadoNivelActual);
             return;
         }
         Usuario UsuarioActivo = SistemaAutenticacion.getUsuarioActivo();
@@ -595,6 +606,11 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void VolverASeleccion() {
+        if (GestorDueloLocal.EsIdDueloLocal(IdRivalidadActual)) {
+            DueloLocal Duelo = GestorDueloLocal.ObtenerDueloDesdeId(IdRivalidadActual);
+            JuegoAplicacion.CambiarPantalla(new PantallaDueloLocal(JuegoAplicacion, Duelo, PersonalizacionDulceActual.ObtenerColorDulce(), PersonalizacionMonstruoActual.ObtenerColorMonstruo()));
+            return;
+        }
         if (IdRivalidadActual != null && !IdRivalidadActual.trim().isEmpty()) {
             JuegoAplicacion.CambiarPantalla(new PantallaSolicitudesRivalidad(JuegoAplicacion, PersonalizacionDulceActual.ObtenerColorDulce(), PersonalizacionMonstruoActual.ObtenerColorMonstruo()));
             return;

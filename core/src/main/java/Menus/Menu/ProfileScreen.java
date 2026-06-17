@@ -185,7 +185,7 @@ public class ProfileScreen implements Screen {
             btnReto.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    parentGame.setScreen(new PantallaRivalidad((Juego) parentGame, ColorDulce.Rojo, ColorMonstruo.Verde));
+                    parentGame.setScreen(new PantallaRivalidad((Juego) parentGame, ColorDulce.Rojo, ColorMonstruo.Verde, usuarioPerfil.getUsername()));
                 }
             });
             contenedorCentral.add(btnReto).width(210).height(44).center().row();

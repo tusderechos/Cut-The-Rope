@@ -35,12 +35,15 @@ import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
 import com.tusderechos.Juego.rivalidad.DatosReto;
+import com.tusderechos.Juego.rivalidad.DueloLocal;
+import com.tusderechos.Juego.rivalidad.GestorDueloLocal;
 import com.tusderechos.Juego.rivalidad.GestorRivalidades;
 import com.tusderechos.Juego.rivalidad.GestorRetos;
 import com.tusderechos.Juego.rivalidad.GuardadorRivalidadesBinario;
 import com.tusderechos.Juego.rivalidad.SolicitudRivalidad;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
+import Menus.Menu.PantallaDueloLocal;
 import Menus.Menu.PantallaSolicitudesRivalidad;
 import Menus.Menu.ProfileScreen;
 import java.nio.file.Path;
@@ -158,7 +161,7 @@ public class PantallaRivalidad extends ScreenAdapter {
     }
 
     private void CrearTexturas() {
-        TexturaFacil = CargarTextura("imagenes/facil-removebg-preview.png");
+        TexturaFacil = CargarTextura("imagenes/facil.png");
         TexturaMedia = CargarTextura("imagenes/media.png");
         TexturaDificil = CargarTextura("imagenes/dificil.png");
         TexturaSumar = CargarTextura("imagenes/sumar.png");
@@ -317,8 +320,8 @@ public class PantallaRivalidad extends ScreenAdapter {
             public void changed(ChangeEvent Event, Actor ActorActual) {
                 DatosReto Reto = CrearRetoActual();
                 if (UsernameRetado != null && !UsernameRetado.isEmpty()) {
-                    GuardarSolicitudRivalidad(Reto);
-                    JuegoAplicacion.CambiarPantalla(new PantallaSolicitudesRivalidad(JuegoAplicacion, ColorDulceActual, ColorMonstruoActual));
+                    DueloLocal Duelo = GestorDueloLocal.CrearDuelo(Reto, ObtenerUsernameRetador(), UsernameRetado);
+                    JuegoAplicacion.CambiarPantalla(new PantallaDueloLocal(JuegoAplicacion, Duelo, ColorDulceActual, ColorMonstruoActual));
                     return;
                 }
                 JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, GestorRetos.ObtenerNivelReto(Reto), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual), Reto));
