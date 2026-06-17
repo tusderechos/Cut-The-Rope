@@ -29,7 +29,6 @@ import LogicaArchivos.Usuarios.Usuario;
  * @author HP
  */
 public class StatsScreen implements Screen {
-
     private final Game parentGame;
     private Stage stage;
     private Skin skin;
@@ -52,7 +51,9 @@ public class StatsScreen implements Screen {
         skin = SkinMenu.Crear();
         Usuario usuarioActivo = SistemaAutenticacion.getUsuarioActivo();
 
-        fondoStatsTex = new Texture(Gdx.files.internal("imgMenus/fondo_estadisticas.png"));
+        String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
+
+        fondoStatsTex = new Texture(Gdx.files.internal("imgMenus/fondo_estadisticas_" + idm + ".png"));
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -69,7 +70,7 @@ public class StatsScreen implements Screen {
             fuenteTitulo.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
             fuenteTitulo.getData().setScale(1.3f);
             estiloTitulo.font = fuenteTitulo;
-            estiloTitulo.fontColor = Color.valueOf("FF941A"); 
+            estiloTitulo.fontColor = Color.valueOf("FF941A");
         }
 
         Label.LabelStyle estiloEtiquetas = new Label.LabelStyle(estiloBase);
@@ -82,10 +83,10 @@ public class StatsScreen implements Screen {
             fuenteContenido.getData().setScale(1.1f);
 
             estiloEtiquetas.font = fuenteContenido;
-            estiloEtiquetas.fontColor = Color.valueOf("EAEAEA"); 
+            estiloEtiquetas.fontColor = Color.valueOf("EAEAEA");
 
             estiloValores.font = fuenteContenido;
-            estiloValores.fontColor = Color.GOLD; 
+            estiloValores.fontColor = Color.GOLD;
 
             estiloHistorialTexto.font = fuenteContenido;
             estiloHistorialTexto.fontColor = Color.WHITE;
@@ -116,16 +117,16 @@ public class StatsScreen implements Screen {
             Table filasStats = new Table();
             filasStats.defaults().padTop(6).padBottom(6).padLeft(10).padRight(10).left();
 
-            filasStats.add(new Label("Estrellas Totales:", estiloEtiquetas));
+            filasStats.add(new Label("Estrellas Totales / Total Stars:", estiloEtiquetas));
             filasStats.add(new Label(String.valueOf(usuarioActivo.getEstrellasTotales()), estiloValores)).row();
 
-            filasStats.add(new Label("Maximo Nivel:", estiloEtiquetas));
-            filasStats.add(new Label("Nivel " + usuarioActivo.getNivelesCompletados(), estiloValores)).row();
+            filasStats.add(new Label("Maximo Nivel / Max Level:", estiloEtiquetas));
+            filasStats.add(new Label("Nivel / Level " + usuarioActivo.getNivelesCompletados(), estiloValores)).row();
 
-            filasStats.add(new Label("Partidas Jugadas:", estiloEtiquetas));
+            filasStats.add(new Label("Partidas Jugadas / Matches Played:", estiloEtiquetas));
             filasStats.add(new Label(String.valueOf(usuarioActivo.getPartidasJugadas()), estiloValores)).row();
 
-            filasStats.add(new Label("Tiempo Jugado:", estiloEtiquetas));
+            filasStats.add(new Label("Tiempo Jugado / Playtime:", estiloEtiquetas));
             float tiempoEnMinutos = usuarioActivo.getTiempoTotalJugado() / 60f;
             filasStats.add(new Label(String.format("%.2f min", tiempoEnMinutos), estiloValores)).row();
 
@@ -133,7 +134,7 @@ public class StatsScreen implements Screen {
 
             contenidoScrollable.add(tarjetaStats).width(420).padBottom(25).row();
 
-            Label lblHistorial = new Label("HISTORIAL RECIENTE", estiloTitulo);
+            Label lblHistorial = new Label("HISTORIAL / HISTORY", estiloTitulo);
             contenidoScrollable.add(lblHistorial).padBottom(15).center().row();
 
             if (usuarioActivo.getHistorialPartidas().isEmpty()) {
@@ -141,7 +142,7 @@ public class StatsScreen implements Screen {
                 tarjetaVacia.setBackground(skin.newDrawable("white", new Color(0, 0, 0, 0.3f)));
                 tarjetaVacia.pad(15);
 
-                Label lblVacio = new Label("No hay partidas registradas aun.\n¡A jugar!", estiloEtiquetas);
+                Label lblVacio = new Label("No hay partidas registradas aun.\nNo matches recorded yet.", estiloEtiquetas);
                 lblVacio.setAlignment(com.badlogic.gdx.utils.Align.center);
 
                 tarjetaVacia.add(lblVacio);
@@ -172,9 +173,9 @@ public class StatsScreen implements Screen {
 
             if (!usuarioActivo.getHistorialPartidas().isEmpty()) {
                 Label.LabelStyle estiloGuia = new Label.LabelStyle(estiloEtiquetas);
-                estiloGuia.fontColor = Color.WHITE; 
+                estiloGuia.fontColor = Color.WHITE;
 
-                Label lblIndicadorScroll = new Label("[ DESLIZA PARA VER MAS HISTORIAL ]", estiloGuia);
+                Label lblIndicadorScroll = new Label("[ SCROLL ]", estiloGuia);
                 lblIndicadorScroll.setAlignment(com.badlogic.gdx.utils.Align.center);
 
                 pizarraContenedora.add(lblIndicadorScroll).padTop(8).center().fillX();
@@ -183,7 +184,7 @@ public class StatsScreen implements Screen {
             panelCentral.add(pizarraContenedora).width(480).height(510).expandX().center().row();
 
         } else {
-            Label lblError = new Label("INICIA SESION PARA VER TUS DATOS", estiloTitulo);
+            Label lblError = new Label("INICIA SESION / LOG IN", estiloTitulo);
             panelCentral.add(lblError).padTop(150).row();
         }
 
@@ -225,7 +226,7 @@ public class StatsScreen implements Screen {
                 } else if (linea.startsWith("Fecha:")) {
                     String fechaCruda = linea.replace("Fecha: ", "");
                     String fechaFormateada = simplificarFecha(fechaCruda);
-                    constructor.append("  • FECHA: ").append(fechaFormateada);
+                    constructor.append("  • FECHA / DATE: ").append(fechaFormateada);
                 } else {
                     constructor.append("  • ").append(linea);
                 }
@@ -245,9 +246,9 @@ public class StatsScreen implements Screen {
         try {
             String[] segmentos = fechaCruda.split(" ");
             if (segmentos.length >= 4) {
-                String mes = segmentos[1]; 
-                String dia = segmentos[2]; 
-                String tiempo = segmentos[3]; 
+                String mes = segmentos[1];
+                String dia = segmentos[2];
+                String tiempo = segmentos[3];
 
                 if (tiempo.contains(":")) {
                     String[] hms = tiempo.split(":");
@@ -255,7 +256,7 @@ public class StatsScreen implements Screen {
                         tiempo = hms[0] + ":" + hms[1];
                     }
                 }
-                return mes + " " + dia + " a las " + tiempo;
+                return mes + " " + dia + " - " + tiempo;
             }
         } catch (Exception e) {
         }
@@ -292,8 +293,12 @@ public class StatsScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        fondoStatsTex.dispose();
-        btnVolverTex.dispose();
+        if (fondoStatsTex != null) {
+            fondoStatsTex.dispose();
+        }
+        if (btnVolverTex != null) {
+            btnVolverTex.dispose();
+        }
         if (texturaFondoContenedor != null) {
             texturaFondoContenedor.dispose();
         }

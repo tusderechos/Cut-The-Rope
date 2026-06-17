@@ -27,7 +27,6 @@ import LogicaArchivos.Usuarios.SistemaAutenticacion;
  * @author HP
  */
 public class MainMenuScreen implements Screen {
-
     private final Game parentGame;
     private Stage stage;
     private Skin skin;
@@ -36,7 +35,6 @@ public class MainMenuScreen implements Screen {
     private Texture btnJugarTex;
     private Texture btnPerfilTex;
     private Texture btnBuscarJugadoresTex;
-    private Texture btnRetosTex;
     private Texture btnEstadisticasTex;
     private Texture btnCerrarSesionTex;
     private Texture btnConfigTex;
@@ -52,13 +50,16 @@ public class MainMenuScreen implements Screen {
 
         skin = SkinMenu.Crear();
 
+        String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
+
+        //fondoMenuTex = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal_" + idm + ".png"));
         fondoMenuTex = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal.png"));
-        btnJugarTex = new Texture(Gdx.files.internal("imgMenus/btn_juego.png"));
-        btnPerfilTex = new Texture(Gdx.files.internal("imgMenus/btn_perfil.png"));
-        btnBuscarJugadoresTex = new Texture(Gdx.files.internal("imagenes/buscar_jugadores.png"));
-        btnRetosTex = new Texture(Gdx.files.internal("imagenes/retos.png"));
-        btnEstadisticasTex = new Texture(Gdx.files.internal("imgMenus/btn_estadisticas.png"));
-        btnCerrarSesionTex = new Texture(Gdx.files.internal("imgMenus/btn_cerrar_sesion.png"));
+        btnJugarTex = new Texture(Gdx.files.internal("imgMenus/btn_juego_" + idm + ".png"));
+        btnPerfilTex = new Texture(Gdx.files.internal("imgMenus/btn_perfil_" + idm + ".png"));
+        btnEstadisticasTex = new Texture(Gdx.files.internal("imgMenus/btn_estadisticas_" + idm + ".png"));
+        btnCerrarSesionTex = new Texture(Gdx.files.internal("imgMenus/btn_cerrar_sesion_" + idm + ".png"));
+
+        btnBuscarJugadoresTex = new Texture(Gdx.files.internal("imgMenus/buscar_jugadores_" + idm + ".png"));
         btnConfigTex = new Texture(Gdx.files.internal("imgMenus/btn_config.png"));
 
         Table rootTable = new Table();
@@ -87,14 +88,12 @@ public class MainMenuScreen implements Screen {
         ImageButton btnJugar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnJugarTex)));
         ImageButton btnPerfil = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnPerfilTex)));
         ImageButton btnBuscarJugadores = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnBuscarJugadoresTex)));
-        ImageButton btnRetos = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnRetosTex)));
         ImageButton btnEstadisticas = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnEstadisticasTex)));
         ImageButton btnCerrarSesion = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnCerrarSesionTex)));
 
         btnJugar.getImage().setScaling(Scaling.fill);
         btnPerfil.getImage().setScaling(Scaling.fill);
         btnBuscarJugadores.getImage().setScaling(Scaling.fill);
-        btnRetos.getImage().setScaling(Scaling.fill);
         btnEstadisticas.getImage().setScaling(Scaling.fill);
         btnCerrarSesion.getImage().setScaling(Scaling.fill);
 
@@ -119,13 +118,6 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        btnRetos.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                parentGame.setScreen(new PantallaSolicitudesRivalidad(parentGame));
-            }
-        });
-
         btnEstadisticas.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -141,12 +133,11 @@ public class MainMenuScreen implements Screen {
             }
         });
 
-        contenedorBotones.add(btnJugar).width(245).height(50).padTop(285).padRight(5).row();
-        contenedorBotones.add(btnPerfil).width(245).height(50).padTop(18).padRight(5).row();
-        contenedorBotones.add(btnBuscarJugadores).width(245).height(50).padTop(18).padRight(5).row();
-        contenedorBotones.add(btnRetos).width(245).height(50).padTop(16).padRight(5).row();
-        contenedorBotones.add(btnEstadisticas).width(245).height(50).padTop(16).padRight(5).row();
-        contenedorBotones.add(btnCerrarSesion).width(245).height(50).padTop(16).padRight(5).row();
+        contenedorBotones.add(btnJugar).width(245).height(50).padTop(315).padRight(5).row();
+        contenedorBotones.add(btnPerfil).width(245).height(50).padTop(22).padRight(5).row();
+        contenedorBotones.add(btnBuscarJugadores).width(245).height(50).padTop(22).padRight(5).row();
+        contenedorBotones.add(btnEstadisticas).width(245).height(50).padTop(22).padRight(5).row();
+        contenedorBotones.add(btnCerrarSesion).width(245).height(50).padTop(22).padRight(5).row();
 
         rootTable.add(contenedorBotones).expand().top();
     }
@@ -187,13 +178,26 @@ public class MainMenuScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
-        fondoMenuTex.dispose();
-        btnJugarTex.dispose();
-        btnPerfilTex.dispose();
-        btnBuscarJugadoresTex.dispose();
-        btnRetosTex.dispose();
-        btnEstadisticasTex.dispose();
-        btnCerrarSesionTex.dispose();
-        btnConfigTex.dispose();
+        if (fondoMenuTex != null) {
+            fondoMenuTex.dispose();
+        }
+        if (btnJugarTex != null) {
+            btnJugarTex.dispose();
+        }
+        if (btnPerfilTex != null) {
+            btnPerfilTex.dispose();
+        }
+        if (btnBuscarJugadoresTex != null) {
+            btnBuscarJugadoresTex.dispose();
+        }
+        if (btnEstadisticasTex != null) {
+            btnEstadisticasTex.dispose();
+        }
+        if (btnCerrarSesionTex != null) {
+            btnCerrarSesionTex.dispose();
+        }
+        if (btnConfigTex != null) {
+            btnConfigTex.dispose();
+        }
     }
 }

@@ -25,7 +25,6 @@ import LogicaArchivos.Usuarios.SistemaAutenticacion;
  * @author HP
  */
 public class LoginRegisterScreen implements Screen {
-
     private final Game parentGame;
     private Stage stage;
     private Skin skin;
@@ -49,7 +48,7 @@ public class LoginRegisterScreen implements Screen {
     private Label lblReqMinuscula;
     private Label lblReqNumero;
     private Label lblReqEspecial;
-    
+
     private Texture fondoLoginTexture;
     private Texture fondoRegistroTexture;
     private Table rootTable;
@@ -65,13 +64,15 @@ public class LoginRegisterScreen implements Screen {
 
         skin = SkinMenu.Crear();
 
-        fondoLoginTexture = new Texture(Gdx.files.internal("imgMenus/fondo_login.png"));
-        
-        btnIngresarTex = new Texture(Gdx.files.internal("imgMenus/btn_ingresar.png"));
-        btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png")); 
-        btnCrearTex = new Texture(Gdx.files.internal("imgMenus/btn_crear.png")); 
+        String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
 
-        rootTable = new Table(); 
+        fondoLoginTexture = new Texture(Gdx.files.internal("imgMenus/fondo_login_" + idm + ".png"));
+        btnIngresarTex = new Texture(Gdx.files.internal("imgMenus/btn_ingresar_" + idm + ".png"));
+
+        btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
+        btnCrearTex = new Texture(Gdx.files.internal("imgMenus/btn_crear.png"));
+
+        rootTable = new Table();
         rootTable.setFillParent(true);
         stage.addActor(rootTable);
 
@@ -84,13 +85,13 @@ public class LoginRegisterScreen implements Screen {
     private void mostrarFormularioLogin() {
         rootTable.setBackground(new TextureRegionDrawable(new TextureRegion(fondoLoginTexture)));
         contenedorCentral.clearChildren();
-        contenedorCentral.top(); 
+        contenedorCentral.top();
 
         contenedorCentral.add().height(300).colspan(2).row();
 
         TextField.TextFieldStyle estiloLimpio = new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class));
-        estiloLimpio.background = null; 
-        estiloLimpio.focusedBackground = null; 
+        estiloLimpio.background = null;
+        estiloLimpio.focusedBackground = null;
 
         if (estiloLimpio.font != null) {
             estiloLimpio.font.getData().setScale(2.0f);
@@ -98,7 +99,7 @@ public class LoginRegisterScreen implements Screen {
 
         txtLoginUser = new TextField("", estiloLimpio);
         txtLoginUser.setAlignment(com.badlogic.gdx.utils.Align.center);
-        
+
         contenedorCentral.add(txtLoginUser).width(310).height(65).colspan(2)
                 .padTop(0).padBottom(95).row();
 
@@ -106,7 +107,7 @@ public class LoginRegisterScreen implements Screen {
         txtLoginPassword.setPasswordMode(true);
         txtLoginPassword.setPasswordCharacter('*');
         txtLoginPassword.setAlignment(com.badlogic.gdx.utils.Align.center);
-        
+
         contenedorCentral.add(txtLoginPassword).width(310).height(65).colspan(2)
                 .padTop(10).padBottom(20).row();
 
@@ -130,7 +131,7 @@ public class LoginRegisterScreen implements Screen {
 
                 if (SistemaAutenticacion.iniciarSesion(user, pass)) {
                     Gdx.app.log("Login", "¡Acceso concedido!");
-                    parentGame.setScreen(new MainMenuScreen(parentGame)); 
+                    parentGame.setScreen(new MainMenuScreen(parentGame));
                 } else {
                     Gdx.app.log("Login", "Credenciales Incorrectas");
                 }
@@ -143,14 +144,13 @@ public class LoginRegisterScreen implements Screen {
         btnVolverMenu.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                parentGame.setScreen(new MenuInicioScreen(parentGame)); 
+                parentGame.setScreen(new MenuInicioScreen(parentGame));
             }
         });
 
         contenedorCentral.add(btnVolverMenu).width(55).height(55).left().padLeft(25).padBottom(20);
-        contenedorCentral.add().expandX(); 
+        contenedorCentral.add().expandX();
     }
-
 
     private void validarContrasenaEnTiempoReal(String pass) {
         actualizarEstadoRequisito(lblReqLongitud, "Minimo 5 caracteres", pass.length() >= 5);
@@ -212,9 +212,23 @@ public class LoginRegisterScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
-        fondoTexture.dispose();
-        btnIngresarTex.dispose();
-        btnCrearTex.dispose();
-        btnVolverTex.dispose();
+        if (fondoTexture != null) {
+            fondoTexture.dispose();
+        }
+        if (btnIngresarTex != null) {
+            btnIngresarTex.dispose();
+        }
+        if (btnCrearTex != null) {
+            btnCrearTex.dispose();
+        }
+        if (btnVolverTex != null) {
+            btnVolverTex.dispose();
+        }
+        if (fondoLoginTexture != null) {
+            fondoLoginTexture.dispose();
+        }
+        if (fondoRegistroTexture != null) {
+            fondoRegistroTexture.dispose();
+        }
     }
 }
