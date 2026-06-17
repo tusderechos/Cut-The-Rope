@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.social.BusquedaJugadores;
 import com.tusderechos.Juego.social.GestorSeguimiento;
+import com.tusderechos.Juego.textos.TextosIdioma;
 import java.util.List;
 
 /**
@@ -82,7 +83,7 @@ public class BuscarJugadoresScreen implements Screen {
         AgregarTitulo(TablaRaiz);
 
         CampoBusqueda = new TextField("", SkinActual);
-        CampoBusqueda.setMessageText("Username o nombre");
+        CampoBusqueda.setMessageText(TextosIdioma.Obtener("BuscarCampo"));
         CampoBusqueda.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent EventActual, com.badlogic.gdx.scenes.scene2d.Actor ActorActual) {
@@ -168,7 +169,7 @@ public class BuscarJugadoresScreen implements Screen {
             BotonPerfilImagen.getImage().setScaling(Scaling.fill);
             BotonPerfil = BotonPerfilImagen;
         } else {
-            TextButton BotonPerfilTexto = new TextButton("Perfil", SkinActual);
+            TextButton BotonPerfilTexto = new TextButton(TextosIdioma.Obtener("Perfil"), SkinActual);
             BotonPerfilTexto.getLabel().setAlignment(Align.center);
             BotonPerfil = BotonPerfilTexto;
         }
@@ -191,7 +192,7 @@ public class BuscarJugadoresScreen implements Screen {
             return;
         }
 
-        Label LabelTitulo = new Label("Buscar jugadores", SkinActual);
+        Label LabelTitulo = new Label(TextosIdioma.Obtener("BuscarTitulo"), SkinActual);
         LabelTitulo.setAlignment(Align.center);
         LabelTitulo.setFontScale(1.65f);
         TablaRaiz.add(LabelTitulo).growX().padBottom(18).row();
@@ -232,7 +233,7 @@ public class BuscarJugadoresScreen implements Screen {
             return BotonVolver;
         }
 
-        TextButton BotonVolver = new TextButton("Volver", SkinActual);
+        TextButton BotonVolver = new TextButton(TextosIdioma.Obtener("Volver"), SkinActual);
         BotonVolver.getLabel().setAlignment(Align.center);
         return BotonVolver;
     }
@@ -248,60 +249,27 @@ public class BuscarJugadoresScreen implements Screen {
     }
 
     private String ObtenerTextoEstadoSinSesion() {
-        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
-            case "ENG":
-                return "Log in to follow players.";
-            case "FRA":
-                return "Connecte-toi pour suivre des joueurs.";
-            case "GAR":
-                return "Inicia sesion para seguir jugadores.";
-            case "HEB":
-                return "Inicia sesion para seguir jugadores.";
-            default:
-                return "Inicia sesion para seguir jugadores.";
-        }
+        return TextosIdioma.Obtener("BuscarSinSesion");
     }
 
     private String ObtenerTextoSinResultados() {
-        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
-            case "ENG":
-                return "No players found.";
-            case "FRA":
-                return "Aucun joueur trouve.";
-            case "GAR":
-                return "No se encontraron jugadores.";
-            case "HEB":
-                return "No se encontraron jugadores.";
-            default:
-                return "No se encontraron jugadores.";
-        }
+        return TextosIdioma.Obtener("BuscarSinResultados");
     }
 
     private String ObtenerTextoResultados() {
-        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
-            case "ENG":
-                return "Follow players to prepare future rivalries.";
-            case "FRA":
-                return "Suis des joueurs pour preparer des rivalites.";
-            case "GAR":
-                return "Toca seguir para preparar futuras rivalidades.";
-            case "HEB":
-                return "Toca seguir para preparar futuras rivalidades.";
-            default:
-                return "Toca seguir para preparar futuras rivalidades.";
-        }
+        return TextosIdioma.Obtener("BuscarResultados");
     }
 
     private String ObtenerTextoBloqueado() {
-        return ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Locked" : "Bloqueado";
+        return TextosIdioma.Obtener("Bloqueado");
     }
 
     private String ObtenerTextoSiguiendo() {
-        return ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Following" : "Siguiendo";
+        return TextosIdioma.Obtener("Siguiendo");
     }
 
     private String ObtenerTextoSeguir() {
-        return ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Follow" : "Seguir";
+        return TextosIdioma.Obtener("Seguir");
     }
     private String ObtenerTextoBotonSeguimiento(Usuario UsuarioActivo, Usuario UsuarioEncontrado) {
         if (UsuarioActivo == null) {

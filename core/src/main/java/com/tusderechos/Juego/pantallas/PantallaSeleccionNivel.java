@@ -42,6 +42,7 @@ import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
 import com.tusderechos.Juego.progreso.ProgresoNiveles;
+import com.tusderechos.Juego.textos.TextosIdioma;
 import Menus.Menu.MainMenuScreen;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
@@ -141,7 +142,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         Raiz.row();
         Raiz.add(new Image(TexturaBotonPresionado)).width(360f).height(2f).padTop(4f).padBottom(6f);
         Raiz.row();
-        Raiz.add(new Label("Personalizacion", EstiloTexto)).padBottom(6f);
+        Raiz.add(new Label(TextosIdioma.Obtener("Personalizacion"), EstiloTexto)).padBottom(6f);
         Raiz.row();
         Table TablaPersonalizacion = new Table();
         if (TexturaDulcePreview == null) {
@@ -204,7 +205,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
     private Table CrearPerfilPlaceholder() {
         Table Perfil = new Table();
         Usuario UsuarioActual = SistemaAutenticacion.getUsuarioActivo();
-        String NombreUsuario = UsuarioActual == null ? "Invitado" : UsuarioActual.getUsername();
+        String NombreUsuario = UsuarioActual == null ? TextosIdioma.Obtener("Invitado") : UsuarioActual.getUsername();
         if (TexturaAvatarPerfil == null) {
             TexturaAvatarPerfil = CargarAvatarPerfil(UsuarioActual);
         }
@@ -476,5 +477,4 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         }
     }
 }
-
 

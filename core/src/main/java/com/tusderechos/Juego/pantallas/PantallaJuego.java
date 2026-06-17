@@ -54,6 +54,7 @@ import com.tusderechos.Juego.rivalidad.GestorRivalidades;
 import com.tusderechos.Juego.rivalidad.GuardadorRivalidadesBinario;
 import com.tusderechos.Juego.rivalidad.ResultadoReto;
 import com.tusderechos.Juego.rivalidad.SolicitudRivalidad;
+import com.tusderechos.Juego.textos.TextosIdioma;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 import com.tusderechos.Juego.utilidades.CalculadoraPuntaje;
 import com.tusderechos.Juego.enums.EstadoNivel;
@@ -530,12 +531,12 @@ public class PantallaJuego extends ScreenAdapter {
     private void DetectarFalloInstantaneo(Vector2 Posicion) {
         if (Posicion.y < -0.6f || Posicion.x < -0.6f || Posicion.x > ConstantesJuego.AnchoMundo + 0.6f
                 || (Posicion.y > ConstantesJuego.AltoMundo + 0.6f && HayBurbujaAdherida())) {
-            IniciarFallo("El dulce se perdio");
+            IniciarFallo(TextosIdioma.Obtener("DulcePerdido"));
             return;
         }
         for (Obstaculo ObstaculoActual : Obstaculos) {
             if (ObstaculoActual.TocaDulce(Posicion, ConstantesJuego.RadioDulce)) {
-                IniciarFallo("El dulce toco un peligro");
+                IniciarFallo(TextosIdioma.Obtener("DulcePeligro"));
                 return;
             }
         }
@@ -546,7 +547,7 @@ public class PantallaJuego extends ScreenAdapter {
         boolean Detenido = DulceActual.ObtenerCuerpo().getLinearVelocity().len() < 0.05f;
         TiempoDulceDetenido = Detenido && !HayCuerdaActiva() && !HayBurbujaAdherida() ? TiempoDulceDetenido + Delta : 0f;
         if (TiempoDulceDetenido > 3f && !MonstruoActual.ContieneDulce(Posicion)) {
-            IniciarFallo("Intento fallido");
+            IniciarFallo(TextosIdioma.Obtener("IntentoFallido"));
         }
     }
 
@@ -900,7 +901,7 @@ public class PantallaJuego extends ScreenAdapter {
     }
 
     private void DibujarTextosHud() {
-        DibujarTextoInterfazCentradoMundo("Nivel " + DatosNivelActual.ObtenerNumero(), 1.72f, 7.61f, 1.12f);
+        DibujarTextoInterfazCentradoMundo(TextosIdioma.Formatear("NivelHud", DatosNivelActual.ObtenerNumero()), 1.72f, 7.61f, 1.12f);
         DibujarTextoInterfazCentradoMundo(EstrellasRecolectadas + "/3", 2.65f, 7.61f, 1.12f);
         DibujarTextoInterfazCentradoMundo(Math.round(TiempoNivel) + " s", 3.58f, 7.61f, 1.12f);
     }
@@ -908,7 +909,7 @@ public class PantallaJuego extends ScreenAdapter {
     private void DibujarTextosResultado() {
         Fuente.setColor(Color.WHITE);
         Fuente.getData().setScale(1.05f);
-        DibujarTextoCentradoMundo(EsNivelFinalDelJuego() ? "Juego completado" : "Nivel completado", 2.4f, 5.84f);
+        DibujarTextoCentradoMundo(EsNivelFinalDelJuego() ? TextosIdioma.Obtener("JuegoCompletado") : TextosIdioma.Obtener("NivelCompletado"), 2.4f, 5.84f);
         int PuntajeVisible = AnimacionResultadoActual == null ? PuntajeFinal : AnimacionResultadoActual.ObtenerPuntajeVisible();
         List<String> LineasResultado;
         if (RetoActual != null) {
@@ -934,8 +935,8 @@ public class PantallaJuego extends ScreenAdapter {
     private void DibujarTextosConfirmacionSalida() {
         Fuente.setColor(Color.WHITE);
         Fuente.getData().setScale(1.0f);
-        DibujarTextoCentradoMundo("Salir del nivel?", 2.4f, 4.22f);
-        DibujarTextoInterfazCentradoMundo("El intento se reiniciara.", 2.4f, 3.82f, 1.0f);
+        DibujarTextoCentradoMundo(TextosIdioma.Obtener("SalirDelNivel"), 2.4f, 4.22f);
+        DibujarTextoInterfazCentradoMundo(TextosIdioma.Obtener("IntentoReinicia"), 2.4f, 3.82f, 1.0f);
     }
 
     private void PrepararBatchTexto() {

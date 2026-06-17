@@ -35,6 +35,7 @@ import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.pantallas.PantallaRivalidad;
 import com.tusderechos.Juego.social.GestorSeguimiento;
+import com.tusderechos.Juego.textos.TextosIdioma;
 
 /**
  *
@@ -124,7 +125,7 @@ public class ProfileScreen implements Screen {
                 AgregarAccionesSociales(contenedorCentral, usuarioActivo, usuarioPerfil, estiloDatos);
             }
         } else {
-            Label lblError = new Label("PERFIL NO ENCONTRADO / PROFILE NOT FOUND", estiloDatos);
+            Label lblError = new Label(TextosIdioma.Obtener("PerfilNoEncontrado"), estiloDatos);
             lblError.setColor(Color.RED);
             contenedorCentral.add(lblError).padTop(150).row();
         }
@@ -239,18 +240,7 @@ public class ProfileScreen implements Screen {
     }
 
     private String ObtenerTextoRivalidadPendiente() {
-        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
-            case "ENG":
-                return "Rivalry available when both follow each other";
-            case "FRA":
-                return "Rivalite disponible quand les deux se suivent";
-            case "GAR":
-                return "Rivalidad disponible cuando ambos se sigan";
-            case "HEB":
-                return "Rivalidad disponible cuando ambos se sigan";
-            default:
-                return "Rivalidad disponible cuando ambos se sigan";
-        }
+        return TextosIdioma.Obtener("RivalidadPendiente");
     }
     private Usuario ObtenerUsuarioPerfil(Usuario usuarioActivo) {
         if (usernamePerfil == null || usernamePerfil.trim().isEmpty()) {
@@ -343,14 +333,13 @@ public class ProfileScreen implements Screen {
     }
 
     private String TextoBotonSeguir(Usuario usuarioActivo, Usuario usuarioPerfil) {
-        boolean esEng = ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG");
         if (usuarioActivo == null) {
-            return esEng ? "Log In" : "Inicia sesion";
+            return TextosIdioma.Obtener("IniciaSesion");
         }
         if (GestorSeguimiento.YaSigue(usuarioActivo, usuarioPerfil)) {
-            return esEng ? "Following" : "Siguiendo";
+            return TextosIdioma.Obtener("Siguiendo");
         }
-        return esEng ? "Follow" : "Seguir";
+        return TextosIdioma.Obtener("Seguir");
     }
 
     private void AgregarBotonVolver(Table contenedorCentral) {

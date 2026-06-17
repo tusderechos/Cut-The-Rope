@@ -42,6 +42,7 @@ import com.tusderechos.Juego.rivalidad.GestorRivalidades;
 import com.tusderechos.Juego.rivalidad.GestorRetos;
 import com.tusderechos.Juego.rivalidad.GuardadorRivalidadesBinario;
 import com.tusderechos.Juego.rivalidad.SolicitudRivalidad;
+import com.tusderechos.Juego.textos.TextosIdioma;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
 import Menus.Menu.PantallaDueloLocal;
@@ -198,13 +199,13 @@ public class PantallaRivalidad extends ScreenAdapter {
         Table Panel = new Table();
         Raiz.add(Panel).width(AnchoPanel).padTop(6f * EscalaLayout);
 
-        Label Titulo = new Label("Rivalidad", EstiloTitulo);
+        Label Titulo = new Label(TextosIdioma.Obtener("RivalidadTitulo"), EstiloTitulo);
         Titulo.setAlignment(Align.center);
         Panel.add(Titulo).padBottom(10f * EscalaLayout);
         Panel.row();
 
         AgregarCategorias(Panel, EscalaLayout);
-        AgregarControlNumerico(Panel, "Nivel", String.valueOf(NumeroNivelActual), 120f, AnchoFila, EscalaLayout, new Runnable() {
+        AgregarControlNumerico(Panel, TextosIdioma.Obtener("Nivel"), String.valueOf(NumeroNivelActual), 120f, AnchoFila, EscalaLayout, new Runnable() {
             @Override
             public void run() {
                 AjustarNivel(-1);
@@ -215,7 +216,7 @@ public class PantallaRivalidad extends ScreenAdapter {
                 AjustarNivel(1);
             }
         });
-        AgregarControlNumerico(Panel, "Estrellas", String.valueOf(EstrellasObjetivo), 120f, AnchoFila, EscalaLayout, new Runnable() {
+        AgregarControlNumerico(Panel, TextosIdioma.Obtener("Estrellas"), String.valueOf(EstrellasObjetivo), 120f, AnchoFila, EscalaLayout, new Runnable() {
             @Override
             public void run() {
                 AjustarEstrellasObjetivo(-1);
@@ -226,7 +227,7 @@ public class PantallaRivalidad extends ScreenAdapter {
                 AjustarEstrellasObjetivo(1);
             }
         });
-        AgregarControlNumerico(Panel, "Puntaje", String.valueOf(PuntajeObjetivo), 140f, AnchoFila, EscalaLayout, new Runnable() {
+        AgregarControlNumerico(Panel, TextosIdioma.Obtener("Puntaje"), String.valueOf(PuntajeObjetivo), 140f, AnchoFila, EscalaLayout, new Runnable() {
             @Override
             public void run() {
                 AjustarPuntajeObjetivo(-PasoPuntajeObjetivo);
@@ -354,7 +355,7 @@ public class PantallaRivalidad extends ScreenAdapter {
     }
 
     private String TextoResumenReto() {
-        return CategoriaActual.name() + " " + NumeroNivelActual + " - " + PuntajeObjetivo + " pts / " + EstrellasObjetivo + " estrellas";
+        return TextosIdioma.FormatearCategoria(CategoriaActual, NumeroNivelActual, PuntajeObjetivo, EstrellasObjetivo);
     }
 
     private String ObtenerUsernameRetador() {

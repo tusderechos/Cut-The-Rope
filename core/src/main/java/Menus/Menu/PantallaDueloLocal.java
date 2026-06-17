@@ -44,6 +44,7 @@ import com.tusderechos.Juego.rivalidad.DueloLocal;
 import com.tusderechos.Juego.rivalidad.GestorDueloLocal;
 import com.tusderechos.Juego.rivalidad.GestorRetos;
 import com.tusderechos.Juego.rivalidad.ResultadoTurnoRivalidad;
+import com.tusderechos.Juego.textos.TextosIdioma;
 import com.tusderechos.Juego.utilidades.ConstantesJuego;
 
 public class PantallaDueloLocal implements Screen {
@@ -127,12 +128,12 @@ public class PantallaDueloLocal implements Screen {
         });
         StageActual.addActor(BotonVolver);
 
-        Label Titulo = CrearLabel("Duelo local", FuenteTitulo, 1f);
+        Label Titulo = CrearLabel(TextosIdioma.Obtener("DueloLocal"), FuenteTitulo, 1f);
         Titulo.setBounds(420f, 694f, 260f, 52f);
         StageActual.addActor(Titulo);
 
         if (Duelo == null) {
-            Label Mensaje = CrearLabel("No se encontro el duelo local", FuenteTitulo, 0.85f);
+            Label Mensaje = CrearLabel(TextosIdioma.Obtener("DueloNoEncontrado"), FuenteTitulo, 0.85f);
             Mensaje.setBounds(300f, 360f, 500f, 80f);
             StageActual.addActor(Mensaje);
             return;
@@ -169,7 +170,7 @@ public class PantallaDueloLocal implements Screen {
         Preview.setBounds(X + 18f, Y + 72f, Ancho - 36f, Alto - 116f);
         StageActual.addActor(Preview);
 
-        Label Estado = CrearLabel(Activo ? "Listo para jugar" : "Esperando turno", FuenteTexto, 0.86f);
+        Label Estado = CrearLabel(Activo ? TextosIdioma.Obtener("ListoParaJugar") : TextosIdioma.Obtener("EsperandoTurno"), FuenteTexto, 0.86f);
         Estado.setBounds(X, Y + 18f, Ancho, 40f);
         StageActual.addActor(Estado);
     }
@@ -179,14 +180,14 @@ public class PantallaDueloLocal implements Screen {
         Panel.setBackground(SkinActual.newDrawable("fondoCampo", new Color(0.02f, 0.04f, 0.05f, 0.88f)));
         Panel.pad(16f);
 
-        Label TituloResultado = CrearLabel("Resultado", FuenteTitulo, 0.78f);
+        Label TituloResultado = CrearLabel(TextosIdioma.Obtener("Resultado"), FuenteTitulo, 0.78f);
         Panel.add(TituloResultado).height(42f).row();
         Panel.add(CrearEstrellas(Resultado.ObtenerEstrellas())).height(54f).padTop(2f).padBottom(10f).row();
 
-        Label Puntaje = CrearLabel("Puntaje: 0", FuenteTexto, 0.82f);
+        Label Puntaje = CrearLabel(TextosIdioma.Formatear("PuntajeResultado", 0), FuenteTexto, 0.82f);
         Panel.add(Puntaje).height(42f).row();
-        Panel.add(CrearLabel("Estrellas: " + Resultado.ObtenerEstrellas() + "/3", FuenteTexto, 0.76f)).height(36f).row();
-        Panel.add(CrearLabel("Tiempo: " + Math.round(Resultado.ObtenerTiempo()) + " s", FuenteTexto, 0.76f)).height(36f).row();
+        Panel.add(CrearLabel(TextosIdioma.Formatear("EstrellasResultado", Resultado.ObtenerEstrellas()), FuenteTexto, 0.76f)).height(36f).row();
+        Panel.add(CrearLabel(TextosIdioma.Formatear("TiempoResultado", Math.round(Resultado.ObtenerTiempo())), FuenteTexto, 0.76f)).height(36f).row();
         Panel.add(CrearLabel(Username, FuenteTexto, 0.72f)).height(36f).padTop(8f);
 
         if (EsRetador) {
@@ -214,7 +215,7 @@ public class PantallaDueloLocal implements Screen {
         Label Vs = CrearLabel("VS", FuenteTitulo, 1.25f);
         Vs.setBounds(505f, 362f, 90f, 72f);
         StageActual.addActor(Vs);
-        Label Turno = CrearLabel(Duelo.EstaFinalizado() ? "Final" : "Turno de\n" + Duelo.ObtenerUsernameConTurno(), FuenteTexto, 0.78f);
+        Label Turno = CrearLabel(Duelo.EstaFinalizado() ? TextosIdioma.Obtener("Final") : TextosIdioma.Formatear("TurnoDeLinea", Duelo.ObtenerUsernameConTurno()), FuenteTexto, 0.78f);
         Turno.setBounds(505f, 322f, 90f, 54f);
         StageActual.addActor(Turno);
     }
@@ -256,12 +257,12 @@ public class PantallaDueloLocal implements Screen {
         AnimacionResultadoActual.Avanzar(Delta);
         ResultadoTurnoRivalidad ResultadoRetador = Duelo.ObtenerResultadoRetador();
         ResultadoTurnoRivalidad ResultadoRetado = Duelo.ObtenerResultadoRetado();
-        PuntajeRetadorLabel.setText("Puntaje: " + AnimacionResultadoActual.ObtenerPuntajeRetador(ResultadoRetador));
-        PuntajeRetadoLabel.setText("Puntaje: " + AnimacionResultadoActual.ObtenerPuntajeRetado(ResultadoRetado));
+        PuntajeRetadorLabel.setText(TextosIdioma.Formatear("PuntajeResultado", AnimacionResultadoActual.ObtenerPuntajeRetador(ResultadoRetador)));
+        PuntajeRetadoLabel.setText(TextosIdioma.Formatear("PuntajeResultado", AnimacionResultadoActual.ObtenerPuntajeRetado(ResultadoRetado)));
 
         if (AnimacionResultadoActual.DebeMostrarGanador()) {
             float Progreso = AnimacionResultadoActual.ObtenerProgresoRevealGanador();
-            GanadorLabel.setText("Ganador: " + Duelo.ObtenerGanador());
+            GanadorLabel.setText(TextosIdioma.Formatear("Ganador", ObtenerGanadorVisible()));
             GanadorLabel.setVisible(true);
             AplicarHighlightGanador(Progreso);
         }
@@ -278,6 +279,11 @@ public class PantallaDueloLocal implements Screen {
         }
         AplicarEstadoPanelFinal(PanelRetador, GanoRetador, Progreso);
         AplicarEstadoPanelFinal(PanelRetado, GanoRetado, Progreso);
+    }
+
+    private String ObtenerGanadorVisible() {
+        String Ganador = Duelo.ObtenerGanador();
+        return "Empate".equals(Ganador) ? TextosIdioma.Obtener("Empate") : Ganador;
     }
 
     private void AplicarEstadoPanelFinal(Table Panel, boolean Ganador, float Progreso) {

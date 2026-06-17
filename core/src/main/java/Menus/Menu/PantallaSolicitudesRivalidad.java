@@ -48,6 +48,7 @@ import com.tusderechos.Juego.rivalidad.GestorRetos;
 import com.tusderechos.Juego.rivalidad.GestorRivalidades;
 import com.tusderechos.Juego.rivalidad.GuardadorRivalidadesBinario;
 import com.tusderechos.Juego.rivalidad.SolicitudRivalidad;
+import com.tusderechos.Juego.textos.TextosIdioma;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -152,7 +153,7 @@ public class PantallaSolicitudesRivalidad implements Screen {
     private void AgregarSolicitudes(Table Lista) {
         Usuario UsuarioActivo = SistemaAutenticacion.getUsuarioActivo();
         if (UsuarioActivo == null) {
-            AgregarMensaje(Lista, "Inicia sesion para ver retos");
+            AgregarMensaje(Lista, TextosIdioma.Obtener("RetosSinSesion"));
             return;
         }
         String UsernameActivo = UsuarioActivo.getUsername().trim().toLowerCase();
@@ -165,7 +166,7 @@ public class PantallaSolicitudesRivalidad implements Screen {
             }
         }
         if (RetosMostrados == 0) {
-            AgregarMensaje(Lista, "No hay retos todavia");
+            AgregarMensaje(Lista, TextosIdioma.Obtener("RetosVacio"));
         }
     }
 
@@ -260,28 +261,28 @@ public class PantallaSolicitudesRivalidad implements Screen {
         String Rival = Solicitud.ObtenerUsernameRetador().equals(UsernameActivo) ? Solicitud.ObtenerUsernameRetado() : Solicitud.ObtenerUsernameRetador();
         String Ganador = Solicitud.ObtenerGanador();
         if (!Ganador.isEmpty()) {
-            return "Rival: " + Rival + "\n" + TextoReto(Solicitud) + "\nGanador: " + Ganador;
+            return TextosIdioma.Formatear("Rival", Rival) + "\n" + TextoReto(Solicitud) + "\n" + TextosIdioma.Formatear("Ganador", Ganador);
         }
 
-        return "Rival: " + Rival + "\n" + TextoReto(Solicitud) + "\n" + TextoEstadoCorto(Solicitud, UsernameActivo);
+        return TextosIdioma.Formatear("Rival", Rival) + "\n" + TextoReto(Solicitud) + "\n" + TextoEstadoCorto(Solicitud, UsernameActivo);
     }
 
     private String TextoReto(SolicitudRivalidad Solicitud) {
-        return Solicitud.ObtenerReto().ObtenerCategoria().name() + " " + Solicitud.ObtenerReto().ObtenerNumeroEnCategoria() + " - " + Solicitud.ObtenerReto().ObtenerPuntajeObjetivo() + " pts / " + Solicitud.ObtenerReto().ObtenerEstrellasObjetivo() + " estrellas";
+        return TextosIdioma.FormatearCategoria(Solicitud.ObtenerReto().ObtenerCategoria(), Solicitud.ObtenerReto().ObtenerNumeroEnCategoria(), Solicitud.ObtenerReto().ObtenerPuntajeObjetivo(), Solicitud.ObtenerReto().ObtenerEstrellasObjetivo());
     }
 
     private String TextoEstadoCorto(SolicitudRivalidad Solicitud, String UsernameActivo) {
         if (Solicitud.ObtenerEstado() == EstadoRivalidad.Pendiente) {
-            return Solicitud.ObtenerUsernameRetado().equals(UsernameActivo) ? "Pendiente" : "Esperando";
+            return Solicitud.ObtenerUsernameRetado().equals(UsernameActivo) ? TextosIdioma.Obtener("Pendiente") : TextosIdioma.Obtener("Esperando");
         }
         if (Solicitud.ObtenerEstado() == EstadoRivalidad.Rechazada) {
-            return "Rechazada";
+            return TextosIdioma.Obtener("Rechazada");
         }
         if (Solicitud.ObtenerEstado() == EstadoRivalidad.Finalizada) {
-            return "Final";
+            return TextosIdioma.Obtener("Final");
         }
 
-        return "Turno de " + Solicitud.ObtenerUsernameConTurno();
+        return TextosIdioma.Formatear("TurnoDe", Solicitud.ObtenerUsernameConTurno());
     }
 
     private void IniciarTurno(SolicitudRivalidad Solicitud) {

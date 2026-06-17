@@ -8,11 +8,14 @@ package com.tusderechos.Juego.pantallas;
  *
  * @author Hp
  */
+
+import com.tusderechos.Juego.textos.TextosIdioma;
+
 public final class TextoHudNivel {
     private TextoHudNivel() {
     }
 
     public static String CrearTexto(int NumeroNivel, int EstrellasRecolectadas, float TiempoNivel) {
-        return "Nivel " + NumeroNivel + "   Estrellas " + EstrellasRecolectadas + "/3   Tiempo " + Math.round(TiempoNivel) + " s";
+        return TextosIdioma.Formatear("TextoHudCompleto", NumeroNivel, EstrellasRecolectadas, Math.round(TiempoNivel));
     }
 }
