@@ -16,12 +16,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -61,6 +63,8 @@ public class PantallaSolicitudesRivalidad implements Screen {
     private Texture TexturaVolver;
     private Texture TexturaSalir;
     private Texture TexturaFondo;
+    private Texture TexturaMarcoLista;
+    private Texture TexturaInteriorLista;
 
     public PantallaSolicitudesRivalidad(Game ParentGame) {
         this(ParentGame, ColorDulce.Rojo, ColorMonstruo.Verde);
@@ -86,9 +90,11 @@ public class PantallaSolicitudesRivalidad implements Screen {
     private void CargarTexturas() {
         TexturaRetos = CargarTextura("imagenes/retos.png");
         TexturaIniciarReto = CargarTextura("imagenes/iniciar_reto.png");
-        TexturaVolver = CargarTextura("imagenes/volver.png");
+        TexturaVolver = CargarTextura("imgMenus/btn_volver.png");
         TexturaSalir = CargarTextura("imagenes/salir.png");
-        TexturaFondo = CargarTextura("imagenes/fondo_menu_niveles.png");
+        TexturaFondo = CargarTextura("imagenes/fondo_retos.png");
+        TexturaMarcoLista = CrearTexturaColor(new Color(0.95f, 0.53f, 0.12f, 0.96f));
+        TexturaInteriorLista = CrearTexturaColor(new Color(0.05f, 0.12f, 0.10f, 0.91f));
     }
 
     private Texture CargarTextura(String Ruta) {
@@ -99,10 +105,15 @@ public class PantallaSolicitudesRivalidad implements Screen {
     }
 
     private void ConstruirContenido() {
+        Image FondoPantalla = new Image(TexturaFondo);
+        FondoPantalla.setFillParent(true);
+        FondoPantalla.setScaling(Scaling.fill);
+        StageActual.addActor(FondoPantalla);
+
         Table Raiz = new Table();
         Raiz.setFillParent(true);
-        Raiz.setBackground(new TextureRegionDrawable(new TextureRegion(TexturaFondo)));
-        Raiz.pad(20f);
+        Raiz.top();
+        Raiz.pad(16f);
         StageActual.addActor(Raiz);
 
         ImageButton BotonVolver = CrearBotonImagen(TexturaVolver);
@@ -115,17 +126,26 @@ public class PantallaSolicitudesRivalidad implements Screen {
 
         ImageButton Titulo = CrearBotonImagen(TexturaRetos);
         Table Encabezado = new Table();
-        Encabezado.add(BotonVolver).width(64).height(64).left().padRight(18);
-        Encabezado.add(Titulo).width(240).height(58).center();
-        Raiz.add(Encabezado).padBottom(15).row();
+        Encabezado.add(BotonVolver).width(56).height(56).left();
+        Encabezado.add(Titulo).width(230).height(56).center().expandX();
+        Encabezado.add().width(56).height(56);
+        Raiz.add(Encabezado).width(430).padTop(8).padBottom(18).row();
 
         Table Lista = new Table();
         Lista.top();
+        Lista.pad(14f);
         AgregarSolicitudes(Lista);
 
         ScrollPane Scroll = new ScrollPane(Lista, SkinActual);
         Scroll.setFadeScrollBars(false);
-        Raiz.add(Scroll).width(430).height(560).center();
+        Scroll.setScrollingDisabled(true, false);
+        Scroll.getStyle().background = new TextureRegionDrawable(new TextureRegion(TexturaInteriorLista));
+
+        Table MarcoLista = new Table();
+        MarcoLista.setBackground(new TextureRegionDrawable(new TextureRegion(TexturaMarcoLista)));
+        MarcoLista.pad(7f);
+        MarcoLista.add(Scroll).width(402).height(520).center();
+        Raiz.add(MarcoLista).width(430).height(548).center();
     }
 
     private void AgregarSolicitudes(Table Lista) {
@@ -208,6 +228,16 @@ public class PantallaSolicitudesRivalidad implements Screen {
         Boton.getImage().setAlign(Align.center);
 
         return Boton;
+    }
+
+    private Texture CrearTexturaColor(Color ColorActual) {
+        Pixmap PixmapActual = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        PixmapActual.setColor(ColorActual);
+        PixmapActual.fill();
+        Texture Textura = new Texture(PixmapActual);
+        PixmapActual.dispose();
+
+        return Textura;
     }
 
     private Label CrearLabel(String Texto, float Escala) {
@@ -320,6 +350,8 @@ public class PantallaSolicitudesRivalidad implements Screen {
         Disponer(TexturaVolver);
         Disponer(TexturaSalir);
         Disponer(TexturaFondo);
+        Disponer(TexturaMarcoLista);
+        Disponer(TexturaInteriorLista);
     }
 
     private void Disponer(Texture Textura) {
