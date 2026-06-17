@@ -52,7 +52,6 @@ public class MainMenuScreen implements Screen {
 
         String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
 
-        //fondoMenuTex = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal_" + idm + ".png"));
         fondoMenuTex = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal.png"));
         btnJugarTex = new Texture(Gdx.files.internal("imgMenus/btn_juego_" + idm + ".png"));
         btnPerfilTex = new Texture(Gdx.files.internal("imgMenus/btn_perfil_" + idm + ".png"));
