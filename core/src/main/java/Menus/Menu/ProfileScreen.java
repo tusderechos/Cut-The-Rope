@@ -47,8 +47,11 @@ public class ProfileScreen implements Screen {
     private Texture fondoPerfilTexture;
     private Texture btnVolverTex;
     private Texture fotoPerfilTex;
-    private Texture btnDesactivarTex; 
+    private Texture btnDesactivarTex;
+    private Texture fondoAlertaTex; 
     private BitmapFont fuenteDatos;
+
+    private Table capaAlertaModal;
 
     public ProfileScreen(Game game) {
         this(game, null);
@@ -75,6 +78,7 @@ public class ProfileScreen implements Screen {
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
         fotoPerfilTex = CargarFotoPerfil(usuarioPerfil);
         btnDesactivarTex = new Texture(Gdx.files.internal("imgMenus/btn_desactivar.png"));
+        fondoAlertaTex = new Texture(Gdx.files.internal("imgMenus/fondo_alerta.png")); 
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
@@ -83,23 +87,20 @@ public class ProfileScreen implements Screen {
 
         Table capaEsquinaSuperior = new Table();
         capaEsquinaSuperior.setFillParent(true);
-        capaEsquinaSuperior.top().right().padTop(110).padRight(35); 
-        
+        capaEsquinaSuperior.top().right().padTop(110).padRight(35);
+
         if (perfilPropio && usuarioPerfil != null) {
             ImageButton btnDesactivar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnDesactivarTex)));
             btnDesactivar.getImage().setScaling(Scaling.fill);
             btnDesactivar.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (usuarioActivo != null) {
-                        usuarioActivo.setCuentaActiva(false);
-                        ManejadorArchivos.guardarUsuario(usuarioActivo);
+                    if (capaAlertaModal != null) {
+                        capaAlertaModal.setVisible(true);
                     }
-                    SistemaAutenticacion.cerrarSesion();
-                    parentGame.setScreen(new LoginRegisterScreen(parentGame));
                 }
             });
-            capaEsquinaSuperior.add(btnDesactivar).width(75).height(75); 
+            capaEsquinaSuperior.add(btnDesactivar).width(75).height(75);
         }
         stage.addActor(capaEsquinaSuperior);
 
@@ -124,6 +125,93 @@ public class ProfileScreen implements Screen {
         contenedorCentral.add().expandY();
         contenedorCentral.row();
         AgregarBotonVolver(contenedorCentral);
+
+        if (perfilPropio && usuarioActivo != null) {
+            CrearVentanaAlertaDesactivar(usuarioActivo, estiloDatos);
+        }
+    }
+
+    private void CrearVentanaAlertaDesactivar(final Usuario usuarioActivo, Label.LabelStyle estiloDatos) {
+        capaAlertaModal = new Table();
+        capaAlertaModal.setFillParent(true);
+        capaAlertaModal.center();
+        capaAlertaModal.setVisible(false);
+
+        Table miniVentana = new Table();
+        miniVentana.setBackground(new TextureRegionDrawable(new TextureRegion(fondoAlertaTex)));
+        miniVentana.pad(40); 
+
+        String textoPregunta;
+        String textoSi;
+        String textoNo;
+
+        String idioma = ConfiguracionJuego.idiomaActivo.toUpperCase();
+        switch (idioma) {
+            case "ENG":
+                textoPregunta = "Are you sure you want to\ndeactivate your account?";
+                textoSi = "Yes";
+                textoNo = "No";
+                break;
+            case "FRA":
+                textoPregunta = "Êtes-vous sûr de vouloir\ndésactiver votre compte?";
+                textoSi = "Oui";
+                textoNo = "Non";
+                break;
+            case "HEB":
+                textoPregunta = "?האם אתה בטוח שברצונך\nלנטרל את החשבון שלך";
+                textoSi = "כן";
+                textoNo = "לא";
+                break;
+            case "GAR":
+                textoPregunta = "¿Afurati boun bigira\nadisidagwda humoun bubi?"; 
+                textoSi = "Inje";
+                textoNo = "Ino";
+                break;
+            case "ESP":
+            default:
+                textoPregunta = "¿Está seguro de que desea\ndesactivar la cuenta?";
+                textoSi = "Sí";
+                textoNo = "No";
+                break;
+        }
+
+        Label.LabelStyle estiloAlerta = new Label.LabelStyle();
+        estiloAlerta.font = fuenteDatos; 
+        estiloAlerta.fontColor = Color.BLACK; 
+
+        Label lblPregunta = new Label(textoPregunta, estiloAlerta);
+        lblPregunta.setAlignment(Align.center);
+        
+        lblPregunta.setFontScale(1.3f); 
+
+        miniVentana.add(lblPregunta).padTop(10).padBottom(25).colspan(2).center().row();
+
+        TextButton btnSi = new TextButton(textoSi, skin);
+        btnSi.getLabel().setFontScale(1.15f);
+        btnSi.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                usuarioActivo.setCuentaActiva(false);
+                ManejadorArchivos.guardarUsuario(usuarioActivo);
+                SistemaAutenticacion.cerrarSesion();
+                parentGame.setScreen(new LoginRegisterScreen(parentGame));
+            }
+        });
+
+        TextButton btnNo = new TextButton(textoNo, skin);
+        btnNo.getLabel().setFontScale(1.15f); 
+        btnNo.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                capaAlertaModal.setVisible(false);
+            }
+        });
+
+        miniVentana.add(btnSi).width(130).height(48).padRight(15);
+        miniVentana.add(btnNo).width(130).height(48).padLeft(15);
+
+        capaAlertaModal.add(miniVentana).width(460).height(320).center();
+        stage.addActor(capaAlertaModal);
     }
 
     private Usuario ObtenerUsuarioPerfil(Usuario usuarioActivo) {
@@ -284,13 +372,16 @@ public class ProfileScreen implements Screen {
             btnVolverTex.dispose();
         }
         if (btnDesactivarTex != null) {
-            btnDesactivarTex.dispose(); 
+            btnDesactivarTex.dispose();
         }
         if (fotoPerfilTex != null) {
             fotoPerfilTex.dispose();
         }
         if (fuenteDatos != null) {
             fuenteDatos.dispose();
+        }
+        if (fondoAlertaTex != null) {
+            fondoAlertaTex.dispose(); 
         }
     }
 }
