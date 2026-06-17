@@ -2,12 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.tusderechos.Juego.pantallas;
 
-/**
- *
- * @author Hp
- */
+package com.tusderechos.Juego.pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -72,6 +68,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class PantallaJuego extends ScreenAdapter {
+
     private static final float PasoFisica = 1f / 60f;
     private static final float AnchoPlataformaVisual = 1.18f;
     private static final float AltoPlataformaVisual = 0.16f;
@@ -126,6 +123,9 @@ public class PantallaJuego extends ScreenAdapter {
     private boolean ArrastreCorteActivo;
     private Vector2 PuntoArrastreAnterior;
 
+    private Vector2 PosicionMiraTeclado;
+    private final float VelocidadMiraTeclado = 4.5f; 
+
     public PantallaJuego(Juego JuegoAplicacion, DatosNivel DatosNivelActual, PersonalizacionDulce PersonalizacionDulceActual, PersonalizacionMonstruo PersonalizacionMonstruoActual) {
         this(JuegoAplicacion, DatosNivelActual, PersonalizacionDulceActual, PersonalizacionMonstruoActual, null);
     }
@@ -161,6 +161,9 @@ public class PantallaJuego extends ScreenAdapter {
         GestorAudioActual.IniciarMusica();
         DulceActual = new Dulce(Mundo, DatosNivelActual.ObtenerPosicionDulce(), PersonalizacionDulceActual);
         MonstruoActual = new Monstruo(DatosNivelActual.ObtenerPosicionMonstruo(), PersonalizacionMonstruoActual);
+
+        PosicionMiraTeclado = new Vector2(ConstantesJuego.AnchoMundo / 2f, ConstantesJuego.AltoMundo / 2f);
+
         for (DatosCuerda DatosCuerdaActual : DatosNivelActual.ObtenerCuerdas()) {
             Cuerdas.add(new Cuerda(Mundo, DatosCuerdaActual.ObtenerAncla(), DatosCuerdaActual.ObtenerLongitud(), DulceActual.ObtenerCuerpo()));
         }
@@ -186,11 +189,39 @@ public class PantallaJuego extends ScreenAdapter {
                     }
                     return true;
                 }
+
+                if ("TECLADO".equals(Menus.Menu.ConfiguracionJuego.modoControl) && EstadoNivelActual == EstadoNivel.Jugando && !ConfirmacionSalidaActiva && AlphaEntrada <= 0f) {
+                    if (Keycode == Input.Keys.SPACE) {
+                        // Intentar reventar burbuja primero en la posición de la mira
+                        if (!ReventarBurbujaCercana(PosicionMiraTeclado)) {
+                            // Si no hay burbuja, simular un micro-trazo vertical de corte en esa posición
+                            Vector2 InicioCorte = new Vector2(PosicionMiraTeclado.x, PosicionMiraTeclado.y + 0.15f);
+                            Vector2 FinCorte = new Vector2(PosicionMiraTeclado.x, PosicionMiraTeclado.y - 0.15f);
+                            CortarCuerdaPorArrastre(InicioCorte, FinCorte);
+                        }
+                        return true;
+                    }
+                }
                 return false;
             }
 
             @Override
             public boolean touchDown(int ScreenX, int ScreenY, int Pointer, int Button) {
+                if ("TECLADO".equals(Menus.Menu.ConfiguracionJuego.modoControl)) {
+                    Vector2 PuntoMundo = ConvertirPantallaAMundo(ScreenX, ScreenY);
+                    if (ConfirmacionSalidaActiva) {
+                        ManejarClicConfirmacionSalida(PuntoMundo);
+                        return true;
+                    } else if (NivelCompletado()) {
+                        ManejarClicResultado(PuntoMundo);
+                        return true;
+                    } else if (BotonSalir.contains(PuntoMundo)) {
+                        ConfirmacionSalidaActiva = true;
+                        return true;
+                    }
+                    return false;
+                }
+
                 if (Button != Input.Buttons.LEFT || AlphaEntrada > 0f || EstadoNivelActual == EstadoNivel.Fallando) {
                     return false;
                 }
@@ -215,6 +246,10 @@ public class PantallaJuego extends ScreenAdapter {
 
             @Override
             public boolean touchDragged(int ScreenX, int ScreenY, int Pointer) {
+                if ("TECLADO".equals(Menus.Menu.ConfiguracionJuego.modoControl)) {
+                    return false;
+                }
+
                 if (!ArrastreCorteActivo || AlphaEntrada > 0f || EstadoNivelActual != EstadoNivel.Jugando || ConfirmacionSalidaActiva) {
                     return false;
                 }
@@ -227,6 +262,10 @@ public class PantallaJuego extends ScreenAdapter {
 
             @Override
             public boolean touchUp(int ScreenX, int ScreenY, int Pointer, int Button) {
+                if ("TECLADO".equals(Menus.Menu.ConfiguracionJuego.modoControl)) {
+                    return false;
+                }
+
                 ArrastreCorteActivo = false;
                 PuntoArrastreAnterior = null;
 
@@ -239,6 +278,25 @@ public class PantallaJuego extends ScreenAdapter {
     public void render(float Delta) {
         ScreenUtils.clear(0.12f, 0.16f, 0.20f, 1f);
         AlphaEntrada = Math.max(0f, AlphaEntrada - Delta * 1.6f);
+
+        if ("TECLADO".equals(Menus.Menu.ConfiguracionJuego.modoControl) && EstadoNivelActual == EstadoNivel.Jugando && !ConfirmacionSalidaActiva && AlphaEntrada <= 0f) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                PosicionMiraTeclado.y += VelocidadMiraTeclado * Delta;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+                PosicionMiraTeclado.y -= VelocidadMiraTeclado * Delta;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                PosicionMiraTeclado.x -= VelocidadMiraTeclado * Delta;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                PosicionMiraTeclado.x += VelocidadMiraTeclado * Delta;
+            }
+
+            PosicionMiraTeclado.x = Math.max(0.1f, Math.min(ConstantesJuego.AnchoMundo - 0.1f, PosicionMiraTeclado.x));
+            PosicionMiraTeclado.y = Math.max(0.1f, Math.min(FondoHud.y - 0.1f, PosicionMiraTeclado.y));
+        }
+
         if (EstadoNivelActual == EstadoNivel.Jugando && AlphaEntrada <= 0f) {
             float DeltaSimulado = Math.min(Delta, 0.25f);
             ActualizarFisica(DeltaSimulado);
@@ -304,6 +362,20 @@ public class PantallaJuego extends ScreenAdapter {
         if (GestorTexturasActual.ObtenerDulce(PersonalizacionDulceActual.ObtenerColorDulce()) == null) {
             DulceActual.Dibujar(ShapeRendererActual);
         }
+
+        if ("TECLADO".equals(Menus.Menu.ConfiguracionJuego.modoControl) && EstadoNivelActual == EstadoNivel.Jugando && !ConfirmacionSalidaActiva) {
+            ShapeRendererActual.end();
+
+            ShapeRendererActual.begin(ShapeRenderer.ShapeType.Line);
+            ShapeRendererActual.setColor(Color.CYAN);
+            ShapeRendererActual.circle(PosicionMiraTeclado.x, PosicionMiraTeclado.y, 0.12f, 16);
+            ShapeRendererActual.line(PosicionMiraTeclado.x - 0.2f, PosicionMiraTeclado.y, PosicionMiraTeclado.x + 0.2f, PosicionMiraTeclado.y);
+            ShapeRendererActual.line(PosicionMiraTeclado.x, PosicionMiraTeclado.y - 0.2f, PosicionMiraTeclado.x, PosicionMiraTeclado.y + 0.2f);
+            ShapeRendererActual.end();
+
+            ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
+        }
+
         ShapeRendererActual.end();
         DibujarSpritesMundo();
         ShapeRendererActual.begin(ShapeRenderer.ShapeType.Filled);
@@ -457,7 +529,7 @@ public class PantallaJuego extends ScreenAdapter {
 
     private void DetectarFalloInstantaneo(Vector2 Posicion) {
         if (Posicion.y < -0.6f || Posicion.x < -0.6f || Posicion.x > ConstantesJuego.AnchoMundo + 0.6f
-            || (Posicion.y > ConstantesJuego.AltoMundo + 0.6f && HayBurbujaAdherida())) {
+                || (Posicion.y > ConstantesJuego.AltoMundo + 0.6f && HayBurbujaAdherida())) {
             IniciarFallo("El dulce se perdio");
             return;
         }
@@ -625,6 +697,7 @@ public class PantallaJuego extends ScreenAdapter {
     private void DibujarPanelResultado(ShapeRenderer Renderer) {
         DibujarPanelRedondeado(Renderer, 0.35f, 1.0f, 4.1f, 5.15f, 0.18f, new Color(0.05f, 0.07f, 0.10f, 0.98f), new Color(0.20f, 0.28f, 0.35f, 0.92f));
         DibujarPanelRedondeado(Renderer, 0.56f, 2.55f, 3.68f, 2.25f, 0.12f, new Color(0.10f, 0.14f, 0.19f, 1f), new Color(0.25f, 0.34f, 0.42f, 0.85f));
+
         if (GestorTexturasActual.ObtenerEstrella(false) == null || GestorTexturasActual.ObtenerEstrella(true) == null) {
             DibujarEstrellasResultado(Renderer);
         }
@@ -688,7 +761,6 @@ public class PantallaJuego extends ScreenAdapter {
     static Rectangle CrearRectanguloPlataformaVisual(Vector2 PosicionMonstruo) {
         float X = PosicionMonstruo.x - AnchoPlataformaVisual / 2f;
         float Y = PosicionMonstruo.y - ConstantesJuego.RadioMonstruo - SeparacionPlataformaVisualMonstruo - AltoPlataformaVisual;
-
         return new Rectangle(X, Y, AnchoPlataformaVisual, AltoPlataformaVisual);
     }
 
@@ -898,14 +970,12 @@ public class PantallaJuego extends ScreenAdapter {
     private Vector2 ConvertirMundoAPantalla(float MundoX, float MundoY) {
         float PantallaX = Viewport.getScreenX() + MundoX / ConstantesJuego.AnchoMundo * Viewport.getScreenWidth();
         float PantallaY = Viewport.getScreenY() + MundoY / ConstantesJuego.AltoMundo * Viewport.getScreenHeight();
-
         return new Vector2(PantallaX, PantallaY);
     }
 
     private Vector2 ConvertirPantallaAMundo(int ScreenX, int ScreenY) {
         Vector3 PuntoPantalla = new Vector3(ScreenX, ScreenY, 0f);
         Viewport.unproject(PuntoPantalla);
-
         return new Vector2(PuntoPantalla.x, PuntoPantalla.y);
     }
 
@@ -976,4 +1046,3 @@ public class PantallaJuego extends ScreenAdapter {
         }
     }
 }
-
