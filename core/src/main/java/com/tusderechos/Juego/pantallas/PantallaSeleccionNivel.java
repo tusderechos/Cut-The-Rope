@@ -118,7 +118,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         Raiz.setFillParent(true);
         Raiz.center();
         Raiz.pad(12f);
-        Raiz.setBackground(new TextureRegionDrawable(new TextureRegion(TexturaFondoMenuNiveles)).tint(new Color(0.48f, 0.48f, 0.48f, 1f)));
+        Raiz.setBackground(new TextureRegionDrawable(new TextureRegion(TexturaFondoMenuNiveles)));
         StageActual.addActor(Raiz);
         ConstruirContenido();
         Gdx.input.setInputProcessor(StageActual);
@@ -192,10 +192,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
 
     private void AgregarBarraSuperior() {
         Table BarraSuperior = new Table();
-        BarraSuperior.setBackground(new TextureRegionDrawable(new TextureRegion(TexturaHeaderSuperior)));
         BarraSuperior.pad(3f, 10f, 3f, 10f);
-        Image Titulo = new Image(TexturaTituloSeleccionNiveles);
-        BarraSuperior.add(Titulo).width(230f).height(42f).left();
         BarraSuperior.add().expandX();
         BarraSuperior.add(CrearPerfilPlaceholder()).width(166f).height(44f).right();
         Raiz.add(BarraSuperior).width(440f).height(48f);
