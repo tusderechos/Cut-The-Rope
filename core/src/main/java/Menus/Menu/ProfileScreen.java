@@ -32,8 +32,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.Juego;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.pantallas.PantallaRivalidad;
 import com.tusderechos.Juego.social.GestorSeguimiento;
+import com.tusderechos.Juego.textos.TextosIdioma;
 
 /**
  *
@@ -47,7 +49,14 @@ public class ProfileScreen implements Screen {
     private Texture fondoPerfilTexture;
     private Texture btnVolverTex;
     private Texture fotoPerfilTex;
+    private Texture btnDesactivarTex;
+    private Texture fondoAlertaTex; 
+    private Texture btnSeguirTex;
+    private Texture btnSiguiendoTex;
+    private Texture btnRetarTex;
     private BitmapFont fuenteDatos;
+
+    private Table capaAlertaModal;
 
     public ProfileScreen(Game game) {
         this(game, null);
@@ -70,14 +79,38 @@ public class ProfileScreen implements Screen {
 
         String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
 
-        fondoPerfilTexture = new Texture(Gdx.files.internal("imgMenus/fondo_perfil_" + idm + ".png"));
+        fondoPerfilTexture = new Texture(Gdx.files.internal(ObtenerRutaFondoPerfil(perfilPropio, idm)));
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
         fotoPerfilTex = CargarFotoPerfil(usuarioPerfil);
+        btnDesactivarTex = new Texture(Gdx.files.internal("imgMenus/btn_desactivar.png"));
+        btnSeguirTex = new Texture(Gdx.files.internal(RutasAssetsIdioma.ObtenerRutaBoton("seguir")));
+        btnSiguiendoTex = new Texture(Gdx.files.internal(RutasAssetsIdioma.ObtenerRutaBoton("siguiendo")));
+        btnRetarTex = new Texture(Gdx.files.internal(RutasAssetsIdioma.ObtenerRutaBoton("retar")));
+        fondoAlertaTex = new Texture(Gdx.files.internal("imgMenus/fondo_alerta.png")); 
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         rootTable.setBackground(new TextureRegionDrawable(new TextureRegion(fondoPerfilTexture)));
         stage.addActor(rootTable);
+
+        Table capaEsquinaSuperior = new Table();
+        capaEsquinaSuperior.setFillParent(true);
+        capaEsquinaSuperior.top().right().padTop(110).padRight(35);
+
+        if (perfilPropio && usuarioPerfil != null) {
+            ImageButton btnDesactivar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnDesactivarTex)));
+            btnDesactivar.getImage().setScaling(Scaling.fill);
+            btnDesactivar.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (capaAlertaModal != null) {
+                        capaAlertaModal.setVisible(true);
+                    }
+                }
+            });
+            capaEsquinaSuperior.add(btnDesactivar).width(75).height(75);
+        }
+        stage.addActor(capaEsquinaSuperior);
 
         Table contenedorCentral = new Table();
         contenedorCentral.top();
@@ -92,7 +125,7 @@ public class ProfileScreen implements Screen {
                 AgregarAccionesSociales(contenedorCentral, usuarioActivo, usuarioPerfil, estiloDatos);
             }
         } else {
-            Label lblError = new Label("PERFIL NO ENCONTRADO / PROFILE NOT FOUND", estiloDatos);
+            Label lblError = new Label(TextosIdioma.Obtener("PerfilNoEncontrado"), estiloDatos);
             lblError.setColor(Color.RED);
             contenedorCentral.add(lblError).padTop(150).row();
         }
@@ -100,13 +133,119 @@ public class ProfileScreen implements Screen {
         contenedorCentral.add().expandY();
         contenedorCentral.row();
         AgregarBotonVolver(contenedorCentral);
+
+        if (perfilPropio && usuarioActivo != null) {
+            CrearVentanaAlertaDesactivar(usuarioActivo, estiloDatos);
+        }
     }
 
+    private void CrearVentanaAlertaDesactivar(final Usuario usuarioActivo, Label.LabelStyle estiloDatos) {
+        capaAlertaModal = new Table();
+        capaAlertaModal.setFillParent(true);
+        capaAlertaModal.center();
+        capaAlertaModal.setVisible(false);
+
+        Table miniVentana = new Table();
+        miniVentana.setBackground(new TextureRegionDrawable(new TextureRegion(fondoAlertaTex)));
+        miniVentana.pad(40); 
+
+        String textoPregunta;
+        String textoSi;
+        String textoNo;
+
+        String idioma = ConfiguracionJuego.idiomaActivo.toUpperCase();
+        switch (idioma) {
+            case "ENG":
+                textoPregunta = "Are you sure you want to\ndeactivate your account?";
+                textoSi = "Yes";
+                textoNo = "No";
+                break;
+            case "FRA":
+                textoPregunta = "ÃŠtes-vous sÃ»r de vouloir\ndÃ©sactiver votre compte?";
+                textoSi = "Oui";
+                textoNo = "Non";
+                break;
+            case "HEB":
+                textoPregunta = "?×”×× ××ª×” ×‘×˜×•×— ×©×‘×¨×¦×•× ×š\n×œ× ×˜×¨×œ ××ª ×”×—×©×‘×•×Ÿ ×©×œ×š";
+                textoSi = "×›×Ÿ";
+                textoNo = "×œ×";
+                break;
+            case "GAR":
+                textoPregunta = "Â¿Afurati boun bigira\nadisidagwda humoun bubi?"; 
+                textoSi = "Inje";
+                textoNo = "Ino";
+                break;
+            case "ESP":
+            default:
+                textoPregunta = "Â¿EstÃ¡ seguro de que desea\ndesactivar la cuenta?";
+                textoSi = "SÃ­";
+                textoNo = "No";
+                break;
+        }
+
+        Label.LabelStyle estiloAlerta = new Label.LabelStyle();
+        estiloAlerta.font = fuenteDatos; 
+        estiloAlerta.fontColor = Color.BLACK; 
+
+        Label lblPregunta = new Label(textoPregunta, estiloAlerta);
+        lblPregunta.setAlignment(Align.center);
+        
+        lblPregunta.setFontScale(1.3f); 
+
+        miniVentana.add(lblPregunta).padTop(10).padBottom(25).colspan(2).center().row();
+
+        TextButton btnSi = new TextButton(textoSi, skin);
+        btnSi.getLabel().setFontScale(1.15f);
+        btnSi.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                usuarioActivo.setCuentaActiva(false);
+                ManejadorArchivos.guardarUsuario(usuarioActivo);
+                SistemaAutenticacion.cerrarSesion();
+                parentGame.setScreen(new LoginRegisterScreen(parentGame));
+            }
+        });
+
+        TextButton btnNo = new TextButton(textoNo, skin);
+        btnNo.getLabel().setFontScale(1.15f); 
+        btnNo.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                capaAlertaModal.setVisible(false);
+            }
+        });
+
+        miniVentana.add(btnSi).width(130).height(48).padRight(15);
+        miniVentana.add(btnNo).width(130).height(48).padLeft(15);
+
+        capaAlertaModal.add(miniVentana).width(460).height(320).center();
+        stage.addActor(capaAlertaModal);
+    }
+
+
+    private String ObtenerRutaFondoPerfil(boolean perfilPropio, String idm) {
+        if (perfilPropio) {
+            return "imgMenus/fondo_perfil_" + idm + ".png";
+        }
+
+        return RutasAssetsIdioma.ObtenerRutaFondoPerfilAjeno();
+    }
+
+    private ImageButton CrearBotonImagen(Texture TexturaBoton) {
+        ImageButton Boton = new ImageButton(new TextureRegionDrawable(new TextureRegion(TexturaBoton)));
+        Boton.getImage().setScaling(Scaling.fill);
+        Boton.getImage().setAlign(Align.center);
+
+        return Boton;
+    }
+
+    private String ObtenerTextoRivalidadPendiente() {
+        return TextosIdioma.Obtener("RivalidadPendiente");
+    }
     private Usuario ObtenerUsuarioPerfil(Usuario usuarioActivo) {
         if (usernamePerfil == null || usernamePerfil.trim().isEmpty()) {
             return usuarioActivo;
         }
-
         return ManejadorArchivos.cargarUsuario(usernamePerfil.trim().toLowerCase());
     }
 
@@ -125,7 +264,6 @@ public class ProfileScreen implements Screen {
         if (ruta.startsWith("imgMenus")) {
             return new Texture(Gdx.files.internal(ruta));
         }
-
         return new Texture(Gdx.files.absolute(ruta));
     }
 
@@ -138,7 +276,6 @@ public class ProfileScreen implements Screen {
             estiloDatos.font = fuenteDatos;
             estiloDatos.fontColor = Color.WHITE;
         }
-
         return estiloDatos;
     }
 
@@ -163,8 +300,8 @@ public class ProfileScreen implements Screen {
     private void AgregarAccionesSociales(Table contenedorCentral, final Usuario usuarioActivo, final Usuario usuarioPerfil, Label.LabelStyle estiloDatos) {
         contenedorCentral.add().height(28).row();
 
-        TextButton btnSeguir = new TextButton(TextoBotonSeguir(usuarioActivo, usuarioPerfil), skin);
-        btnSeguir.getLabel().setAlignment(Align.center);
+        Texture TexturaSeguir = GestorSeguimiento.YaSigue(usuarioActivo, usuarioPerfil) ? btnSiguiendoTex : btnSeguirTex;
+        ImageButton btnSeguir = CrearBotonImagen(TexturaSeguir);
         btnSeguir.setDisabled(!GestorSeguimiento.PuedeSeguir(usuarioActivo, usuarioPerfil));
         btnSeguir.addListener(new ClickListener() {
             @Override
@@ -175,41 +312,34 @@ public class ProfileScreen implements Screen {
                 }
             }
         });
-        contenedorCentral.add(btnSeguir).width(210).height(44).center().row();
+        contenedorCentral.add(btnSeguir).width(210).height(50).center().row();
         contenedorCentral.add().height(18).row();
 
         if (GestorSeguimiento.SonRivalesMutuos(usuarioActivo, usuarioPerfil)) {
-            String textoReto = ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG") ? "Send Challenge" : "Enviar reto";
-            TextButton btnReto = new TextButton(textoReto, skin);
-            btnReto.getLabel().setAlignment(Align.center);
+            ImageButton btnReto = CrearBotonImagen(btnRetarTex);
             btnReto.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    parentGame.setScreen(new PantallaRivalidad((Juego) parentGame, ColorDulce.Rojo, ColorMonstruo.Verde));
+                    parentGame.setScreen(new PantallaRivalidad((Juego) parentGame, ColorDulce.Rojo, ColorMonstruo.Verde, usuarioPerfil.getUsername()));
                 }
             });
-            contenedorCentral.add(btnReto).width(210).height(44).center().row();
+            contenedorCentral.add(btnReto).width(210).height(50).center().row();
         } else {
-            String textoRivalidad = ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG")
-                    ? "Rivalry available when both follow each other"
-                    : "Rivalidad disponible cuando ambos se sigan";
-            Label lblRivalidad = new Label(textoRivalidad, estiloDatos);
+            Label lblRivalidad = new Label(ObtenerTextoRivalidadPendiente(), estiloDatos);
             lblRivalidad.setFontScale(0.72f);
-            contenedorCentral.add(lblRivalidad).height(36).center().row();
+            lblRivalidad.setAlignment(Align.center);
+            contenedorCentral.add(lblRivalidad).width(340).height(36).center().row();
         }
     }
 
     private String TextoBotonSeguir(Usuario usuarioActivo, Usuario usuarioPerfil) {
-        boolean esEng = ConfiguracionJuego.idiomaActivo.equalsIgnoreCase("ENG");
         if (usuarioActivo == null) {
-            return esEng ? "Log In" : "Inicia sesion";
+            return TextosIdioma.Obtener("IniciaSesion");
         }
-
         if (GestorSeguimiento.YaSigue(usuarioActivo, usuarioPerfil)) {
-            return esEng ? "Following" : "Siguiendo";
+            return TextosIdioma.Obtener("Siguiendo");
         }
-
-        return esEng ? "Follow" : "Seguir";
+        return TextosIdioma.Obtener("Seguir");
     }
 
     private void AgregarBotonVolver(Table contenedorCentral) {
@@ -264,11 +394,30 @@ public class ProfileScreen implements Screen {
         if (btnVolverTex != null) {
             btnVolverTex.dispose();
         }
+        if (btnDesactivarTex != null) {
+            btnDesactivarTex.dispose();
+        }
+        if (btnSeguirTex != null) {
+            btnSeguirTex.dispose();
+        }
+        if (btnSiguiendoTex != null) {
+            btnSiguiendoTex.dispose();
+        }
+        if (btnRetarTex != null) {
+            btnRetarTex.dispose();
+        }
         if (fotoPerfilTex != null) {
             fotoPerfilTex.dispose();
         }
         if (fuenteDatos != null) {
             fuenteDatos.dispose();
         }
+        if (fondoAlertaTex != null) {
+            fondoAlertaTex.dispose(); 
+        }
     }
 }
+
+
+
+

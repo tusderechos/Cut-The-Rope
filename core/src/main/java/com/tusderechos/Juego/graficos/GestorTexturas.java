@@ -45,21 +45,35 @@ public final class GestorTexturas implements Disposable {
     }
 
     public Texture ObtenerBotonSalir() {
-        return Texturas.get(RutasTexturas.BotonSalir);
+        return ObtenerTextura(RutasAssetsIdioma.ObtenerRutaBoton("salir"));
     }
 
     public Texture ObtenerBotonSiguiente() {
-        return Texturas.get(RutasTexturas.BotonSiguiente);
+        return ObtenerTextura(RutasAssetsIdioma.ObtenerRutaBoton("siguiente"));
     }
 
     public Texture ObtenerBotonVolver() {
-        return Texturas.get(RutasTexturas.BotonVolver);
+        return ObtenerTextura(RutasAssetsIdioma.ObtenerRutaBoton("volver"));
     }
 
     public Texture ObtenerBotonRetos() {
-        return Texturas.get(RutasTexturas.BotonRetos);
+        return ObtenerTextura(RutasAssetsIdioma.ObtenerRutaBoton("retos"));
     }
 
+
+    private void CargarRutaLocalizada(String Ruta) {
+        if (!Texturas.containsKey(Ruta)) {
+            Texturas.put(Ruta, CargarTextura(Ruta));
+        }
+    }
+
+    private Texture ObtenerTextura(String Ruta) {
+        if (!Texturas.containsKey(Ruta)) {
+            CargarRutaLocalizada(Ruta);
+        }
+
+        return Texturas.get(Ruta);
+    }
     private Texture CargarTextura(String Ruta) {
         try {
             Texture Textura = new Texture(Gdx.files.internal(Ruta));
@@ -83,3 +97,4 @@ public final class GestorTexturas implements Disposable {
         Texturas.clear();
     }
 }
+

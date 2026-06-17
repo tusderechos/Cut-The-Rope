@@ -32,8 +32,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.social.BusquedaJugadores;
 import com.tusderechos.Juego.social.GestorSeguimiento;
+import com.tusderechos.Juego.textos.TextosIdioma;
 import java.util.List;
 
 /**
@@ -66,21 +68,11 @@ public class BuscarJugadoresScreen implements Screen {
 
         SkinActual = SkinMenu.Crear();
         FondoMenuTextura = new Texture(Gdx.files.internal("imgMenus/fondo_menu_principal.png"));
-        if (Gdx.files.internal("imagenes/buscar_jugadores.png").exists()) {
-            TituloBuscarJugadoresTexture = new Texture(Gdx.files.internal("imagenes/buscar_jugadores.png"));
-        }
-        if (Gdx.files.internal("imagenes/perfil.png").exists()) {
-            BotonPerfilTexture = new Texture(Gdx.files.internal("imagenes/perfil.png"));
-        }
-        if (Gdx.files.internal("imagenes/seguir.png").exists()) {
-            BotonSeguirTexture = new Texture(Gdx.files.internal("imagenes/seguir.png"));
-        }
-        if (Gdx.files.internal("imagenes/siguiendo.png").exists()) {
-            BotonSiguiendoTexture = new Texture(Gdx.files.internal("imagenes/siguiendo.png"));
-        }
-        if (Gdx.files.internal("imagenes/volver.png").exists()) {
-            BotonVolverTexture = new Texture(Gdx.files.internal("imagenes/volver.png"));
-        }
+        TituloBuscarJugadoresTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("buscar_jugadores"));
+        BotonPerfilTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("perfil"));
+        BotonSeguirTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("seguir"));
+        BotonSiguiendoTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("siguiendo"));
+        BotonVolverTexture = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("volver"));
 
         Table TablaRaiz = new Table();
         TablaRaiz.setFillParent(true);
@@ -91,7 +83,7 @@ public class BuscarJugadoresScreen implements Screen {
         AgregarTitulo(TablaRaiz);
 
         CampoBusqueda = new TextField("", SkinActual);
-        CampoBusqueda.setMessageText("Username o nombre");
+        CampoBusqueda.setMessageText(TextosIdioma.Obtener("BuscarCampo"));
         CampoBusqueda.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent EventActual, com.badlogic.gdx.scenes.scene2d.Actor ActorActual) {
@@ -132,11 +124,11 @@ public class BuscarJugadoresScreen implements Screen {
         List<Usuario> UsuariosEncontrados = BusquedaJugadores.FiltrarUsuarios(ManejadorArchivos.listarUsuarios(), CampoBusqueda.getText(), UsernameActivo);
 
         if (UsuarioActivo == null) {
-            LabelEstado.setText("Inicia sesion para seguir jugadores.");
+            LabelEstado.setText(ObtenerTextoEstadoSinSesion());
         } else if (UsuariosEncontrados.isEmpty()) {
-            LabelEstado.setText("No se encontraron jugadores.");
+            LabelEstado.setText(ObtenerTextoSinResultados());
         } else {
-            LabelEstado.setText("Toca seguir para preparar futuras rivalidades.");
+            LabelEstado.setText(ObtenerTextoResultados());
         }
 
         for (Usuario UsuarioEncontrado : UsuariosEncontrados) {
@@ -177,7 +169,7 @@ public class BuscarJugadoresScreen implements Screen {
             BotonPerfilImagen.getImage().setScaling(Scaling.fill);
             BotonPerfil = BotonPerfilImagen;
         } else {
-            TextButton BotonPerfilTexto = new TextButton("Perfil", SkinActual);
+            TextButton BotonPerfilTexto = new TextButton(TextosIdioma.Obtener("Perfil"), SkinActual);
             BotonPerfilTexto.getLabel().setAlignment(Align.center);
             BotonPerfil = BotonPerfilTexto;
         }
@@ -200,7 +192,7 @@ public class BuscarJugadoresScreen implements Screen {
             return;
         }
 
-        Label LabelTitulo = new Label("Buscar jugadores", SkinActual);
+        Label LabelTitulo = new Label(TextosIdioma.Obtener("BuscarTitulo"), SkinActual);
         LabelTitulo.setAlignment(Align.center);
         LabelTitulo.setFontScale(1.65f);
         TablaRaiz.add(LabelTitulo).growX().padBottom(18).row();
@@ -241,21 +233,54 @@ public class BuscarJugadoresScreen implements Screen {
             return BotonVolver;
         }
 
-        TextButton BotonVolver = new TextButton("Volver", SkinActual);
+        TextButton BotonVolver = new TextButton(TextosIdioma.Obtener("Volver"), SkinActual);
         BotonVolver.getLabel().setAlignment(Align.center);
         return BotonVolver;
     }
 
+    private Texture CargarTexturaSiExiste(String Ruta) {
+        if (Ruta != null && Gdx.files.internal(Ruta).exists()) {
+            Texture Textura = new Texture(Gdx.files.internal(Ruta));
+            Textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+            return Textura;
+        }
+
+        return null;
+    }
+
+    private String ObtenerTextoEstadoSinSesion() {
+        return TextosIdioma.Obtener("BuscarSinSesion");
+    }
+
+    private String ObtenerTextoSinResultados() {
+        return TextosIdioma.Obtener("BuscarSinResultados");
+    }
+
+    private String ObtenerTextoResultados() {
+        return TextosIdioma.Obtener("BuscarResultados");
+    }
+
+    private String ObtenerTextoBloqueado() {
+        return TextosIdioma.Obtener("Bloqueado");
+    }
+
+    private String ObtenerTextoSiguiendo() {
+        return TextosIdioma.Obtener("Siguiendo");
+    }
+
+    private String ObtenerTextoSeguir() {
+        return TextosIdioma.Obtener("Seguir");
+    }
     private String ObtenerTextoBotonSeguimiento(Usuario UsuarioActivo, Usuario UsuarioEncontrado) {
         if (UsuarioActivo == null) {
-            return "Bloqueado";
+            return ObtenerTextoBloqueado();
         }
 
         if (GestorSeguimiento.YaSigue(UsuarioActivo, UsuarioEncontrado)) {
-            return "Siguiendo";
+            return ObtenerTextoSiguiendo();
         }
 
-        return "Seguir";
+        return ObtenerTextoSeguir();
     }
 
     private String ObtenerNombreVisible(Usuario UsuarioEncontrado) {
@@ -315,3 +340,4 @@ public class BuscarJugadoresScreen implements Screen {
         }
     }
 }
+

@@ -39,8 +39,109 @@ public class StatsScreen implements Screen {
     private BitmapFont fuenteTitulo;
     private BitmapFont fuenteContenido;
 
+    private Texture icoEstrellaTex;
+    private Texture icoTiempoTex;
+    private Texture icoFechaTex;
+
+    private String txtEstrellas;
+    private String txtNivelMax;
+    private String txtNivel;
+    private String txtPartidasJugadas;
+    private String txtTiempoJugado;
+    private String txtHistorial;
+    private String txtNoPartidas;
+    private String txtErrorSesion;
+    private String txtScroll;
+    private String txtFecha;
+
+    private String txtHistEstrellas;
+    private String txtHistTiempo;
+    private String txtHistCompletado;
+
     public StatsScreen(Game game) {
         this.parentGame = game;
+    }
+
+    private void inicializarIdioma(String idioma) {
+        switch (idioma.toLowerCase().trim()) {
+            case "eng":
+                txtEstrellas = "Total Stars:";
+                txtNivelMax = "Max Level:";
+                txtNivel = "Level ";
+                txtPartidasJugadas = "Matches Played:";
+                txtTiempoJugado = "Playtime:";
+                txtHistorial = "HISTORY";
+                txtNoPartidas = "No matches recorded yet.";
+                txtErrorSesion = "LOG IN";
+                txtScroll = "SCROLL";
+                txtFecha = "DATE: ";
+                txtHistEstrellas = "STARS: ";
+                txtHistTiempo = "TIME: ";
+                txtHistCompletado = "Completed";
+                break;
+            case "gar":
+                txtEstrellas = "Sunwiti luma Chulugati:";
+                txtNivelMax = "Ibunidun Lida Sani:";
+                txtNivel = "Sani ";
+                txtPartidasJugadas = "Uruba Agachagua:";
+                txtTiempoJugado = "Dan lida Agachagua:";
+                txtHistorial = "SENSEI";
+                txtNoPartidas = "Weiriti siyei lida agachagua jenia.";
+                txtErrorSesion = "AGUYUGA ME";
+                txtScroll = "ALUJA";
+                txtFecha = "DAN: ";
+                txtHistEstrellas = "CHULUGATI: ";
+                txtHistTiempo = "DAN: ";
+                txtHistCompletado = "Lidoun";
+                break;
+            case "fra":
+                txtEstrellas = "Étoiles Totales:";
+                txtNivelMax = "Niveau Maximum:";
+                txtNivel = "Niveau ";
+                txtPartidasJugadas = "Parties Jouées:";
+                txtTiempoJugado = "Temps de Jeu:";
+                txtHistorial = "HISTORIQUE";
+                txtNoPartidas = "Aucune partie enregistrée pour le moment.";
+                txtErrorSesion = "CONNECTEZ-VOUS";
+                txtScroll = "DÉFILER";
+                txtFecha = "DATE: ";
+                txtHistEstrellas = "ÉTOILES: ";
+                txtHistTiempo = "TEMPS: ";
+                txtHistCompletado = "Terminé";
+                break;
+            case "heb":
+                txtEstrellas = "כוכבים סך הכל:";
+                txtNivelMax = "רמה מקסימלית:";
+                txtNivel = "רמה ";
+                txtPartidasJugadas = "משחקים ששוחקו:";
+                txtTiempoJugado = "זמן משחק:";
+                txtHistorial = "היסטוריה";
+                txtNoPartidas = "אין משחקים מוקלטים עדיין.";
+                txtErrorSesion = "התחבר";
+                txtScroll = "גלול";
+                txtFecha = "תאריך: ";
+                txtHistEstrellas = "כוכבים: ";
+                txtHistTiempo = "זמן: ";
+                txtHistCompletado = "הושלם";
+                break;
+            case "esp":
+            case "spa":
+            default:
+                txtEstrellas = "Estrellas Totales:";
+                txtNivelMax = "Máximo Nivel:";
+                txtNivel = "Nivel ";
+                txtPartidasJugadas = "Partidas Jugadas:";
+                txtTiempoJugado = "Tiempo Jugado:";
+                txtHistorial = "HISTORIAL";
+                txtNoPartidas = "No hay partidas registradas aún.";
+                txtErrorSesion = "INICIA SESIÓN";
+                txtScroll = "DESLIZAR";
+                txtFecha = "FECHA: ";
+                txtHistEstrellas = "ESTRELLAS: ";
+                txtHistTiempo = "TIEMPO: ";
+                txtHistCompletado = "Completado";
+                break;
+        }
     }
 
     @Override
@@ -53,8 +154,14 @@ public class StatsScreen implements Screen {
 
         String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
 
+        inicializarIdioma(idm);
+
         fondoStatsTex = new Texture(Gdx.files.internal("imgMenus/fondo_estadisticas_" + idm + ".png"));
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
+
+        icoEstrellaTex = new Texture(Gdx.files.internal("imgMenus/ico_estrella.png"));
+        icoTiempoTex = new Texture(Gdx.files.internal("imgMenus/ico_tiempo.png"));
+        icoFechaTex = new Texture(Gdx.files.internal("imgMenus/ico_fecha.png"));
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(new Color(0, 0, 0, 0.6f));
@@ -117,24 +224,23 @@ public class StatsScreen implements Screen {
             Table filasStats = new Table();
             filasStats.defaults().padTop(6).padBottom(6).padLeft(10).padRight(10).left();
 
-            filasStats.add(new Label("Estrellas Totales / Total Stars:", estiloEtiquetas));
+            filasStats.add(new Label(txtEstrellas, estiloEtiquetas));
             filasStats.add(new Label(String.valueOf(usuarioActivo.getEstrellasTotales()), estiloValores)).row();
 
-            filasStats.add(new Label("Maximo Nivel / Max Level:", estiloEtiquetas));
-            filasStats.add(new Label("Nivel / Level " + usuarioActivo.getNivelesCompletados(), estiloValores)).row();
+            filasStats.add(new Label(txtNivelMax, estiloEtiquetas));
+            filasStats.add(new Label(txtNivel + usuarioActivo.getNivelesCompletados(), estiloValores)).row();
 
-            filasStats.add(new Label("Partidas Jugadas / Matches Played:", estiloEtiquetas));
+            filasStats.add(new Label(txtPartidasJugadas, estiloEtiquetas));
             filasStats.add(new Label(String.valueOf(usuarioActivo.getPartidasJugadas()), estiloValores)).row();
 
-            filasStats.add(new Label("Tiempo Jugado / Playtime:", estiloEtiquetas));
+            filasStats.add(new Label(txtTiempoJugado, estiloEtiquetas));
             float tiempoEnMinutos = usuarioActivo.getTiempoTotalJugado() / 60f;
             filasStats.add(new Label(String.format("%.2f min", tiempoEnMinutos), estiloValores)).row();
 
             tarjetaStats.add(filasStats).fillX().expandX();
-
             contenidoScrollable.add(tarjetaStats).width(420).padBottom(25).row();
 
-            Label lblHistorial = new Label("HISTORIAL / HISTORY", estiloTitulo);
+            Label lblHistorial = new Label(txtHistorial, estiloTitulo);
             contenidoScrollable.add(lblHistorial).padBottom(15).center().row();
 
             if (usuarioActivo.getHistorialPartidas().isEmpty()) {
@@ -142,7 +248,7 @@ public class StatsScreen implements Screen {
                 tarjetaVacia.setBackground(skin.newDrawable("white", new Color(0, 0, 0, 0.3f)));
                 tarjetaVacia.pad(15);
 
-                Label lblVacio = new Label("No hay partidas registradas aun.\nNo matches recorded yet.", estiloEtiquetas);
+                Label lblVacio = new Label(txtNoPartidas, estiloEtiquetas);
                 lblVacio.setAlignment(com.badlogic.gdx.utils.Align.center);
 
                 tarjetaVacia.add(lblVacio);
@@ -150,16 +256,12 @@ public class StatsScreen implements Screen {
             } else {
                 for (String registroOriginal : usuarioActivo.getHistorialPartidas()) {
 
-                    String registroFormateado = formatearRegistroHistorial(registroOriginal);
-
                     Table tarjetaPartida = new Table();
                     tarjetaPartida.setBackground(skin.newDrawable("white", new Color(0, 0, 0, 0.3f)));
-                    tarjetaPartida.pad(15);
+                    tarjetaPartida.pad(12);
+                    tarjetaPartida.left();
 
-                    Label lblPartida = new Label(registroFormateado, estiloHistorialTexto);
-                    lblPartida.setWrap(true);
-
-                    tarjetaPartida.add(lblPartida).left().expandX().fillX();
+                    armarTarjetaConFotos(tarjetaPartida, registroOriginal, estiloHistorialTexto);
 
                     contenidoScrollable.add(tarjetaPartida).width(420).padBottom(12).row();
                 }
@@ -175,7 +277,7 @@ public class StatsScreen implements Screen {
                 Label.LabelStyle estiloGuia = new Label.LabelStyle(estiloEtiquetas);
                 estiloGuia.fontColor = Color.WHITE;
 
-                Label lblIndicadorScroll = new Label("[ SCROLL ]", estiloGuia);
+                Label lblIndicadorScroll = new Label("[ " + txtScroll + " ]", estiloGuia);
                 lblIndicadorScroll.setAlignment(com.badlogic.gdx.utils.Align.center);
 
                 pizarraContenedora.add(lblIndicadorScroll).padTop(8).center().fillX();
@@ -184,7 +286,7 @@ public class StatsScreen implements Screen {
             panelCentral.add(pizarraContenedora).width(480).height(510).expandX().center().row();
 
         } else {
-            Label lblError = new Label("INICIA SESION / LOG IN", estiloTitulo);
+            Label lblError = new Label(txtErrorSesion, estiloTitulo);
             panelCentral.add(lblError).padTop(150).row();
         }
 
@@ -206,39 +308,62 @@ public class StatsScreen implements Screen {
         panelCentral.add(filaInferior).fillX().left();
     }
 
-    private String formatearRegistroHistorial(String original) {
+    private void armarTarjetaConFotos(Table tarjeta, String original, Label.LabelStyle estiloTexto) {
         try {
-            String[] partes = original.split(" \\| ");
+            String limpia = original.replace("⭐", "")
+                    .replace("⏱️", "")
+                    .replace("📅", "")
+                    .replaceAll("[^\\x00-\\x7F\\p{InHebrew}]", "")
+                    .trim();
 
-            StringBuilder constructor = new StringBuilder();
+            String[] partes = limpia.split(" \\| ");
 
             if (partes.length > 0) {
-                constructor.append(partes[0]).append("\n");
+                String encabezado = partes[0].trim();
+                if (encabezado.startsWith("Nivel")) {
+                    encabezado = encabezado.replace("Nivel", txtNivel)
+                            .replace("- Completado", "- " + txtHistCompletado)
+                            .replace("Completado", txtHistCompletado);
+                }
+                Label lblTituloPartida = new Label(encabezado, estiloTexto);
+                lblTituloPartida.setColor(Color.valueOf("FFB84D")); 
+                tarjeta.add(lblTituloPartida).left().colspan(2).padBottom(6).row();
             }
 
             for (int i = 1; i < partes.length; i++) {
-                String linea = partes[i];
+                String linea = partes[i].trim();
+                Image imgIcono = null;
+                String textoFinal = "";
 
-                if (linea.startsWith("Estrellas:")) {
-                    constructor.append("  • ").append(linea.toUpperCase());
-                } else if (linea.startsWith("Tiempo:")) {
-                    constructor.append("  • ").append(linea.toUpperCase());
-                } else if (linea.startsWith("Fecha:")) {
-                    String fechaCruda = linea.replace("Fecha: ", "");
-                    String fechaFormateada = simplificarFecha(fechaCruda);
-                    constructor.append("  • FECHA / DATE: ").append(fechaFormateada);
-                } else {
-                    constructor.append("  • ").append(linea);
+                if (linea.toLowerCase().startsWith("estrellas:")) {
+                    String valor = linea.substring(linea.indexOf(":") + 1).trim();
+                    imgIcono = new Image(icoEstrellaTex);
+                    textoFinal = txtHistEstrellas + valor;
+                } else if (linea.toLowerCase().startsWith("tiempo:")) {
+                    String valor = linea.substring(linea.indexOf(":") + 1).trim();
+                    imgIcono = new Image(icoTiempoTex);
+                    textoFinal = txtHistTiempo + valor;
+                } else if (linea.toLowerCase().startsWith("fecha:")) {
+                    String fechaCruda = linea.substring(linea.indexOf(":") + 1).trim();
+                    imgIcono = new Image(icoFechaTex);
+                    textoFinal = txtFecha + simplificarFecha(fechaCruda);
+                } else if (!linea.isEmpty()) {
+                    textoFinal = linea;
                 }
 
-                if (i < partes.length - 1) {
-                    constructor.append("\n");
+                if (!textoFinal.isEmpty()) {
+                    if (imgIcono != null) {
+                        tarjeta.add(imgIcono).size(18, 18).left().padLeft(10).padRight(8).padBottom(3);
+                    } else {
+                        tarjeta.add().width(18); 
+                    }
+
+                    Label lblLinea = new Label(textoFinal, estiloTexto);
+                    tarjeta.add(lblLinea).left().padBottom(3).row();
                 }
             }
-
-            return constructor.toString();
         } catch (Exception e) {
-            return original.replace("⭐ ", "").replace("⏱️ ", "").replace("📅 ", "");
+            tarjeta.add(new Label(original.replaceAll("[^\\x00-\\x7F]", ""), estiloTexto)).left().row();
         }
     }
 
@@ -307,6 +432,16 @@ public class StatsScreen implements Screen {
         }
         if (fuenteContenido != null) {
             fuenteContenido.dispose();
+        }
+
+        if (icoEstrellaTex != null) {
+            icoEstrellaTex.dispose();
+        }
+        if (icoTiempoTex != null) {
+            icoTiempoTex.dispose();
+        }
+        if (icoFechaTex != null) {
+            icoFechaTex.dispose();
         }
     }
 }

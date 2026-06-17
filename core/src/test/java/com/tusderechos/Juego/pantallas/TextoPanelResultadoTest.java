@@ -10,15 +10,22 @@ package com.tusderechos.Juego.pantallas;
  */
 
 import java.util.List;
+import Menus.Menu.ConfiguracionJuego;
 import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.rivalidad.DatosReto;
 import com.tusderechos.Juego.rivalidad.ResultadoReto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TextoPanelResultadoTest {
+    @BeforeEach
+    void ConfigurarIdiomaBase() {
+        ConfiguracionJuego.idiomaActivo = "ESP";
+    }
+
     @Test
     void CreaTodasLasLineasDelPanelDeVictoria() {
         List<String> Lineas = TextoPanelResultado.CrearLineas(2, 3100, 12.4f, 1);

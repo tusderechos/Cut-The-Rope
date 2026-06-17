@@ -10,9 +10,16 @@ package com.tusderechos.Juego.pantallas;
  */
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import Menus.Menu.ConfiguracionJuego;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TextoHudNivelTest {
+    @BeforeEach
+    void ConfigurarIdiomaBase() {
+        ConfiguracionJuego.idiomaActivo = "ESP";
+    }
+
     @Test
     void CreaTextoDelHudSinPuntajeEstimado() {
         String TextoHud = TextoHudNivel.CrearTexto(3, 2, 18.6f);

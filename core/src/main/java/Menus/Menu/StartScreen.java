@@ -61,6 +61,9 @@ public class StartScreen implements Screen {
                 parentGame.setScreen(new MenuInicioScreen(parentGame));
             }
         });
+        
+        AudioManager.getInstancia().reproducirMusicaMenu();
+
     }
 
     @Override
