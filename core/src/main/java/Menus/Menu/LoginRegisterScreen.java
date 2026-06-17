@@ -19,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
+import LogicaArchivos.Usuarios.Usuario;
+import ManejoArchivos.Archivos.ManejadorArchivos;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 /**
  *
@@ -31,27 +34,20 @@ public class LoginRegisterScreen implements Screen {
 
     private Table contenedorCentral;
 
-    private Texture fondoTexture;
     private Texture btnIngresarTex;
-    private Texture btnCrearTex;
     private Texture btnVolverTex;
+    private Texture fondoAlertaTex;
 
     private TextField txtLoginUser;
     private TextField txtLoginPassword;
 
-    private TextField txtRegNombre;
-    private TextField txtRegUser;
-    private TextField txtRegPassword;
-
-    private Label lblReqLongitud;
-    private Label lblReqMayuscula;
-    private Label lblReqMinuscula;
-    private Label lblReqNumero;
-    private Label lblReqEspecial;
-
     private Texture fondoLoginTexture;
-    private Texture fondoRegistroTexture;
     private Table rootTable;
+
+    private Table contenedorFlotanteAlerta;
+    private String usuarioPorActivar;
+
+    private BitmapFont fuenteAlerta;
 
     public LoginRegisterScreen(Game game) {
         this.parentGame = game;
@@ -70,7 +66,7 @@ public class LoginRegisterScreen implements Screen {
         btnIngresarTex = new Texture(Gdx.files.internal("imgMenus/btn_ingresar_" + idm + ".png"));
 
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
-        btnCrearTex = new Texture(Gdx.files.internal("imgMenus/btn_crear.png"));
+        fondoAlertaTex = new Texture(Gdx.files.internal("imgMenus/fondo_alerta.png"));
 
         rootTable = new Table();
         rootTable.setFillParent(true);
@@ -90,6 +86,7 @@ public class LoginRegisterScreen implements Screen {
         contenedorCentral.add().height(300).colspan(2).row();
 
         TextField.TextFieldStyle estiloLimpio = new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class));
+        estiloLinter:
         estiloLimpio.background = null;
         estiloLimpio.focusedBackground = null;
 
@@ -108,17 +105,31 @@ public class LoginRegisterScreen implements Screen {
         txtLoginPassword.setPasswordCharacter('*');
         txtLoginPassword.setAlignment(com.badlogic.gdx.utils.Align.center);
 
-        contenedorCentral.add(txtLoginPassword).width(310).height(65).colspan(2)
-                .padTop(10).padBottom(20).row();
+        Stack contenedorPassword = new Stack();
 
-        final CheckBox chkMostrarPass = new CheckBox(" Ver", skin);
-        chkMostrarPass.addListener(new ClickListener() {
+        Table capaTexto = new Table();
+        capaTexto.add(txtLoginPassword).width(310).height(65);
+        contenedorPassword.add(capaTexto);
+
+        Table capaBotonOjo = new Table();
+        capaBotonOjo.right();
+
+        Texture btnOjoTex = new Texture(Gdx.files.internal("imgMenus/ojo.png"));
+        ImageButton btnMostrarPass = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnOjoTex)));
+        btnMostrarPass.getImage().setScaling(Scaling.fill);
+
+        capaBotonOjo.add(btnMostrarPass).width(35).height(35).padRight(15);
+        contenedorPassword.add(capaBotonOjo);
+
+        btnMostrarPass.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                txtLoginPassword.setPasswordMode(!chkMostrarPass.isChecked());
+                txtLoginPassword.setPasswordMode(!txtLoginPassword.isPasswordMode());
             }
         });
-        contenedorCentral.add(chkMostrarPass).colspan(2).center().padBottom(35).row();
+
+        contenedorCentral.add(contenedorPassword).width(310).height(65).colspan(2)
+                .padTop(10).padBottom(60).row(); 
 
         ImageButton btnIngresar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnIngresarTex)));
         btnIngresar.getImage().setScaling(Scaling.fill);
@@ -129,11 +140,43 @@ public class LoginRegisterScreen implements Screen {
                 String user = txtLoginUser.getText();
                 String pass = txtLoginPassword.getText();
 
-                if (SistemaAutenticacion.iniciarSesion(user, pass)) {
+                String lang = ConfiguracionJuego.idiomaActivo.toUpperCase();
+
+                if (user.trim().isEmpty() || pass.trim().isEmpty()) {
+                    if (lang.equals("ENG")) {
+                        mostrarVentanaError("All fields are required!");
+                    } else if (lang.equals("FRA")) {
+                        mostrarVentanaError("Tous les champs sont obligatoires!");
+                    } else if (lang.equals("GAR")) {
+                        mostrarVentanaError("Sun lidan sun bikuenta mebeguñou!");
+                    } else if (lang.equals("HEB")) {
+                        mostrarVentanaError("כל השדות חובה!");
+                    } else {
+                        mostrarVentanaError("¡Todos los campos son obligatorios!");
+                    }
+                    return;
+                }
+
+                String resultado = SistemaAutenticacion.intentarIniciarSesion(user, pass);
+
+                if (resultado.equals("LOGIN_EXITOSO")) {
                     Gdx.app.log("Login", "¡Acceso concedido!");
                     parentGame.setScreen(new MainMenuScreen(parentGame));
+                } else if (resultado.equals("CUENTA_DESACTIVADA")) {
+                    usuarioPorActivar = user;
+                    crearMiniVentanaAlerta();
                 } else {
-                    Gdx.app.log("Login", "Credenciales Incorrectas");
+                    if (lang.equals("ENG")) {
+                        mostrarVentanaError("Incorrect user or password!");
+                    } else if (lang.equals("FRA")) {
+                        mostrarVentanaError("Utilisateur ou mot de passe incorrect!");
+                    } else if (lang.equals("GAR")) {
+                        mostrarVentanaError("Uá gari o bikuenta bisiama!");
+                    } else if (lang.equals("HEB")) {
+                        mostrarVentanaError("שם משתמש או סיסמה שגויים!");
+                    } else {
+                        mostrarVentanaError("¡Usuario o contraseña incorrectos!");
+                    }
                 }
             }
         });
@@ -152,41 +195,209 @@ public class LoginRegisterScreen implements Screen {
         contenedorCentral.add().expandX();
     }
 
-    private void validarContrasenaEnTiempoReal(String pass) {
-        actualizarEstadoRequisito(lblReqLongitud, "Minimo 5 caracteres", pass.length() >= 5);
-        actualizarEstadoRequisito(lblReqMayuscula, "Al menos una mayuscula", pass.matches(".*[A-Z].*"));
-        actualizarEstadoRequisito(lblReqMinuscula, "Al menos una minuscula", pass.matches(".*[a-z].*"));
-        actualizarEstadoRequisito(lblReqNumero, "Al menos un numero", pass.matches(".*[0-9].*"));
-        actualizarEstadoRequisito(lblReqEspecial, "Un caracter especial", pass.matches(".*[!@#$%^&*(),.?\":{}|<>_\\-+=\\[\\]\\\\/].*"));
-    }
-
-    private void actualizarEstadoRequisito(Label label, String textoBase, boolean cumplido) {
-        if (label == null) {
-            return;
+    private void mostrarVentanaError(String mensaje) {
+        if (contenedorFlotanteAlerta != null) {
+            contenedorFlotanteAlerta.remove();
         }
 
-        if (cumplido) {
-            label.setColor(Color.GREEN);
-            label.setText("✔ " + textoBase);
+        contenedorFlotanteAlerta = new Table();
+        contenedorFlotanteAlerta.setFillParent(true);
+        contenedorFlotanteAlerta.center();
+
+        Table cuadroInterno = new Table();
+        cuadroInterno.setBackground(new TextureRegionDrawable(new TextureRegion(fondoAlertaTex)));
+        cuadroInterno.pad(25);
+
+        Label.LabelStyle estiloMsg = new Label.LabelStyle();
+        Label.LabelStyle estiloBase = skin.get(Label.LabelStyle.class);
+
+        if (estiloBase != null && estiloBase.font != null) {
+            fuenteAlerta = new BitmapFont(estiloBase.font.getData().getFontFile(), false);
+            for (int i = 0; i < fuenteAlerta.getRegions().size; i++) {
+                fuenteAlerta.getRegions().get(i).getTexture().setFilter(
+                        Texture.TextureFilter.Linear, Texture.TextureFilter.Linear
+                );
+            }
+            fuenteAlerta.getData().setScale(1.2f);
+            estiloMsg.font = fuenteAlerta;
         } else {
-            label.setColor(Color.RED);
-            label.setText("[ ] " + textoBase);
+            estiloMsg.font = skin.getFont("default-font");
         }
+        estiloMsg.fontColor = new Color(0.7f, 0.1f, 0.1f, 1f); 
+
+        Label lblMensaje = new Label(mensaje, estiloMsg);
+        lblMensaje.setAlignment(com.badlogic.gdx.utils.Align.center);
+        lblMensaje.setWrap(true);
+        cuadroInterno.add(lblMensaje).width(400).padBottom(25).center().row();
+
+        String btnOkTexto;
+        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
+            case "ENG":
+                btnOkTexto = "Accept";
+                break;
+            case "FRA":
+                btnOkTexto = "Accepter";
+                break;
+            case "GAR":
+                btnOkTexto = "Lere";
+                break;
+            case "HEB":
+                btnOkTexto = "אישור";
+                break;
+            default:
+                btnOkTexto = "Aceptar";
+                break;
+        }
+
+        TextButton btnOk = new TextButton(btnOkTexto, skin);
+        btnOk.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                contenedorFlotanteAlerta.remove();
+            }
+        });
+
+        cuadroInterno.add(btnOk).width(130).height(45).center();
+        contenedorFlotanteAlerta.add(cuadroInterno).width(460).height(240);
+        stage.addActor(contenedorFlotanteAlerta);
     }
 
-    private boolean esContrasenaSegura(String pass) {
-        return pass.length() >= 5
-                && pass.matches(".*[A-Z].*")
-                && pass.matches(".*[a-z].*")
-                && pass.matches(".*[0-9].*")
-                && pass.matches(".*[!@#$%^&*(),.?\":{}|<>_\\-+=\\[\\]\\\\/].*");
+    private void crearMiniVentanaAlerta() {
+        if (contenedorFlotanteAlerta != null) {
+            contenedorFlotanteAlerta.remove();
+        }
+
+        contenedorFlotanteAlerta = new Table();
+        contenedorFlotanteAlerta.setFillParent(true);
+        contenedorFlotanteAlerta.center();
+
+        Table cuadroInterno = new Table();
+        cuadroInterno.setBackground(new TextureRegionDrawable(new TextureRegion(fondoAlertaTex)));
+        cuadroInterno.pad(30);
+
+        String textoPregunta, btnSiTexto, btnNoTexto, textoExito;
+
+        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
+            case "ENG":
+                textoPregunta = "Your account is deactivated.\nDo you want to reactivate it?";
+                btnSiTexto = "Yes";
+                btnNoTexto = "No";
+                textoExito = "Your account has been successfully activated!\nYou can now log in normally.";
+                break;
+            case "GAR":
+                textoPregunta = "Desactivadu tumuti lidan bikuenta.\nBusenba bounwagua laguyuguñoun?";
+                btnSiTexto = "In";
+                btnNoTexto = "Ua";
+                textoExito = "¡Lidounwagüili bikuenta buiti!\nHagoun bounwagua beibu luma lere.";
+                break;
+            case "FRA":
+                textoPregunta = "Votre compte est désactivé.\nVoulez-vous le réactiver?";
+                btnSiTexto = "Oui";
+                btnNoTexto = "Non";
+                textoExito = "Votre compte a été activé avec succès!\nVous pouvez maintenant vous connecter normalement.";
+                break;
+            case "HEB":
+                textoPregunta = "החשבון שלך מושבת.\nהאם ברצונך להפעיל אותו מחדש?";
+                btnSiTexto = "כן";
+                btnNoTexto = "לא";
+                textoExito = "החשבון שלך הופעל בהצלחה!\nכעת תוכל להתחבר כרגיל.";
+                break;
+            default:
+                textoPregunta = "Tu cuenta está desactivada.\n¿Deseas activarla de nuevo?";
+                btnSiTexto = "Sí";
+                btnNoTexto = "No";
+                textoExito = "¡Tu cuenta se ha activado con éxito!\nYa puedes iniciar sesión normalmente.";
+                break;
+        }
+
+        Label.LabelStyle estiloMsg = new Label.LabelStyle();
+        Label.LabelStyle estiloBase = skin.get(Label.LabelStyle.class);
+
+        if (estiloBase != null && estiloBase.font != null) {
+            fuenteAlerta = new BitmapFont(estiloBase.font.getData().getFontFile(), false);
+            for (int i = 0; i < fuenteAlerta.getRegions().size; i++) {
+                fuenteAlerta.getRegions().get(i).getTexture().setFilter(
+                        Texture.TextureFilter.Linear, Texture.TextureFilter.Linear
+                );
+            }
+            fuenteAlerta.getData().setScale(1.25f);
+            estiloMsg.font = fuenteAlerta;
+        } else {
+            estiloMsg.font = skin.getFont("default-font");
+        }
+        estiloMsg.fontColor = new Color(0.18f, 0.14f, 0.08f, 1f);
+
+        final Label lblMensajePregunta = new Label(textoPregunta, estiloMsg);
+        lblMensajePregunta.setAlignment(com.badlogic.gdx.utils.Align.center);
+        cuadroInterno.add(lblMensajePregunta).padBottom(30).colspan(2).row();
+
+        TextButton btnSi = new TextButton(btnSiTexto, skin);
+        TextButton btnNo = new TextButton(btnNoTexto, skin);
+
+        btnSi.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Usuario u = ManejadorArchivos.cargarUsuario(usuarioPorActivar.trim().toLowerCase());
+                if (u != null) {
+                    u.setCuentaActiva(true);
+                    ManejadorArchivos.guardarUsuario(u);
+                }
+
+                lblMensajePregunta.setText(textoExito);
+                lblMensajePregunta.setColor(new Color(0.05f, 0.38f, 0.12f, 1f));
+
+                cuadroInterno.clearChildren();
+                cuadroInterno.add(lblMensajePregunta).padBottom(20).row();
+
+                String btnOkTexto;
+                switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
+                    case "ENG":
+                        btnOkTexto = "Accept";
+                        break;
+                    case "FRA":
+                        btnOkTexto = "Accepter";
+                        break;
+                    case "GAR":
+                        btnOkTexto = "Lere";
+                        break;
+                    case "HEB":
+                        btnOkTexto = "אישור";
+                        break;
+                    default:
+                        btnOkTexto = "Aceptar";
+                        break;
+                }
+
+                TextButton btnOk = new TextButton(btnOkTexto, skin);
+                btnOk.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        contenedorFlotanteAlerta.remove();
+                        txtLoginPassword.setText("");
+                    }
+                });
+                cuadroInterno.add(btnOk).width(120).height(45).center();
+            }
+        });
+
+        btnNo.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                contenedorFlotanteAlerta.remove();
+            }
+        });
+
+        cuadroInterno.add(btnSi).width(110).height(45).padRight(20).center();
+        cuadroInterno.add(btnNo).width(110).height(45).center();
+
+        contenedorFlotanteAlerta.add(cuadroInterno).width(460).height(240);
+        stage.addActor(contenedorFlotanteAlerta);
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.12f, 0.18f, 0.29f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         stage.act(delta);
         stage.draw();
     }
@@ -212,14 +423,8 @@ public class LoginRegisterScreen implements Screen {
     public void dispose() {
         stage.dispose();
         skin.dispose();
-        if (fondoTexture != null) {
-            fondoTexture.dispose();
-        }
         if (btnIngresarTex != null) {
             btnIngresarTex.dispose();
-        }
-        if (btnCrearTex != null) {
-            btnCrearTex.dispose();
         }
         if (btnVolverTex != null) {
             btnVolverTex.dispose();
@@ -227,8 +432,11 @@ public class LoginRegisterScreen implements Screen {
         if (fondoLoginTexture != null) {
             fondoLoginTexture.dispose();
         }
-        if (fondoRegistroTexture != null) {
-            fondoRegistroTexture.dispose();
+        if (fondoAlertaTex != null) {
+            fondoAlertaTex.dispose();
+        }
+        if (fuenteAlerta != null) {
+            fuenteAlerta.dispose();
         }
     }
 }

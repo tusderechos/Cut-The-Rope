@@ -47,6 +47,7 @@ public class ProfileScreen implements Screen {
     private Texture fondoPerfilTexture;
     private Texture btnVolverTex;
     private Texture fotoPerfilTex;
+    private Texture btnDesactivarTex; 
     private BitmapFont fuenteDatos;
 
     public ProfileScreen(Game game) {
@@ -73,11 +74,34 @@ public class ProfileScreen implements Screen {
         fondoPerfilTexture = new Texture(Gdx.files.internal("imgMenus/fondo_perfil_" + idm + ".png"));
         btnVolverTex = new Texture(Gdx.files.internal("imgMenus/btn_volver.png"));
         fotoPerfilTex = CargarFotoPerfil(usuarioPerfil);
+        btnDesactivarTex = new Texture(Gdx.files.internal("imgMenus/btn_desactivar.png"));
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
         rootTable.setBackground(new TextureRegionDrawable(new TextureRegion(fondoPerfilTexture)));
         stage.addActor(rootTable);
+
+        Table capaEsquinaSuperior = new Table();
+        capaEsquinaSuperior.setFillParent(true);
+        capaEsquinaSuperior.top().right().padTop(110).padRight(35); 
+        
+        if (perfilPropio && usuarioPerfil != null) {
+            ImageButton btnDesactivar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnDesactivarTex)));
+            btnDesactivar.getImage().setScaling(Scaling.fill);
+            btnDesactivar.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (usuarioActivo != null) {
+                        usuarioActivo.setCuentaActiva(false);
+                        ManejadorArchivos.guardarUsuario(usuarioActivo);
+                    }
+                    SistemaAutenticacion.cerrarSesion();
+                    parentGame.setScreen(new LoginRegisterScreen(parentGame));
+                }
+            });
+            capaEsquinaSuperior.add(btnDesactivar).width(75).height(75); 
+        }
+        stage.addActor(capaEsquinaSuperior);
 
         Table contenedorCentral = new Table();
         contenedorCentral.top();
@@ -106,7 +130,6 @@ public class ProfileScreen implements Screen {
         if (usernamePerfil == null || usernamePerfil.trim().isEmpty()) {
             return usuarioActivo;
         }
-
         return ManejadorArchivos.cargarUsuario(usernamePerfil.trim().toLowerCase());
     }
 
@@ -125,7 +148,6 @@ public class ProfileScreen implements Screen {
         if (ruta.startsWith("imgMenus")) {
             return new Texture(Gdx.files.internal(ruta));
         }
-
         return new Texture(Gdx.files.absolute(ruta));
     }
 
@@ -138,7 +160,6 @@ public class ProfileScreen implements Screen {
             estiloDatos.font = fuenteDatos;
             estiloDatos.fontColor = Color.WHITE;
         }
-
         return estiloDatos;
     }
 
@@ -204,11 +225,9 @@ public class ProfileScreen implements Screen {
         if (usuarioActivo == null) {
             return esEng ? "Log In" : "Inicia sesion";
         }
-
         if (GestorSeguimiento.YaSigue(usuarioActivo, usuarioPerfil)) {
             return esEng ? "Following" : "Siguiendo";
         }
-
         return esEng ? "Follow" : "Seguir";
     }
 
@@ -263,6 +282,9 @@ public class ProfileScreen implements Screen {
         }
         if (btnVolverTex != null) {
             btnVolverTex.dispose();
+        }
+        if (btnDesactivarTex != null) {
+            btnDesactivarTex.dispose(); 
         }
         if (fotoPerfilTex != null) {
             fotoPerfilTex.dispose();

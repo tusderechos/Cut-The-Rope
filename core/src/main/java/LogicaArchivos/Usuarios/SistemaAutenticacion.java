@@ -3,13 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package LogicaArchivos.Usuarios;
+
 import ManejoArchivos.Archivos.ManejadorArchivos;
 import java.util.Date;
+
 /**
  *
  * @author HP
  */
 public class SistemaAutenticacion {
+
     private static Usuario usuarioActivo = null;
 
     public static Usuario getUsuarioActivo() {
@@ -18,7 +21,7 @@ public class SistemaAutenticacion {
 
     public static void cerrarSesion() {
         if (usuarioActivo != null) {
-            ManejadorArchivos.guardarUsuario(usuarioActivo); 
+            ManejadorArchivos.guardarUsuario(usuarioActivo);
             usuarioActivo = null;
         }
     }
@@ -27,16 +30,19 @@ public class SistemaAutenticacion {
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             return "Campos vacios no permitidos.";
         }
-        
+
         String userLimpio = username.trim().toLowerCase();
-        
+
         if (ManejadorArchivos.cargarUsuario(userLimpio) != null) {
             return "El nombre de usuario ya se encuentra registrado.";
         }
-        
+
         Usuario nuevoUsuario = new Usuario(userLimpio, password, nombreCompleto, rutaFotoPerfil);
+
+        nuevoUsuario.setCuentaActiva(true);
+
         boolean exito = ManejadorArchivos.guardarUsuario(nuevoUsuario);
-        
+
         if (exito) {
             return "REGISTRO_EXITOSO";
         } else {
@@ -44,19 +50,25 @@ public class SistemaAutenticacion {
         }
     }
 
-    public static boolean iniciarSesion(String username, String password) {
-        if (username == null || password == null) return false;
-        
+    public static String intentarIniciarSesion(String username, String password) {
+        if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
+            return "DATOS_INCOMPLETOS";
+        }
+
         String userLimpio = username.trim().toLowerCase();
         Usuario encontrado = ManejadorArchivos.cargarUsuario(userLimpio);
-        
+
         if (encontrado != null && encontrado.getPassword().equals(password)) {
+            if (!encontrado.isCuentaActiva()) {
+                return "CUENTA_DESACTIVADA";
+            }
+
             usuarioActivo = encontrado;
-            usuarioActivo.setUltimaSesion(new Date()); 
-            ManejadorArchivos.guardarUsuario(usuarioActivo); 
-            return true;
+            usuarioActivo.setUltimaSesion(new Date());
+            ManejadorArchivos.guardarUsuario(usuarioActivo);
+            return "LOGIN_EXITOSO";
         }
-        
-        return false;
+
+        return "CREDENCIALES_ERRONEAS";
     }
 }

@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -44,6 +45,7 @@ public class RegisterScreen implements Screen {
     private Texture btnCrearTex;
     private Texture btnVolverTex;
     private Texture iconoOjoTex;
+    private Texture fondoAlertaTex;
 
     private Texture btnFlechaIzqTex;
     private Texture btnFlechaDerTex;
@@ -61,17 +63,16 @@ public class RegisterScreen implements Screen {
     private Label lblReqEspecial;
 
     private BitmapFont fuenteCampos;
+    private BitmapFont fuenteAlerta;
     private boolean ocultarContrasena = true;
 
     private final String[] avataresPredeterminados = {
-        "imgMenus/avatar1.png",
-        "imgMenus/avatar2.png",
-        "imgMenus/avatar3.png",
-        "imgMenus/avatar4.png",
-        "imgMenus/avatar5.png"
+        "imgMenus/avatar1.png", "imgMenus/avatar2.png", "imgMenus/avatar3.png", "imgMenus/avatar4.png", "imgMenus/avatar5.png"
     };
     private int indiceAvatarActual = 0;
     private String rutaImagenSeleccionada = "imgMenus/avatar1.png";
+
+    private Table contenedorFlotanteAlerta;
 
     public RegisterScreen(Game game) {
         this.parentGame = game;
@@ -83,7 +84,6 @@ public class RegisterScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         skin = SkinMenu.Crear();
-
         String idm = ConfiguracionJuego.idiomaActivo.toLowerCase();
 
         fondoRegistroTexture = new Texture(Gdx.files.internal("imgMenus/fondo_registro_completo_" + idm + ".png"));
@@ -95,6 +95,7 @@ public class RegisterScreen implements Screen {
         btnFlechaDerTex = new Texture(Gdx.files.internal("imgMenus/btn_flecha_der.png"));
         btnSubirTex = new Texture(Gdx.files.internal("imgMenus/btn_subir.png"));
         avatarActualTex = new Texture(Gdx.files.internal("imgMenus/avatar1.png"));
+        fondoAlertaTex = new Texture(Gdx.files.internal("imgMenus/fondo_alerta.png"));
 
         Table rootTable = new Table();
         rootTable.setFillParent(true);
@@ -158,7 +159,6 @@ public class RegisterScreen implements Screen {
         seccionAvatar.add(btnFlechaIzq).width(35).height(35).padRight(15);
         seccionAvatar.add(imgAvatarVisor).width(82).height(82);
         seccionAvatar.add(btnFlechaDer).width(35).height(35).padLeft(15).row();
-
         contenedorCentral.add(seccionAvatar).row();
 
         contenedorCentral.add().height(25).row();
@@ -172,12 +172,9 @@ public class RegisterScreen implements Screen {
                     JFileChooser fileChooser = new JFileChooser();
                     fileChooser.setDialogTitle("Selecciona tu foto de perfil");
                     fileChooser.setFileFilter(new FileNameExtensionFilter("Imágenes (*.png, *.jpg)", "png", "jpg", "jpeg"));
-
-                    int seleccion = fileChooser.showOpenDialog(null);
-                    if (seleccion == JFileChooser.APPROVE_OPTION) {
+                    if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         File archivo = fileChooser.getSelectedFile();
                         String rutaAbsoluta = archivo.getAbsolutePath();
-
                         Gdx.app.postRunnable(() -> actualizarVisorAvatar(imgAvatarVisor, rutaAbsoluta, false));
                     }
                 }).start();
@@ -200,7 +197,6 @@ public class RegisterScreen implements Screen {
         contenedorCentral.add().height(28).row();
 
         Table contenedorPassword = new Table();
-
         txtRegPassword = new TextField("", estiloTransparente);
         txtRegPassword.setPasswordMode(ocultarContrasena);
         txtRegPassword.setPasswordCharacter('*');
@@ -219,7 +215,6 @@ public class RegisterScreen implements Screen {
 
         contenedorPassword.add(txtRegPassword).width(220).height(45).padLeft(35).padTop(8);
         contenedorPassword.add(btnOjo).width(26).height(26).padRight(10);
-
         contenedorCentral.add(contenedorPassword).width(290).height(45).row();
 
         contenedorCentral.add().height(30).row();
@@ -232,17 +227,11 @@ public class RegisterScreen implements Screen {
             estiloReq.font.getData().setScale(1.0f);
         }
 
-        lblReqLongitud = new Label("Minimo 5 caracteres", estiloReq);
-        lblReqMayuscula = new Label("Al menos una mayuscula", estiloReq);
-        lblReqMinuscula = new Label("Al menos una minuscula", estiloReq);
-        lblReqNumero = new Label("Al menos un numero", estiloReq);
-        lblReqEspecial = new Label("Un caracter especial", estiloReq);
-
-        lblReqLongitud.setColor(Color.RED);
-        lblReqMayuscula.setColor(Color.RED);
-        lblReqMinuscula.setColor(Color.RED);
-        lblReqNumero.setColor(Color.RED);
-        lblReqEspecial.setColor(Color.RED);
+        lblReqLongitud = new Label("", estiloReq);
+        lblReqMayuscula = new Label("", estiloReq);
+        lblReqMinuscula = new Label("", estiloReq);
+        lblReqNumero = new Label("", estiloReq);
+        lblReqEspecial = new Label("", estiloReq);
 
         cajaRequisitos.add(lblReqLongitud).row();
         cajaRequisitos.add(lblReqMayuscula).row();
@@ -251,8 +240,9 @@ public class RegisterScreen implements Screen {
         cajaRequisitos.add(lblReqEspecial).row();
 
         contenedorCentral.add(cajaRequisitos).width(300).height(95).center().row();
-
         contenedorCentral.add().height(32).row();
+
+        validarContrasenaEnTiempoReal("");
 
         txtRegPassword.setTextFieldListener(new TextField.TextFieldListener() {
             @Override
@@ -263,7 +253,6 @@ public class RegisterScreen implements Screen {
 
         ImageButton btnRegistrar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnCrearTex)));
         ImageButton btnVolver = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnVolverTex)));
-
         btnRegistrar.getImage().setScaling(Scaling.fill);
         btnVolver.getImage().setScaling(Scaling.fill);
 
@@ -273,17 +262,42 @@ public class RegisterScreen implements Screen {
                 String nombre = txtRegNombre.getText().trim();
                 String user = txtRegUser.getText().trim();
                 String pass = txtRegPassword.getText();
+                String lang = ConfiguracionJuego.idiomaActivo.toUpperCase();
 
                 if (nombre.isEmpty() || user.isEmpty() || pass.isEmpty()) {
+                    if (lang.equals("ENG")) {
+                        mostrarVentanaError("All fields are required!");
+                    } else if (lang.equals("FRA")) {
+                        mostrarVentanaError("Champs obligatoires!");
+                    } else if (lang.equals("GAR")) {
+                        mostrarVentanaError("Sun lidan sun!");
+                    } else if (lang.equals("HEB")) {
+                        mostrarVentanaError("שדות חובה!");
+                    } else {
+                        mostrarVentanaError("¡Campos obligatorios!");
+                    }
                     return;
                 }
                 if (!esContrasenaSegura(pass)) {
+                    if (lang.equals("ENG")) {
+                        mostrarVentanaError("Password is not safe enough!");
+                    } else if (lang.equals("FRA")) {
+                        mostrarVentanaError("Mot de passe non sécurisé!");
+                    } else if (lang.equals("GAR")) {
+                        mostrarVentanaError("Password igendi buiti!");
+                    } else if (lang.equals("HEB")) {
+                        mostrarVentanaError("סיסמה לא בטוחה!");
+                    } else {
+                        mostrarVentanaError("¡Contraseña insegura!");
+                    }
                     return;
                 }
 
                 String resultado = SistemaAutenticacion.registrarNuevoUsuario(user, pass, nombre, rutaImagenSeleccionada);
                 if (resultado.equals("REGISTRO_EXITOSO")) {
                     parentGame.setScreen(new LoginRegisterScreen(parentGame));
+                } else {
+                    mostrarVentanaError(resultado);
                 }
             }
         });
@@ -298,31 +312,133 @@ public class RegisterScreen implements Screen {
         Table filaBotones = new Table();
         filaBotones.add(btnVolver).width(55).height(55).padRight(40);
         filaBotones.add(btnRegistrar).width(135).height(50);
-
         contenedorCentral.add(filaBotones).center();
+    }
+
+    private void mostrarVentanaError(String mensaje) {
+        if (contenedorFlotanteAlerta != null) {
+            contenedorFlotanteAlerta.remove();
+        }
+
+        contenedorFlotanteAlerta = new Table();
+        contenedorFlotanteAlerta.setFillParent(true);
+        contenedorFlotanteAlerta.center();
+
+        Table cuadroInterno = new Table();
+        cuadroInterno.setBackground(new TextureRegionDrawable(new TextureRegion(fondoAlertaTex)));
+        cuadroInterno.pad(25);
+
+        Label.LabelStyle estiloMsg = new Label.LabelStyle();
+        Label.LabelStyle estiloBase = skin.get(Label.LabelStyle.class);
+
+        if (estiloBase != null && estiloBase.font != null) {
+            fuenteAlerta = new BitmapFont(estiloBase.font.getData().getFontFile(), false);
+            for (int i = 0; i < fuenteAlerta.getRegions().size; i++) {
+                fuenteAlerta.getRegions().get(i).getTexture().setFilter(
+                        Texture.TextureFilter.Linear, Texture.TextureFilter.Linear
+                );
+            }
+            fuenteAlerta.getData().setScale(1.2f);
+            estiloMsg.font = fuenteAlerta;
+        } else {
+            estiloMsg.font = skin.getFont("default-font");
+        }
+        estiloMsg.fontColor = new Color(0.7f, 0.1f, 0.1f, 1f);
+
+        Label lblMensaje = new Label(mensaje, estiloMsg);
+        lblMensaje.setAlignment(com.badlogic.gdx.utils.Align.center);
+        lblMensaje.setWrap(true);
+        cuadroInterno.add(lblMensaje).width(400).padBottom(25).center().row();
+
+        String btnOkTexto;
+        switch (ConfiguracionJuego.idiomaActivo.toUpperCase()) {
+            case "ENG":
+                btnOkTexto = "Accept";
+                break;
+            case "FRA":
+                btnOkTexto = "Accepter";
+                break;
+            case "GAR":
+                btnOkTexto = "Lere";
+                break;
+            case "HEB":
+                btnOkTexto = "אישור";
+                break;
+            default:
+                btnOkTexto = "Aceptar";
+                break;
+        }
+
+        TextButton btnOk = new TextButton(btnOkTexto, skin);
+        btnOk.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                contenedorFlotanteAlerta.remove();
+            }
+        });
+
+        cuadroInterno.add(btnOk).width(130).height(45).center();
+        contenedorFlotanteAlerta.add(cuadroInterno).width(460).height(240);
+        stage.addActor(contenedorFlotanteAlerta);
     }
 
     private void actualizarVisorAvatar(Image visor, String ruta, boolean esInterno) {
         if (avatarActualTex != null) {
             avatarActualTex.dispose();
         }
-
-        if (esInterno) {
-            avatarActualTex = new Texture(Gdx.files.internal(ruta));
-        } else {
-            avatarActualTex = new Texture(Gdx.files.absolute(ruta));
-        }
-
+        avatarActualTex = esInterno ? new Texture(Gdx.files.internal(ruta)) : new Texture(Gdx.files.absolute(ruta));
         visor.setDrawable(new TextureRegionDrawable(new TextureRegion(avatarActualTex)));
         rutaImagenSeleccionada = ruta;
     }
 
     private void validarContrasenaEnTiempoReal(String password) {
-        actualizarEstadoRequisito(lblReqLongitud, "Minimo 5 caracteres", password.length() >= 5);
-        actualizarEstadoRequisito(lblReqMayuscula, "Al menos una mayuscula", password.matches(".*[A-Z].*"));
-        actualizarEstadoRequisito(lblReqMinuscula, "Al menos una minuscula", password.matches(".*[a-z].*"));
-        actualizarEstadoRequisito(lblReqNumero, "Al menos un numero", password.matches(".*[0-9].*"));
-        actualizarEstadoRequisito(lblReqEspecial, "Un caracter especial", password.matches(".*[!@#$%^&*(),.?\":{}|<>_\\-+=\\[\\]\\\\/].*"));
+        String lang = ConfiguracionJuego.idiomaActivo.toUpperCase();
+
+        String tLong, tMayus, tMinus, tNum, tEsp;
+
+        switch (lang) {
+            case "ENG":
+                tLong = "Minimum 5 characters";
+                tMayus = "At least one uppercase";
+                tMinus = "At least one lowercase";
+                tNum = "At least one number";
+                tEsp = "One special character";
+                break;
+            case "FRA":
+                tLong = "Minimum 5 caractères";
+                tMayus = "Au moins une majuscule";
+                tMinus = "Au moins une minuscule";
+                tNum = "Au moins un chiffre";
+                tEsp = "Un caractère spécial";
+                break;
+            case "GAR":
+                tLong = "Seingü mase bikuenta";
+                tMayus = "Aban aburugu tila";
+                tMinus = "Aban aburugu siri";
+                tNum = "Aban gamberu";
+                tEsp = "Aban laübu bisiama";
+                break;
+            case "HEB":
+                tLong = "לפחות 5 תווים";
+                tMayus = "לפחות אות אחת גדולה";
+                tMinus = "לפחות אות אחת קטנה";
+                tNum = "לפחות מספר אחד";
+                tEsp = "תו מיוחד אחד";
+                break;
+            default:
+                tLong = "Mínimo 5 caracteres";
+                tMayus = "Al menos una mayúscula";
+                tMinus = "Al menos una minúscula";
+                tNum = "Al menos un número";
+                tEsp = "Un carácter especial";
+                break;
+        }
+
+        actualizarEstadoRequisito(lblReqLongitud, tLong, password.length() >= 5);
+        actualizarEstadoRequisito(lblReqMayuscula, tMayus, password.matches(".*[A-Z].*"));
+        actualizarEstadoRequisito(lblReqMinuscula, tMinus, password.matches(".*[a-z].*"));
+        actualizarEstadoRequisito(lblReqNumero, tNum, password.matches(".*[0-9].*"));
+        actualizarEstadoRequisito(lblReqEspecial, tEsp, password.matches(".*[!@#$%^&*(),.?\":{}|<>_\\-+=\\[\\]\\\\/].*"));
     }
 
     private void actualizarEstadoRequisito(Label label, String textoBase, boolean cumplido) {
@@ -396,6 +512,12 @@ public class RegisterScreen implements Screen {
         }
         if (fuenteCampos != null) {
             fuenteCampos.dispose();
+        }
+        if (fondoAlertaTex != null) {
+            fondoAlertaTex.dispose();
+        }
+        if (fuenteAlerta != null) {
+            fuenteAlerta.dispose();
         }
     }
 }
