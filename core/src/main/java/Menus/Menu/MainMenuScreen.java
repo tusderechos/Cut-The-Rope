@@ -12,15 +12,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.tusderechos.Juego.pantallas.PantallaSeleccionNivel;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
+import com.tusderechos.Juego.textos.TextosIdioma;
 
 /**
  *
@@ -35,6 +39,7 @@ public class MainMenuScreen implements Screen {
     private Texture btnJugarTex;
     private Texture btnPerfilTex;
     private Texture btnBuscarJugadoresTex;
+    private Texture btnRankingTex;
     private Texture btnEstadisticasTex;
     private Texture btnCerrarSesionTex;
     private Texture btnConfigTex;
@@ -59,6 +64,7 @@ public class MainMenuScreen implements Screen {
         btnCerrarSesionTex = new Texture(Gdx.files.internal("imgMenus/btn_cerrar_sesion_" + idm + ".png"));
 
         btnBuscarJugadoresTex = new Texture(Gdx.files.internal("imgMenus/buscar_jugadores_" + idm + ".png"));
+        btnRankingTex = CargarTexturaSiExiste(RutasAssetsIdioma.ObtenerRutaBoton("ranking"));
         btnConfigTex = new Texture(Gdx.files.internal("imgMenus/btn_config.png"));
 
         Table rootTable = new Table();
@@ -87,6 +93,7 @@ public class MainMenuScreen implements Screen {
         ImageButton btnJugar = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnJugarTex)));
         ImageButton btnPerfil = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnPerfilTex)));
         ImageButton btnBuscarJugadores = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnBuscarJugadoresTex)));
+        Actor btnRanking = CrearBotonRanking();
         ImageButton btnEstadisticas = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnEstadisticasTex)));
         ImageButton btnCerrarSesion = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnCerrarSesionTex)));
 
@@ -118,6 +125,13 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        btnRanking.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                parentGame.setScreen(new RankingScreen(parentGame));
+            }
+        });
+
         btnEstadisticas.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -136,10 +150,33 @@ public class MainMenuScreen implements Screen {
         contenedorBotones.add(btnJugar).width(245).height(50).padTop(315).padRight(5).row();
         contenedorBotones.add(btnPerfil).width(245).height(50).padTop(22).padRight(5).row();
         contenedorBotones.add(btnBuscarJugadores).width(245).height(50).padTop(22).padRight(5).row();
+        contenedorBotones.add(btnRanking).width(245).height(50).padTop(22).padRight(5).row();
         contenedorBotones.add(btnEstadisticas).width(245).height(50).padTop(22).padRight(5).row();
         contenedorBotones.add(btnCerrarSesion).width(245).height(50).padTop(22).padRight(5).row();
 
         rootTable.add(contenedorBotones).expand().top();
+    }
+
+    private Actor CrearBotonRanking() {
+        if (btnRankingTex != null) {
+            ImageButton BotonRanking = new ImageButton(new TextureRegionDrawable(new TextureRegion(btnRankingTex)));
+            BotonRanking.getImage().setScaling(Scaling.fill);
+            return BotonRanking;
+        }
+
+        TextButton BotonRanking = new TextButton(TextosIdioma.Obtener("Ranking"), skin);
+        BotonRanking.getLabel().setFontScale(2f);
+        return BotonRanking;
+    }
+
+    private Texture CargarTexturaSiExiste(String Ruta) {
+        if (!Gdx.files.internal(Ruta).exists()) {
+            return null;
+        }
+
+        Texture Textura = new Texture(Gdx.files.internal(Ruta));
+        Textura.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        return Textura;
     }
 
     @Override
@@ -189,6 +226,9 @@ public class MainMenuScreen implements Screen {
         }
         if (btnBuscarJugadoresTex != null) {
             btnBuscarJugadoresTex.dispose();
+        }
+        if (btnRankingTex != null) {
+            btnRankingTex.dispose();
         }
         if (btnEstadisticasTex != null) {
             btnEstadisticasTex.dispose();

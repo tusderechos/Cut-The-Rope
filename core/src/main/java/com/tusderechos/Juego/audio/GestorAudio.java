@@ -12,10 +12,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Disposable;
+import Menus.Menu.ConfiguracionJuego;
 
 public final class GestorAudio implements Disposable {
-    private static final float VolumenMusica = 0.22f;
-    private static final float VolumenSonidos = 0.62f;
     private final Music MusicaFondo;
     private final Sound SonidoCortarCuerda;
     private final Sound SonidoEstrella;
@@ -37,7 +36,7 @@ public final class GestorAudio implements Disposable {
             return;
         }
         MusicaFondo.setLooping(true);
-        MusicaFondo.setVolume(VolumenMusica);
+        MusicaFondo.setVolume(VolumenAudio.CalcularVolumenMusicaJuego(ConfiguracionJuego.volumenGeneral));
         MusicaFondo.play();
     }
 
@@ -81,7 +80,7 @@ public final class GestorAudio implements Disposable {
         if (Sonido == null) {
             return;
         }
-        Sonido.play(VolumenSonidos);
+        Sonido.play(VolumenAudio.CalcularVolumenSonidosJuego(ConfiguracionJuego.volumenGeneral));
     }
 
     @Override

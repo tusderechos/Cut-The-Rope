@@ -195,6 +195,22 @@ public final class TextosIdioma {
                 return "Puntaje: %d";
             case "Empate":
                 return "Empate";
+            case "Ranking":
+                return "Ranking";
+            case "RankingGlobal":
+                return "Global";
+            case "RankingAmigos":
+                return "Amigos";
+            case "RankingSinSesion":
+                return "Inicia sesion para ver ranking de amigos";
+            case "RankingVacio":
+                return "No hay puntajes todavia";
+            case "RankingPuntaje":
+                return "%d pts";
+            case "RankingEstrellas":
+                return "%d estrellas";
+            case "RankingNivelMax":
+                return "Nivel max %d";
             default:
                 return Clave;
         }
@@ -322,6 +338,22 @@ public final class TextosIdioma {
                 return "Score: %d";
             case "Empate":
                 return "Tie";
+            case "Ranking":
+                return "Ranking";
+            case "RankingGlobal":
+                return "Global";
+            case "RankingAmigos":
+                return "Friends";
+            case "RankingSinSesion":
+                return "Log in to see friends ranking";
+            case "RankingVacio":
+                return "No scores yet";
+            case "RankingPuntaje":
+                return "%d pts";
+            case "RankingEstrellas":
+                return "%d stars";
+            case "RankingNivelMax":
+                return "Max level %d";
             default:
                 return ObtenerEspanol(Clave);
         }
@@ -449,6 +481,22 @@ public final class TextosIdioma {
                 return "Score: %d";
             case "Empate":
                 return "Egalite";
+            case "Ranking":
+                return "Classement";
+            case "RankingGlobal":
+                return "Global";
+            case "RankingAmigos":
+                return "Amis";
+            case "RankingSinSesion":
+                return "Connecte-toi pour voir le classement amis";
+            case "RankingVacio":
+                return "Aucun score pour l'instant";
+            case "RankingPuntaje":
+                return "%d pts";
+            case "RankingEstrellas":
+                return "%d etoiles";
+            case "RankingNivelMax":
+                return "Niveau max %d";
             default:
                 return ObtenerEspanol(Clave);
         }
@@ -576,6 +624,22 @@ public final class TextosIdioma {
                 return "Puntaje: %d";
             case "Empate":
                 return "Empate";
+            case "Ranking":
+                return "Ranking";
+            case "RankingGlobal":
+                return "Global";
+            case "RankingAmigos":
+                return "Amigos";
+            case "RankingSinSesion":
+                return "Inicia sesion para ver ranking de amigos";
+            case "RankingVacio":
+                return "No hay puntajes todavia";
+            case "RankingPuntaje":
+                return "%d pts";
+            case "RankingEstrellas":
+                return "%d estrellas";
+            case "RankingNivelMax":
+                return "Nivel max %d";
             default:
                 return ObtenerEspanol(Clave);
         }
@@ -703,6 +767,22 @@ public final class TextosIdioma {
                 return "Nikod: %d";
             case "Empate":
                 return "Teko";
+            case "Ranking":
+                return "Dirug";
+            case "RankingGlobal":
+                return "Klali";
+            case "RankingAmigos":
+                return "Chaverim";
+            case "RankingSinSesion":
+                return "Hitchaber kedei lirot dirug chaverim";
+            case "RankingVacio":
+                return "Ein nikud adayin";
+            case "RankingPuntaje":
+                return "%d pts";
+            case "RankingEstrellas":
+                return "%d kochavim";
+            case "RankingNivelMax":
+                return "Shlav max %d";
             default:
                 return ObtenerEspanol(Clave);
         }
