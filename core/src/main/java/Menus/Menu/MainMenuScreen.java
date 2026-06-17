@@ -99,6 +99,7 @@ public class MainMenuScreen implements Screen {
         btnJugar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                AudioManager.getInstancia().detenerMusicaMenu();
                 parentGame.setScreen(new PantallaSeleccionNivel((com.tusderechos.Juego.Juego) parentGame));
             }
         });
