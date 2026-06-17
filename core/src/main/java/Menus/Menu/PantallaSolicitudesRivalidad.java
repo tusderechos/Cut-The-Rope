@@ -38,6 +38,7 @@ import com.tusderechos.Juego.Juego;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.GestorFuentes;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.niveles.DatosNivel;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
@@ -88,10 +89,10 @@ public class PantallaSolicitudesRivalidad implements Screen {
     }
 
     private void CargarTexturas() {
-        TexturaRetos = CargarTextura("imagenes/retos.png");
-        TexturaIniciarReto = CargarTextura("imagenes/iniciar_reto.png");
+        TexturaRetos = CargarTextura(RutasAssetsIdioma.ObtenerRutaBoton("retos"));
+        TexturaIniciarReto = CargarTextura(RutasAssetsIdioma.ObtenerRutaBoton("iniciar_reto"));
         TexturaVolver = CargarTextura("imgMenus/btn_volver.png");
-        TexturaSalir = CargarTextura("imagenes/salir.png");
+        TexturaSalir = CargarTextura(RutasAssetsIdioma.ObtenerRutaBoton("salir"));
         TexturaFondo = CargarTextura("imagenes/fondo_retos.png");
         TexturaMarcoLista = CrearTexturaColor(new Color(0.95f, 0.53f, 0.12f, 0.96f));
         TexturaInteriorLista = CrearTexturaColor(new Color(0.05f, 0.12f, 0.10f, 0.91f));
@@ -360,3 +361,4 @@ public class PantallaSolicitudesRivalidad implements Screen {
         }
     }
 }
+

@@ -33,6 +33,7 @@ import com.tusderechos.Juego.Juego;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.GestorFuentes;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.graficos.RutasTexturas;
 import com.tusderechos.Juego.niveles.DatosNivel;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
@@ -96,7 +97,7 @@ public class PantallaDueloLocal implements Screen {
         int NumeroFondo = Duelo == null ? 1 : Duelo.ObtenerReto().ObtenerNumeroEnCategoria();
         TexturaFondoDuelo = CargarTextura("imagenes/fondo_duelo_local.PNG");
         TexturaFondoNivel = CargarTextura(RutasTexturas.ObtenerFondoNivel(NumeroFondo));
-        TexturaIniciarReto = CargarTextura("imagenes/iniciar_reto.png");
+        TexturaIniciarReto = CargarTextura(RutasAssetsIdioma.ObtenerRutaBoton("iniciar_reto"));
         TexturaVolver = CargarTextura("imgMenus/btn_volver.png");
         TexturaEstrella = CargarTextura("imagenes/estrella.png");
         TexturaEstrellaPlaceholder = CargarTextura("imagenes/estrella_placeholder.png");

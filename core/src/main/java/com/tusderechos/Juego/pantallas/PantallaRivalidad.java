@@ -31,6 +31,7 @@ import com.tusderechos.Juego.enums.CategoriaDificultad;
 import com.tusderechos.Juego.enums.ColorDulce;
 import com.tusderechos.Juego.enums.ColorMonstruo;
 import com.tusderechos.Juego.graficos.GestorFuentes;
+import com.tusderechos.Juego.graficos.RutasAssetsIdioma;
 import com.tusderechos.Juego.niveles.FabricaNiveles;
 import com.tusderechos.Juego.personalizacion.PersonalizacionDulce;
 import com.tusderechos.Juego.personalizacion.PersonalizacionMonstruo;
@@ -166,8 +167,8 @@ public class PantallaRivalidad extends ScreenAdapter {
         TexturaDificil = CargarTextura("imagenes/dificil.png");
         TexturaSumar = CargarTextura("imagenes/sumar.png");
         TexturaRestar = CargarTextura("imagenes/restar.png");
-        TexturaVolver = CargarTextura("imagenes/volver.png");
-        TexturaIniciarReto = CargarTextura("imagenes/iniciar_reto.png");
+        TexturaVolver = CargarTextura(RutasAssetsIdioma.ObtenerRutaBoton("volver"));
+        TexturaIniciarReto = CargarTextura(RutasAssetsIdioma.ObtenerRutaBoton("iniciar_reto"));
     }
 
     private Texture CargarTextura(String Ruta) {
@@ -432,3 +433,4 @@ public class PantallaRivalidad extends ScreenAdapter {
         }
     }
 }
+
