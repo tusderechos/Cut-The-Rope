@@ -100,11 +100,11 @@ public class ConfiguracionScreen implements Screen {
         tablaComponentes.padTop(270).padRight(35);
 
         final Slider sliderVolumen = new Slider(0f, 1f, 0.05f, false, skin);
-        sliderVolumen.setValue(ConfiguracionJuego.volumenGeneral);
+        sliderVolumen.setValue(AudioManager.getInstancia().getVolumen());
         sliderVolumen.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ConfiguracionJuego.guardarVolumen(sliderVolumen.getValue());
+                AudioManager.getInstancia().actualizarVolumen(sliderVolumen.getValue());
             }
         });
         tablaComponentes.add(sliderVolumen).width(210).height(30).center().row();

@@ -44,6 +44,7 @@ import com.tusderechos.Juego.progreso.ProgresoNiveles;
 import Menus.Menu.MainMenuScreen;
 import LogicaArchivos.Usuarios.SistemaAutenticacion;
 import LogicaArchivos.Usuarios.Usuario;
+import Menus.Menu.AudioManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -99,6 +100,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
 
     @Override
     public void show() {
+        AudioManager.getInstancia().reproducirMusicaMenu();
         StageActual = new Stage(new ScreenViewport());
         Fuente = GestorFuentes.CrearFuenteGoodDog(36);
         TexturaBotonPresionado = TexturasInterfaz.CrearTexturaBoton(Color.valueOf("21766d"), Color.valueOf("c6fff0"), Color.valueOf("2fa394"));
@@ -181,6 +183,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         BotonMenuPrincipal.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent Event, Actor ActorActual) {
+                AudioManager.getInstancia().reproducirMusicaMenu();
                 JuegoAplicacion.CambiarPantalla(new MainMenuScreen(JuegoAplicacion));
             }
         });
@@ -226,6 +229,7 @@ public class PantallaSeleccionNivel extends ScreenAdapter {
         Tarjeta.addListener(new ClickListener() {
             @Override
             public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent Event, float X, float Y) {
+                AudioManager.getInstancia().detenerMusicaMenu();
                 JuegoAplicacion.CambiarPantalla(new PantallaJuego(JuegoAplicacion, FabricaNiveles.ObtenerNivel(CategoriaActual, NumeroNivel), new PersonalizacionDulce(ColorDulceActual), new PersonalizacionMonstruo(ColorMonstruoActual)));
             }
         });
