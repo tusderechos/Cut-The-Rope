@@ -47,7 +47,8 @@ import com.tusderechos.Juego.utilidades.ConstantesJuego;
 
 public class PantallaDueloLocal implements Screen {
     private static final int AnchoVentanaDuelo = ConstantesJuego.AnchoVentana * 2 + 140;
-    private static final float EscalaGanadorMaxima = 1.07f;
+    private static final int AltoVentanaDuelo = ConstantesJuego.AltoVentanaEscritorio;
+    private static final float EscalaGanadorMaxima = 1.09f;
     private final Game ParentGame;
     private final DueloLocal Duelo;
     private final ColorDulce ColorDulceActual;
@@ -60,11 +61,13 @@ public class PantallaDueloLocal implements Screen {
     private Texture TexturaFondoNivel;
     private Texture TexturaIniciarReto;
     private Texture TexturaVolver;
+    private Texture TexturaEstrella;
+    private Texture TexturaEstrellaPlaceholder;
     private AnimacionResultadoDueloLocal AnimacionResultadoActual;
     private Table PanelRetador;
     private Table PanelRetado;
-    private Label EstadoRetador;
-    private Label EstadoRetado;
+    private Label PuntajeRetadorLabel;
+    private Label PuntajeRetadoLabel;
     private Label GanadorLabel;
 
     public PantallaDueloLocal(Game ParentGame, DueloLocal Duelo, ColorDulce ColorDulceActual, ColorMonstruo ColorMonstruoActual) {
@@ -78,7 +81,7 @@ public class PantallaDueloLocal implements Screen {
     public void show() {
         StageActual = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(StageActual);
-        Gdx.graphics.setWindowedMode(AnchoVentanaDuelo, ConstantesJuego.AltoVentanaEscritorio);
+        Gdx.graphics.setWindowedMode(AnchoVentanaDuelo, AltoVentanaDuelo);
         SkinActual = SkinMenu.Crear();
         FuenteTitulo = GestorFuentes.CrearFuenteGoodDog(42);
         FuenteTexto = GestorFuentes.CrearFuenteGoodDog(28);
@@ -95,6 +98,8 @@ public class PantallaDueloLocal implements Screen {
         TexturaFondoNivel = CargarTextura(RutasTexturas.ObtenerFondoNivel(NumeroFondo));
         TexturaIniciarReto = CargarTextura("imagenes/iniciar_reto.png");
         TexturaVolver = CargarTextura("imgMenus/btn_volver.png");
+        TexturaEstrella = CargarTextura("imagenes/estrella.png");
+        TexturaEstrellaPlaceholder = CargarTextura("imagenes/estrella_placeholder.png");
     }
 
     private Texture CargarTextura(String Ruta) {
@@ -106,16 +111,12 @@ public class PantallaDueloLocal implements Screen {
 
     private void ConstruirContenido() {
         Image Fondo = new Image(TexturaFondoDuelo);
-        Fondo.setFillParent(true);
+        Fondo.setBounds(0f, 0f, AnchoVentanaDuelo, AltoVentanaDuelo);
         Fondo.setScaling(Scaling.fill);
         StageActual.addActor(Fondo);
 
-        Table Raiz = new Table();
-        Raiz.setFillParent(true);
-        Raiz.pad(16f);
-        StageActual.addActor(Raiz);
-
         ImageButton BotonVolver = CrearBotonImagen(TexturaVolver);
+        BotonVolver.setBounds(34f, 684f, 58f, 58f);
         BotonVolver.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent Event, float X, float Y) {
@@ -123,90 +124,117 @@ public class PantallaDueloLocal implements Screen {
                 ParentGame.setScreen(new MainMenuScreen(ParentGame));
             }
         });
+        StageActual.addActor(BotonVolver);
 
-        Table Encabezado = new Table();
-        Encabezado.add(BotonVolver).width(58).height(58).left();
-        Encabezado.add(CrearLabel("Duelo local", FuenteTitulo, 1f)).expandX().center();
-        Encabezado.add().width(58);
-        Raiz.add(Encabezado).width(AnchoVentanaDuelo - 40).padBottom(12).row();
+        Label Titulo = CrearLabel("Duelo local", FuenteTitulo, 1f);
+        Titulo.setBounds(420f, 694f, 260f, 52f);
+        StageActual.addActor(Titulo);
 
         if (Duelo == null) {
-            Raiz.add(CrearLabel("No se encontro el duelo local", FuenteTitulo, 0.85f)).padTop(120).row();
+            Label Mensaje = CrearLabel("No se encontro el duelo local", FuenteTitulo, 0.85f);
+            Mensaje.setBounds(300f, 360f, 500f, 80f);
+            StageActual.addActor(Mensaje);
             return;
         }
 
-        Table Tableros = new Table();
-        PanelRetador = CrearPanelJugador(Duelo.ObtenerUsernameRetador(), Duelo.ObtenerResultadoRetador(), EsTurnoDe(Duelo.ObtenerUsernameRetador()), true);
-        PanelRetado = CrearPanelJugador(Duelo.ObtenerUsernameRetado(), Duelo.ObtenerResultadoRetado(), EsTurnoDe(Duelo.ObtenerUsernameRetado()), false);
-        Tableros.add(PanelRetador).width(ConstantesJuego.AnchoVentana).height(630);
-        Tableros.add(CrearDivisor()).width(100).height(630).padLeft(12).padRight(12);
-        Tableros.add(PanelRetado).width(ConstantesJuego.AnchoVentana).height(630);
-        Raiz.add(Tableros).row();
-
-        AgregarAccionPrincipal(Raiz);
+        CrearAreaJugador(Duelo.ObtenerUsernameRetador(), Duelo.ObtenerResultadoRetador(), EsTurnoDe(Duelo.ObtenerUsernameRetador()), true, 92f, 122f, 392f, 536f);
+        CrearDivisor();
+        CrearAreaJugador(Duelo.ObtenerUsernameRetado(), Duelo.ObtenerResultadoRetado(), EsTurnoDe(Duelo.ObtenerUsernameRetado()), false, 618f, 122f, 392f, 536f);
+        AgregarAccionPrincipal();
         ActualizarAnimacionResultado(0f);
     }
 
-    private Table CrearPanelJugador(String Username, ResultadoTurnoRivalidad Resultado, boolean Activo, boolean EsRetador) {
-        Table Panel = new Table();
-        Panel.setTransform(true);
-        Panel.setOrigin(Align.center);
-        Panel.setBackground(SkinActual.newDrawable("fondoCampo", Activo ? new Color(0.08f, 0.18f, 0.15f, 0.96f) : new Color(0.03f, 0.05f, 0.06f, 0.94f)));
-        Panel.pad(12f);
+    private void CrearAreaJugador(String Username, ResultadoTurnoRivalidad Resultado, boolean Activo, boolean EsRetador, float X, float Y, float Ancho, float Alto) {
+        Label TituloJugador = CrearLabel(Username, FuenteTitulo, 0.86f);
+        TituloJugador.setBounds(X, Y + Alto + 10f, Ancho, 48f);
+        StageActual.addActor(TituloJugador);
 
-        Label TituloJugador = CrearLabel(Username, FuenteTitulo, 0.9f);
-        Panel.add(TituloJugador).height(50).row();
+        if (Resultado != null) {
+            Table PanelResultado = CrearPanelVictoria(Username, Resultado, EsRetador);
+            PanelResultado.setBounds(X + 36f, Y + 76f, Ancho - 72f, Alto - 132f);
+            PanelResultado.setTransform(true);
+            PanelResultado.setOrigin(Align.center);
+            StageActual.addActor(PanelResultado);
+            if (EsRetador) {
+                PanelRetador = PanelResultado;
+            } else {
+                PanelRetado = PanelResultado;
+            }
+            return;
+        }
 
         Image Preview = new Image(TexturaFondoNivel);
         Preview.setScaling(Scaling.fill);
-        Panel.add(Preview).width(360).height(500).padTop(8).row();
+        Preview.setBounds(X + 18f, Y + 72f, Ancho - 36f, Alto - 116f);
+        StageActual.addActor(Preview);
 
-        Label Estado = CrearLabel(CrearTextoEstadoJugador(Resultado, Activo), FuenteTexto, 0.86f);
-        Panel.add(Estado).height(52).padTop(8);
+        Label Estado = CrearLabel(Activo ? "Listo para jugar" : "Esperando turno", FuenteTexto, 0.86f);
+        Estado.setBounds(X, Y + 18f, Ancho, 40f);
+        StageActual.addActor(Estado);
+    }
+
+    private Table CrearPanelVictoria(String Username, ResultadoTurnoRivalidad Resultado, boolean EsRetador) {
+        Table Panel = new Table();
+        Panel.setBackground(SkinActual.newDrawable("fondoCampo", new Color(0.02f, 0.04f, 0.05f, 0.88f)));
+        Panel.pad(16f);
+
+        Label TituloResultado = CrearLabel("Resultado", FuenteTitulo, 0.78f);
+        Panel.add(TituloResultado).height(42f).row();
+        Panel.add(CrearEstrellas(Resultado.ObtenerEstrellas())).height(54f).padTop(2f).padBottom(10f).row();
+
+        Label Puntaje = CrearLabel("Puntaje: 0", FuenteTexto, 0.82f);
+        Panel.add(Puntaje).height(42f).row();
+        Panel.add(CrearLabel("Estrellas: " + Resultado.ObtenerEstrellas() + "/3", FuenteTexto, 0.76f)).height(36f).row();
+        Panel.add(CrearLabel("Tiempo: " + Math.round(Resultado.ObtenerTiempo()) + " s", FuenteTexto, 0.76f)).height(36f).row();
+        Panel.add(CrearLabel(Username, FuenteTexto, 0.72f)).height(36f).padTop(8f);
+
         if (EsRetador) {
-            EstadoRetador = Estado;
+            PuntajeRetadorLabel = Puntaje;
         } else {
-            EstadoRetado = Estado;
+            PuntajeRetadoLabel = Puntaje;
         }
 
         return Panel;
     }
 
-    private Table CrearDivisor() {
-        Table Divisor = new Table();
-        Divisor.add(CrearLabel("VS", FuenteTitulo, 1.25f)).center().row();
-        String TextoTurno = Duelo.EstaFinalizado() ? "Final" : "Turno de\n" + Duelo.ObtenerUsernameConTurno();
-        Divisor.add(CrearLabel(TextoTurno, FuenteTexto, 0.78f)).width(90).center().padTop(18);
+    private Table CrearEstrellas(int EstrellasGanadas) {
+        Table Fila = new Table();
+        for (int Indice = 1; Indice <= 3; Indice++) {
+            Texture Textura = Indice <= EstrellasGanadas ? TexturaEstrella : TexturaEstrellaPlaceholder;
+            Image Estrella = new Image(Textura);
+            Estrella.setScaling(Scaling.fit);
+            Fila.add(Estrella).width(48f).height(48f).padLeft(4f).padRight(4f);
+        }
 
-        return Divisor;
+        return Fila;
     }
 
-    private void AgregarAccionPrincipal(Table Raiz) {
+    private void CrearDivisor() {
+        Label Vs = CrearLabel("VS", FuenteTitulo, 1.25f);
+        Vs.setBounds(505f, 362f, 90f, 72f);
+        StageActual.addActor(Vs);
+        Label Turno = CrearLabel(Duelo.EstaFinalizado() ? "Final" : "Turno de\n" + Duelo.ObtenerUsernameConTurno(), FuenteTexto, 0.78f);
+        Turno.setBounds(505f, 322f, 90f, 54f);
+        StageActual.addActor(Turno);
+    }
+
+    private void AgregarAccionPrincipal() {
         if (Duelo.EstaFinalizado()) {
             GanadorLabel = CrearLabel("", FuenteTitulo, 0.95f);
             GanadorLabel.setVisible(false);
-            Raiz.add(GanadorLabel).padTop(12).row();
+            GanadorLabel.setBounds(350f, 56f, 400f, 56f);
+            StageActual.addActor(GanadorLabel);
             return;
         }
         ImageButton BotonJugar = CrearBotonImagen(TexturaIniciarReto);
+        BotonJugar.setBounds(440f, 58f, 220f, 58f);
         BotonJugar.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent Event, float X, float Y) {
                 IniciarTurnoActual();
             }
         });
-        Raiz.add(BotonJugar).width(220).height(58).padTop(12);
-    }
-
-    private String CrearTextoEstadoJugador(ResultadoTurnoRivalidad Resultado, boolean Activo) {
-        if (Resultado != null) {
-            return Resultado.ObtenerPuntaje() + " pts / " + Resultado.ObtenerEstrellas() + " estrellas";
-        }
-        if (Activo) {
-            return "Listo para jugar";
-        }
-
-        return "Esperando turno";
+        StageActual.addActor(BotonJugar);
     }
 
     private boolean EsTurnoDe(String Username) {
@@ -227,8 +255,8 @@ public class PantallaDueloLocal implements Screen {
         AnimacionResultadoActual.Avanzar(Delta);
         ResultadoTurnoRivalidad ResultadoRetador = Duelo.ObtenerResultadoRetador();
         ResultadoTurnoRivalidad ResultadoRetado = Duelo.ObtenerResultadoRetado();
-        EstadoRetador.setText(CrearTextoResultadoAnimado(ResultadoRetador, AnimacionResultadoActual.ObtenerPuntajeRetador(ResultadoRetador)));
-        EstadoRetado.setText(CrearTextoResultadoAnimado(ResultadoRetado, AnimacionResultadoActual.ObtenerPuntajeRetado(ResultadoRetado)));
+        PuntajeRetadorLabel.setText("Puntaje: " + AnimacionResultadoActual.ObtenerPuntajeRetador(ResultadoRetador));
+        PuntajeRetadoLabel.setText("Puntaje: " + AnimacionResultadoActual.ObtenerPuntajeRetado(ResultadoRetado));
 
         if (AnimacionResultadoActual.DebeMostrarGanador()) {
             float Progreso = AnimacionResultadoActual.ObtenerProgresoRevealGanador();
@@ -236,14 +264,6 @@ public class PantallaDueloLocal implements Screen {
             GanadorLabel.setVisible(true);
             AplicarHighlightGanador(Progreso);
         }
-    }
-
-    private String CrearTextoResultadoAnimado(ResultadoTurnoRivalidad Resultado, int PuntajeMostrado) {
-        if (Resultado == null) {
-            return "0 pts / 0 estrellas";
-        }
-
-        return PuntajeMostrado + " pts / " + Resultado.ObtenerEstrellas() + " estrellas";
     }
 
     private void AplicarHighlightGanador(float Progreso) {
@@ -260,12 +280,12 @@ public class PantallaDueloLocal implements Screen {
     }
 
     private void AplicarEstadoPanelFinal(Table Panel, boolean Ganador, float Progreso) {
-        float Escala = Ganador ? 1f + ((EscalaGanadorMaxima - 1f) * Progreso) : 1f - (0.05f * Progreso);
-        float Opacidad = Ganador ? 1f : 1f - (0.28f * Progreso);
+        float Escala = Ganador ? 1f + ((EscalaGanadorMaxima - 1f) * Progreso) : 1f - (0.04f * Progreso);
+        float Opacidad = Ganador ? 1f : 1f - (0.24f * Progreso);
         Panel.setScale(Escala);
         Panel.setColor(1f, 1f, 1f, Opacidad);
         if (Ganador) {
-            Panel.setBackground(SkinActual.newDrawable("fondoCampo", new Color(0.12f + (0.18f * Progreso), 0.22f + (0.18f * Progreso), 0.12f, 0.96f)));
+            Panel.setBackground(SkinActual.newDrawable("fondoCampo", new Color(0.13f + (0.20f * Progreso), 0.22f + (0.18f * Progreso), 0.08f, 0.92f)));
         }
     }
 
@@ -335,6 +355,8 @@ public class PantallaDueloLocal implements Screen {
         Disponer(TexturaFondoNivel);
         Disponer(TexturaIniciarReto);
         Disponer(TexturaVolver);
+        Disponer(TexturaEstrella);
+        Disponer(TexturaEstrellaPlaceholder);
     }
 
     private void RestaurarVentanaNormal() {
